@@ -1,3 +1,5 @@
+![Graphium](doc/img/Graphium_Logo.png)
+
 # Graphium
 
 Graphium is an Open Source project to store, manage and version transport graphs. Graph data can be stored from several data providers. With the REST-API imports and management is easy. Graphium is designed for deployment in distributed systems for centralized management and publishing to several servers.
