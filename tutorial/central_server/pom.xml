@@ -1,0 +1,56 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+	<artifactId>graphium-tutorial-central-server</artifactId>
+	<packaging>war</packaging>
+	
+	<name>graphium-central-server</name>
+	<description>Tutorial: template of a Graphium central server</description>
+
+    <parent>
+		<groupId>at.srfg.graphium</groupId>
+		<artifactId>graphium-parent</artifactId>
+		<version>1.0.0</version>
+		<relativePath>../../pom.xml</relativePath>
+ 	</parent>
+ 	 	
+  	<dependencies>
+  	
+  		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-web</artifactId>				
+		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-config</artifactId>	
+		</dependency>
+		
+    	<dependency>
+  			<groupId>at.srfg.graphium</groupId>
+			<artifactId>graphium-core</artifactId>
+			<version>${graphium.version}</version>
+  		</dependency>
+    
+    	<dependency>
+  			<groupId>at.srfg.graphium</groupId>
+			<artifactId>graphium-postgis</artifactId>
+			<version>${graphium.version}</version>
+  		</dependency>
+  		
+    	<dependency>
+  			<groupId>at.srfg.graphium</groupId>
+			<artifactId>graphium-api</artifactId>
+			<version>${graphium.version}</version>
+  		</dependency>
+  		
+  		<dependency>
+  			<groupId>at.srfg.graphium</groupId>
+  			<artifactId>graphium-pixelcuts</artifactId>
+  			<version>${graphium.version}</version>
+  		</dependency>
+  		
+  	</dependencies>
+
+</project>

@@ -1,0 +1,31 @@
+<?xml version = "1.0"?>
+<project name = "graphium-tutorial" basedir = "." default = "usage">
+	
+	<path id="classpath.postgres"> 
+	    <fileset dir="C:/development/maven_repository/org/postgresql/postgresql/42.1.1"> 
+	        <include name="postgresql-42.1.1.jar"/> 
+	    </fileset> 
+	</path> 
+	
+	<target name = "usage">
+		<echo message = ""/>
+		<echo message = "${name} build file"/>
+		<echo message = "-----------------------------------"/>
+		<echo message = ""/>
+		<echo message = "Available targets are:"/>
+		<echo message = ""/>
+		<echo message = "merge_db_files> Merges all incremental create and update scripts into one composite SQL script file"/>
+		<echo message = ""/>
+	</target>
+	
+	<target name = "merge_db_files">
+		<concat destfile="../composite/create_graphium_database.sql">
+		  <path>
+		    <fileset dir="./..">
+		      <include name="*.sql"/>
+		  	</fileset>
+		  </path>
+		</concat>
+	</target>
+
+</project>

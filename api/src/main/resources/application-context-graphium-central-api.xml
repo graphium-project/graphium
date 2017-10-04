@@ -1,0 +1,88 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<!-- central server specific services -->
+	<bean id="subscribedGraphserverImportStateService" class="at.srfg.graphium.api.service.impl.SubscribedGraphserverImportStateServiceImpl">
+		<property name="dao" ref="graphImportStateDao"/>
+		<property name="subscriptionDao" ref="subscriptionDao"/>
+		<property name="metadataService" ref="graphVersionMetadataService"/>
+	</bean>
+	
+	<bean id="graphVersionMetadataAPIService" class="at.srfg.graphium.api.service.impl.GraphVersionMetadataAPIServiceImpl">
+		<property name="adapter" ref="graphVersionMetadata2GraphVersionMetadataDTOAdapter"/>
+		<property name="metadataService" ref="graphVersionMetadataService"/>
+		<property name="importNotifier" ref="graphVersionImportHttpNotifier"/>
+		<property name="validityPeriodValidator" ref="graphVersionValidityPeriodValidator"/>
+	</bean>
+	
+	<!-- notifier -->
+	<bean id="graphVersionImportHttpNotifier" class="at.srfg.graphium.api.events.notifier.impl.GraphVersionImportHttpNotifierImpl">
+		<!-- <property name="credentials">
+			<map>
+				<entry key="${server.notification.url}" value-ref="notificationCredentials" >				
+				</entry>
+			</map>
+		</property> -->
+		<property name="getGraphVersionUrl" value="${graphium.server.getGraphVersion.urlpart}"/>
+		<property name="setGraphVersionStateUrl" value="${graphium.server.setGraphVersionState.urlpart}"/>
+		<property name="notificationUrl" value="${graphium.server.notification.urlpart}"/>
+		<property name="serverName" value="${graphium.server.name}"/>
+		<property name="restTemplate" ref="notificationRestTemplate"/>
+		<!-- <property name="servletContext" ref=""/> -->
+		<property name="subscriptionDao" ref="subscriptionDao"/>
+		<property name="graphImportStateDao" ref="graphImportStateDao"/>
+	</bean>
+	
+  	<!-- Listener -->
+	<bean id="graphVersionImportFinishedListener" class="at.srfg.graphium.api.events.listener.impl.GraphVersionImportFinishedListenerImpl">
+		<property name="subscribedGraphserverImportStateService" ref="subscribedGraphserverImportStateService"/>
+	</bean>
+
+	<bean id="subscriptionApiService" class="at.srfg.graphium.api.service.impl.SubscriptionAPIServiceImpl">
+		<property name="subscriptionService" ref="subscriptionService"/>
+		<property name="adapter" ref="subscription2SubscriptionDTOAdapter"/>
+	</bean>
+	
+	<!-- additional sat/central specific controller configs -->
+	<!-- define controllers -->
+	<bean id="subscriptionApiController" class="at.srfg.graphium.api.controller.SubscriptionApiController">
+		<property name="subscriptionAPIService" ref="subscriptionApiService"/>
+		<property name="localUrl" value="${graphium.server.uri}"/>
+		<property name="localServerName" value="${graphium.server.name}"/>
+	</bean>
+	
+	<!-- enable listener api -->
+    <context:component-scan base-package="at.srfg.graphium.api.controller" />
+    <bean id="eventApiController" class="at.srfg.graphium.api.controller.EventApiController" >
+		<property name="listeners">
+			<map>
+				<entry key="graphVersionImportFinished">
+					<set>
+						<ref bean="graphVersionImportFinishedListener" />
+					</set>			
+				</entry>
+				<entry key="graphVersionImportFailed">
+					<set>
+						<ref bean="graphVersionImportFinishedListener" />
+					</set>			
+				</entry>
+			</map>
+		</property>
+	</bean>		
+	
+</beans>

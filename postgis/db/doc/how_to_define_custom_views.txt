@@ -1,0 +1,236 @@
+Default-View
+============
+
+Bei Anlegen eines neuen Graphen (initialer Import) wird automatisch eine Default-View angelegt. Dessen View-Name setzt sich aus dem Prefix "vw_" und dem 
+Graphnamen zusammen. Die View ist für alle Versionen des Graphen gültig.
+Diese View ist als SQL-View wie folgt definiert:
+
+CREATE OR REPLACE VIEW graphs.vw_gip_at_frc_0_4 AS 
+ SELECT wayseg.id,
+    wayseg.graphversion_id AS wayseg_graphversion_id,
+    st_asewkb(wayseg.geometry) AS wayseg_geometry,
+    wayseg.length AS wayseg_length,
+    wayseg.name AS wayseg_name,
+    wayseg.maxspeed_tow AS wayseg_maxspeed_tow,
+    wayseg.maxspeed_bkw AS wayseg_maxspeed_bkw,
+    wayseg.speed_calc_tow AS wayseg_speed_calc_tow,
+    wayseg.speed_calc_bkw AS wayseg_speed_calc_bkw,
+    wayseg.lanes_tow AS wayseg_lanes_tow,
+    wayseg.lanes_bkw AS wayseg_lanes_bkw,
+    wayseg.frc AS wayseg_frc,
+    wayseg.formofway AS wayseg_formofway,
+    wayseg.streettype AS wayseg_streettype,
+    wayseg.way_id AS wayseg_way_id,
+    wayseg.startnode_id AS wayseg_startnode_id,
+    wayseg.startnode_index AS wayseg_startnode_index,
+    wayseg.endnode_id AS wayseg_endnode_id,
+    wayseg.endnode_index AS wayseg_endnode_index,
+    wayseg.access_tow::integer[] AS wayseg_access_tow,
+    wayseg.access_bkw::integer[] AS wayseg_access_bkw,
+    wayseg.tunnel AS wayseg_tunnel,
+    wayseg.bridge AS wayseg_bridge,
+    wayseg.urban AS wayseg_urban,
+    wayseg."timestamp" AS wayseg_timestamp,
+    wayseg.tags AS wayseg_tags,
+    array_agg(con_start.*::character varying) AS startnodesegments,
+    array_agg(con_end.*::character varying) AS endnodesegments
+   FROM graphs.waysegments wayseg
+   	LEFT OUTER JOIN graphs.waysegment_connections con_start
+	ON (con_start.node_id = wayseg.startnode_id AND con_start.from_segment_id = wayseg.id AND con_start.to_segment_id <> wayseg.id AND con_start.graphversion_id = wayseg.graphversion_id)
+	LEFT OUTER JOIN graphs.waysegment_connections con_end
+	ON (con_end.node_id = wayseg.endnode_id AND con_end.from_segment_id = wayseg.id AND con_end.to_segment_id <> wayseg.id AND con_end.graphversion_id = wayseg.graphversion_id)
+   GROUP BY wayseg.id;   
+
+ALTER TABLE graphs.vw_gip_at_frc_0_4
+  OWNER TO graphserver;
+
+Jede Anfrage über die API hat zur Folge, dass diese View verwendet wird. Das Lesen der eigentlichen Graphversion-Partition wird durch Einschränkung der
+View auf die entsprechende graphversion_id erreicht:
+
+SELECT * FROM graphs.vw_gip_at_frc_0_4 WHERE graphversion_id = 1;
+
+Diese Logik ist in der Klasse ViewParseUtil implementiert. Die graphversion_id wird dabei der Table waygraphmetadata entnommen (über graphname und version selektiert).
+
+
+Custom-View
+===========
+
+Soll zusätzlich eine Custom-View angelegt werden, in der mehr oder weniger Attribute bzw. zusätzlich weitere Tables über einen Join ausgelesen werden sollen,
+muss Folgendes berücksichtigt werden:
+
+- Der Viewname muss das Prefix "vw_" besitzen.
+- Für WaySegment-Tables muss das entsprechende Prefix verwendet werden. Dieses ist im zugehörigen RowMapper definiert und wird von diesem zum Auslesen der Attribute benötigt.
+- Die Angabe der selektierten Attribute muss einzeln erfolgen (z.B. wayseg.tunnel AS wayseg_tunnel).
+- Wird für eine Join-Table die graphversion_id als Selektionskriterium benötigt, kann die graphversion_id der waysegments verwendet werden.
+- Wird für eine Join-Table die graph_id als Selektionskriterium benötigt, muss diese über ein Sub-Select auf die Table waygraphmetadata
+  ausgelesen werden.
+- Einschränkungen wie LIMIT dürfen NICHT VERWENDET werden! Ansonsten kann die Filterung auf graphversion_id nicht korrekt erfolgen.
+- Die neue View muss Leserechte für den Benutzer besitzen, mit dem der Graphserver betrieben wird.
+- Es muss zusätzlich ein Eintrag in der Table waygraph_view_metadata erfolgen. Dieser dient zur Registrierung eines Custom-Views im Graphium-System.
+  Wichtig ist hier die korrekte Belegung der Attribute:
+  - viewname: Name des Views ohne Prefix "vw_"
+  - dbviewname: Name des Views mit Prefix "vw_"
+  Beispiel:
+    "gip_at_frc_0_4";5;"";0;0;"";"2017-05-09 09:13:44.743+02";"vw_gip_at_frc_0_4";TRUE
+
+
+Beispiel Einschränkung auf FRC:
+===============================
+CREATE OR REPLACE VIEW graphs.vw_gip_at_frc_0 AS 
+ SELECT wayseg.id,
+    wayseg.graphversion_id AS wayseg_graphversion_id,
+    st_asewkb(wayseg.geometry) AS wayseg_geometry,
+    wayseg.length AS wayseg_length,
+    wayseg.name AS wayseg_name,
+    wayseg.maxspeed_tow AS wayseg_maxspeed_tow,
+    wayseg.maxspeed_bkw AS wayseg_maxspeed_bkw,
+    wayseg.speed_calc_tow AS wayseg_speed_calc_tow,
+    wayseg.speed_calc_bkw AS wayseg_speed_calc_bkw,
+    wayseg.lanes_tow AS wayseg_lanes_tow,
+    wayseg.lanes_bkw AS wayseg_lanes_bkw,
+    wayseg.frc AS wayseg_frc,
+    wayseg.formofway AS wayseg_formofway,
+    wayseg.streettype AS wayseg_streettype,
+    wayseg.way_id AS wayseg_way_id,
+    wayseg.startnode_id AS wayseg_startnode_id,
+    wayseg.startnode_index AS wayseg_startnode_index,
+    wayseg.endnode_id AS wayseg_endnode_id,
+    wayseg.endnode_index AS wayseg_endnode_index,
+    wayseg.access_tow::integer[] AS wayseg_access_tow,
+    wayseg.access_bkw::integer[] AS wayseg_access_bkw,
+    wayseg.tunnel AS wayseg_tunnel,
+    wayseg.bridge AS wayseg_bridge,
+    wayseg.urban AS wayseg_urban,
+    wayseg."timestamp" AS wayseg_timestamp,
+    wayseg.tags AS wayseg_tags,
+    array_agg(con_start.*::character varying) AS startnodesegments,
+    array_agg(con_end.*::character varying) AS endnodesegments
+   FROM graphs.waysegments wayseg
+   	LEFT OUTER JOIN graphs.waysegment_connections con_start
+	ON (con_start.node_id = wayseg.startnode_id AND con_start.from_segment_id = wayseg.id AND con_start.to_segment_id <> wayseg.id AND con_start.graphversion_id = wayseg.graphversion_id)
+	LEFT OUTER JOIN graphs.waysegment_connections con_end
+	ON (con_end.node_id = wayseg.endnode_id AND con_end.from_segment_id = wayseg.id AND con_end.to_segment_id <> wayseg.id AND con_end.graphversion_id = wayseg.graphversion_id)
+   WHERE wayseg.frc >= 0 AND wayseg.frc < 1;
+
+ALTER TABLE graphs.vw_gip_at_frc_0
+  OWNER TO graphserver;
+  
+Beispiel ohne Connections:
+==========================
+CREATE OR REPLACE VIEW graphs.vw_gip_at_without_conns AS 
+ SELECT wayseg.id,
+    wayseg.graphversion_id AS wayseg_graphversion_id,
+    st_asewkb(wayseg.geometry) AS wayseg_geometry,
+    wayseg.length AS wayseg_length,
+    wayseg.name AS wayseg_name,
+    wayseg.maxspeed_tow AS wayseg_maxspeed_tow,
+    wayseg.maxspeed_bkw AS wayseg_maxspeed_bkw,
+    wayseg.speed_calc_tow AS wayseg_speed_calc_tow,
+    wayseg.speed_calc_bkw AS wayseg_speed_calc_bkw,
+    wayseg.lanes_tow AS wayseg_lanes_tow,
+    wayseg.lanes_bkw AS wayseg_lanes_bkw,
+    wayseg.frc AS wayseg_frc,
+    wayseg.formofway AS wayseg_formofway,
+    wayseg.streettype AS wayseg_streettype,
+    wayseg.way_id AS wayseg_way_id,
+    wayseg.startnode_id AS wayseg_startnode_id,
+    wayseg.startnode_index AS wayseg_startnode_index,
+    wayseg.endnode_id AS wayseg_endnode_id,
+    wayseg.endnode_index AS wayseg_endnode_index,
+    wayseg.access_tow::integer[] AS wayseg_access_tow,
+    wayseg.access_bkw::integer[] AS wayseg_access_bkw,
+    wayseg.tunnel AS wayseg_tunnel,
+    wayseg.bridge AS wayseg_bridge,
+    wayseg.urban AS wayseg_urban,
+    wayseg."timestamp" AS wayseg_timestamp,
+    wayseg.tags AS wayseg_tags,
+    array_agg(con_start.*::character varying) AS startnodesegments,
+    array_agg(con_end.*::character varying) AS endnodesegments
+   FROM graphs.waysegments wayseg
+
+Beispiel mit LEFT OUTER JOIN auf eine XInfo-Table:
+==================================================
+CREATE OR REPLACE VIEW graphs.vw_gip_at_frc_0_4 AS 
+ WITH wayseg AS (
+  SELECT wayseg.id,
+    wayseg.graphversion_id AS wayseg_graphversion_id,
+    st_asewkb(wayseg.geometry) AS wayseg_geometry,
+    wayseg.length AS wayseg_length,
+    wayseg.name AS wayseg_name,
+    wayseg.maxspeed_tow AS wayseg_maxspeed_tow,
+    wayseg.maxspeed_bkw AS wayseg_maxspeed_bkw,
+    wayseg.speed_calc_tow AS wayseg_speed_calc_tow,
+    wayseg.speed_calc_bkw AS wayseg_speed_calc_bkw,
+    wayseg.lanes_tow AS wayseg_lanes_tow,
+    wayseg.lanes_bkw AS wayseg_lanes_bkw,
+    wayseg.frc AS wayseg_frc,
+    wayseg.formofway AS wayseg_formofway,
+    wayseg.streettype AS wayseg_streettype,
+    wayseg.way_id AS wayseg_way_id,
+    wayseg.startnode_id AS wayseg_startnode_id,
+    wayseg.startnode_index AS wayseg_startnode_index,
+    wayseg.endnode_id AS wayseg_endnode_id,
+    wayseg.endnode_index AS wayseg_endnode_index,
+    wayseg.access_tow::integer[] AS wayseg_access_tow,
+    wayseg.access_bkw::integer[] AS wayseg_access_bkw,
+    wayseg.tunnel AS wayseg_tunnel,
+    wayseg.bridge AS wayseg_bridge,
+    wayseg.urban AS wayseg_urban,
+    wayseg."timestamp" AS wayseg_timestamp,
+    wayseg.tags AS wayseg_tags,
+    array_agg(con_start.*::character varying) AS startnodesegments,
+    array_agg(con_end.*::character varying) AS endnodesegments
+   FROM graphs.waysegments wayseg
+   	LEFT OUTER JOIN graphs.waysegment_connections con_start
+	ON (con_start.node_id = wayseg.startnode_id AND con_start.from_segment_id = wayseg.id AND con_start.to_segment_id <> wayseg.id AND con_start.graphversion_id = wayseg.graphversion_id)
+	LEFT OUTER JOIN graphs.waysegment_connections con_end
+	ON (con_end.node_id = wayseg.endnode_id AND con_end.from_segment_id = wayseg.id AND con_end.to_segment_id <> wayseg.id AND con_end.graphversion_id = wayseg.graphversion_id)
+	GROUP BY wayseg.id
+)
+SELECT * FROM wayseg
+LEFT OUTER JOIN graphs.default_xinfo def ON (def.segment_id = wayseg.id)
+ORDER BY id
+
+Beispiel mit LEFT OUTER JOIN auf eine XInfo-Table mit Einschränkung auf graphversion_id:
+========================================================================================
+CREATE OR REPLACE VIEW graphs.vw_gip_at_frc_0_4 AS 
+ WITH wayseg AS (
+  SELECT wayseg.id,
+    wayseg.graphversion_id AS wayseg_graphversion_id,
+    st_asewkb(wayseg.geometry) AS wayseg_geometry,
+    wayseg.length AS wayseg_length,
+    wayseg.name AS wayseg_name,
+    wayseg.maxspeed_tow AS wayseg_maxspeed_tow,
+    wayseg.maxspeed_bkw AS wayseg_maxspeed_bkw,
+    wayseg.speed_calc_tow AS wayseg_speed_calc_tow,
+    wayseg.speed_calc_bkw AS wayseg_speed_calc_bkw,
+    wayseg.lanes_tow AS wayseg_lanes_tow,
+    wayseg.lanes_bkw AS wayseg_lanes_bkw,
+    wayseg.frc AS wayseg_frc,
+    wayseg.formofway AS wayseg_formofway,
+    wayseg.streettype AS wayseg_streettype,
+    wayseg.way_id AS wayseg_way_id,
+    wayseg.startnode_id AS wayseg_startnode_id,
+    wayseg.startnode_index AS wayseg_startnode_index,
+    wayseg.endnode_id AS wayseg_endnode_id,
+    wayseg.endnode_index AS wayseg_endnode_index,
+    wayseg.access_tow::integer[] AS wayseg_access_tow,
+    wayseg.access_bkw::integer[] AS wayseg_access_bkw,
+    wayseg.tunnel AS wayseg_tunnel,
+    wayseg.bridge AS wayseg_bridge,
+    wayseg.urban AS wayseg_urban,
+    wayseg."timestamp" AS wayseg_timestamp,
+    wayseg.tags AS wayseg_tags,
+    array_agg(con_start.*::character varying) AS startnodesegments,
+    array_agg(con_end.*::character varying) AS endnodesegments
+   FROM graphs.waysegments wayseg
+   	LEFT OUTER JOIN graphs.waysegment_connections con_start
+	ON (con_start.node_id = wayseg.startnode_id AND con_start.from_segment_id = wayseg.id AND con_start.to_segment_id <> wayseg.id AND con_start.graphversion_id = wayseg.graphversion_id)
+	LEFT OUTER JOIN graphs.waysegment_connections con_end
+	ON (con_end.node_id = wayseg.endnode_id AND con_end.from_segment_id = wayseg.id AND con_end.to_segment_id <> wayseg.id AND con_end.graphversion_id = wayseg.graphversion_id)
+	GROUP BY wayseg.id
+)
+SELECT * FROM wayseg
+LEFT OUTER JOIN graphs.default_xinfo def ON (def.segment_id = wayseg.id
+  AND def.graphversion_id = wayseg.graphversion_id)
+ORDER BY id

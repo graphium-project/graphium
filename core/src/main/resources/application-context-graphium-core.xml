@@ -1,0 +1,79 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+    	
+	<import resource="classpath:/application-context-graphium-model.xml" />
+	<import resource="classpath:/application-context-graphium-io.xml" />
+		
+	<!-- <bean id="graphVersionCapacitiesConfigurer" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"> -->
+	<bean id="graphVersionCapacitiesPropertiesFactory" class="org.springframework.beans.factory.config.PropertiesFactoryBean"> 
+        <property name="location" value="#{environment.getProperty('graphium.conf.path','classpath:')}graphVersionCapacities.properties" />
+	</bean>
+		
+	<bean id="serverStatus" class="at.srfg.graphium.model.management.impl.ServerStatus" scope="singleton">
+		<constructor-arg name="serverName" value="${graphium.server.name}"/>
+		<constructor-arg name="uri" value="${graphium.server.uri}"/>
+		<constructor-arg name="maxConcurrentImports" value="${graphium.import.maxconcurrentimports}"/>
+	</bean>
+	
+	<!-- registries -->	
+    <bean id="xInfoDaoRegistry" class="at.srfg.graphium.core.persistence.impl.XInfoDaoRegistry" />
+    
+	<!-- services -->
+	<!-- require backing by some persistence application context. e.g. application-context-graphium-postgis.xml, use 
+		application-context-graphium-postgis-aliasing.xml to ensure correct bean names -->
+	<bean id="graphReadService" 
+		class="at.srfg.graphium.core.service.impl.GraphReadServiceImpl">
+		<property name="readDao" ref="wayGraphReadDao"/>
+	</bean>
+	
+	<bean id="graphWriteService" 
+		class="at.srfg.graphium.core.service.impl.GraphWriteServiceImpl">
+		<property name="graphWriteDao" ref="wayGraphWriteDao"/>
+		<property name="metadataDao" ref="wayGraphVersionMetadataDao"/>
+	</bean>
+	
+	<bean id="graphVersionMetadataService" 
+		class="at.srfg.graphium.core.service.impl.GraphVersionMetadataServiceImpl">
+		<property name="metadataDao" ref="wayGraphVersionMetadataDao"/>
+		<property name="viewDao" ref="wayGraphViewDao"/>
+	</bean>
+ 	
+ 	<bean id="graphVersionValidityPeriodValidator" 
+		class="at.srfg.graphium.core.helper.GraphVersionValidityPeriodValidator">
+		<property name="metadataService" ref="graphVersionMetadataService"/>
+	</bean>
+ 	
+	<bean id="subscriptionService" 
+		class="at.srfg.graphium.core.service.impl.SubscriptionServiceImpl">
+		<property name="dao" ref="subscriptionDao"/>
+		<property name="metadataDao" ref="wayGraphVersionMetadataDao"/>
+		<property name="viewDao" ref="wayGraphViewDao"/>
+	</bean>
+	
+	<bean id="graphVersionCapacityManager" 
+		class="at.srfg.graphium.core.observer.impl.GraphVersionCapacityManager">
+		<property name="metadataDao" ref="wayGraphVersionMetadataDao"/>
+		<property name="graphWriteService" ref="graphWriteService"/>
+		<property name="keepMetadata" value="${graphium.server.keepMetadataOnDelete}"/>
+		<property name="properties" ref="graphVersionCapacitiesPropertiesFactory"/>
+		<property name="graphVersionStateModifiedObservables">
+			<list>
+				<ref bean="graphVersionMetadataService"/>
+			</list>
+		</property>
+	</bean>
+	
+</beans>

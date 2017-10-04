@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>at.srfg.graphium</groupId>
+	<artifactId>graphium-parent</artifactId>
+	<version>1.0.0</version>
+	<packaging>pom</packaging>
+
+  	<name>graphium-builder</name>
+	<description>Graphium's Super POM</description>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+        </license>
+    </licenses>
+  
+    <organization>
+    	<name>Salzburg Research Forschungsgesellschaft m.b.H.</name>
+    	<url>https://www.salzburgresearch.at/</url>
+    </organization>
+    
+    <developers>
+        <developer>
+            <id>micwimmer</id>
+            <name>Michael Wimmer</name>
+            <email>michael.wimmer@salzburgresearch.at</email>
+        </developer>
+        <developer>
+            <id>anwagner</id>
+            <name>Andreas Wagner</name>
+            <email>andreas.wagner@salzburgresearch.at</email>
+        </developer>
+        <developer>
+            <id>shennebe</id>
+            <name>Stefan Henneberger</name>
+            <email>stefan.henneberger@salzburgresearch.at</email>
+        </developer>
+    </developers>
+ 	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.3</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.4.3</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.4</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			
+			
+			<!-- License Header Plugin -->
+			
+			<!-- goal: license:format -->
+			
+			<plugin>
+			    <groupId>com.mycila</groupId>
+			    <artifactId>license-maven-plugin</artifactId>
+			    <version>3.0</version>
+			    <configuration>
+					<!-- Those properties have to be defined. If not favored a custom template has to be created. -->
+			        <!-- <header>com/mycila/maven/plugin/license/templates/GPL-3.txt</header> -->
+			        <header>com/mycila/maven/plugin/license/templates/APACHE-2.txt</header>
+			   		<properties>
+			            <owner>Salzburg Research Forschungsgesellschaft</owner>
+			            <email>graphium@salzburgresearch.at</email>
+			            <project.inceptionYear>2017</project.inceptionYear>
+        			</properties>
+        			
+        			<!-- Custom template -->
+        			<!-- <header>src/license/custom_GPL_3_for_mycila.txt</header> -->
+        			
+			        <includes>
+			        	<include>**/*.java</include>
+			        </includes>
+			        <excludes>
+			            <exclude>**/README</exclude>
+			            <exclude>*/src/test/resources/**</exclude>
+			            <exclude>*/src/main/resources/**</exclude>
+			        </excludes>
+			    </configuration>
+			    <executions>
+			        <execution>
+			            <goals>
+			                <goal>format</goal>
+			            </goals>
+			        </execution>
+			    </executions>
+			</plugin>
+			
+		</plugins>
+	</build>
+
+	<properties>
+		<graphium.version>1.0.0</graphium.version>
+		
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<slf4j-log4j12.version>1.7.21</slf4j-log4j12.version>
+		<junit.version>4.12</junit.version>
+		<jts.version>1.13</jts.version>
+		<jackson.json.legacy.version>1.9.6</jackson.json.legacy.version>
+		<jackson.json.version>2.8.2</jackson.json.version>
+        <org.springframework.version>4.3.3.RELEASE</org.springframework.version>
+        <spring-security.version>4.1.3.RELEASE</spring-security.version>
+        <cglib.version>2.2.2</cglib.version>        
+        <commons.lang3.version>3.4</commons.lang3.version>        
+        <org.apache.httpcomponents.version>4.5.2</org.apache.httpcomponents.version>
+	</properties>
+	
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-framework-bom</artifactId>
+				<version>${org.springframework.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			
+			<!-- fix exclusion of commons logging, we always use slf4j and bridges -->
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-core</artifactId>
+				<version>${org.springframework.version}</version>
+				<exclusions>
+            		<exclusion>
+                		<groupId>commons-logging</groupId>
+                		<artifactId>commons-logging</artifactId>
+            		</exclusion>
+        		</exclusions>
+			</dependency>				
+						
+			<dependency>
+			    <groupId>org.springframework.security</groupId>
+			    <artifactId>spring-security-bom</artifactId>
+			    <version>${spring-security.version}</version>
+			    <type>pom</type>
+			    <scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+	
+	<dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+	</dependencies>
+
+  	<modules>
+    	<module>pixelcuts</module>
+    	<module>api</module>
+    	<module>api-client</module>
+    	<module>core</module>
+    	<module>io</module>
+    	<module>model</module>
+    	<module>postgis</module>
+    	<module>utils</module>
+	 	<module>converters/idf2graphium</module>
+	 	<module>converters/osm2graphium</module>
+    	<module>tutorial/model_extension</module>
+    	<module>tutorial/central_server</module>
+  	</modules>
+  
+</project>

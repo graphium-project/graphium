@@ -1,0 +1,55 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>graphium-io</artifactId>
+	<name>graphium-io</name>
+	<description>Input / Output Package for graphium models (Serialisation etc.)	</description>
+
+	<parent>	
+		<groupId>at.srfg.graphium</groupId>
+		<artifactId>graphium-parent</artifactId>
+		<version>1.0.0</version>
+	</parent>
+
+	<dependencies>
+		<!-- ==== graphium modules ==== -->	
+		<dependency>
+			<groupId>at.srfg.graphium</groupId>
+			<artifactId>graphium-model</artifactId>
+			<version>${graphium.version}</version>
+		</dependency>
+		
+		<!-- ==== external dependencies ==== -->
+		<dependency>
+      		<groupId>org.slf4j</groupId>
+      		<artifactId>slf4j-log4j12</artifactId>
+      		<version>${slf4j-log4j12.version}</version>
+    	</dependency>
+    	
+    	<dependency>
+    		<groupId>org.slf4j</groupId>
+    		<artifactId>jcl-over-slf4j</artifactId>
+    		<version>${slf4j-log4j12.version}</version>
+		</dependency>    	    	
+        
+        <dependency>
+		    <groupId>log4j</groupId>
+		    <artifactId>apache-log4j-extras</artifactId>
+		    <version>1.2.17</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>${jackson.json.version}</version>
+		</dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.4</version>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+</project>

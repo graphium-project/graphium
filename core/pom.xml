@@ -1,0 +1,54 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+	<artifactId>graphium-core</artifactId>
+	<packaging>jar</packaging>
+	
+	<name>graphium-core</name>
+	<description>Base Module for graphium graphserver</description>
+
+    <parent>
+		<groupId>at.srfg.graphium</groupId>
+		<artifactId>graphium-parent</artifactId>
+		<version>1.0.0</version>
+ 	</parent>
+ 	
+  	<dependencies>
+
+    	<dependency>
+    		<groupId>at.srfg.graphium </groupId>
+    		<artifactId>graphium-utils</artifactId>
+    		<version>${graphium.version}</version>
+    	</dependency>
+
+    	<dependency>
+    		<groupId>at.srfg.graphium</groupId>
+    		<artifactId>graphium-io</artifactId>
+    		<version>${graphium.version}</version>
+    	</dependency>
+    
+    	<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+		</dependency>
+		
+   		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-tx</artifactId>
+	    </dependency>
+    
+    	<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>${commons.lang3.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+  	</dependencies>
+  	
+</project>

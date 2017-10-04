@@ -1,0 +1,101 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <context:annotation-config />	
+	<mvc:annotation-driven />
+
+	<bean id="importConfigurer" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+        <property name="location" value="#{environment.getProperty('graphium.conf.path','classpath:')}import.properties" />
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+	</bean>
+
+	<bean id="serverConfigurer" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+        <property name="location" value="#{environment.getProperty('graphium.conf.path','classpath:')}server.properties" />
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+	</bean>
+
+	<bean id="multipartResolver"
+        class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!-- max upload size in bytes -->
+        <property name="maxUploadSize" value="4294967296" /> <!-- 4GB -->         
+        <!-- max size of file in memory (in bytes) -->
+        <property name="maxInMemorySize" value="104857600" /> <!-- 100MB -->
+    </bean>
+	
+	<!-- services -->
+	<bean id="baseSegmentXInfoService" class="at.srfg.graphium.api.service.impl.BaseSegmentXInfoService">
+		<property name="inputFormat" ref="jacksonQueuingSegmentInputFormat"/>
+		<property name="serverStatus" ref="serverStatus"/>
+		<property name="queueSize" value="${graphium.import.queueSize}"/>
+		<property name="batchSize" value="${graphium.import.batchSize}"/>
+		<property name="writeDao" ref="wayGraphWriteDao"/>
+		<property name="readDao" ref="baseSegmentReadDao"/>
+		<property name="outputFormatFactory" ref="jacksonSegmentOutputFormatFactory"/>
+	</bean>
+	
+	<bean id="graphService" 
+		class="at.srfg.graphium.api.service.impl.GraphServiceImpl" scope="prototype">
+		<property name="graphReadService" ref="graphReadService"/>
+		<property name="metadataService" ref="graphVersionMetadataService"/>
+		<property name="graphWriteService" ref="graphWriteService"/>
+		<property name="importService" ref="queuingGraphVersionImportService"/>
+		<property name="graphOutputFormatFactory" ref="jacksonWayGraphOutputFormatFactory"/>
+		<property name="graphFileUploadDirectory" value="${graphium.import.uploadDir}"/>
+		<property name="xInfoDaoRegistry" ref="xInfoDaoRegistry"/>
+		<property name="cacheGraphFiles" value="${graphium.import.cacheGraphFiles}"/>
+	</bean>
+	
+	<bean id="serverStatusService" class="at.srfg.graphium.api.service.impl.ServerStatusServiceImpl">
+		<property name="serverStatus" ref="serverStatus"/>
+		<property name="metadataDao" ref="wayGraphVersionMetadataDao"/>
+	</bean>
+	
+	
+	<!-- Notifier -->
+	<bean id="notificationRestTemplate" class="org.springframework.web.client.RestTemplate" />
+	<!-- <bean id="notificationCredentials" class="org.apache.http.auth.UsernamePasswordCredentials" >
+		<constructor-arg name="userName" value="${itsaw.server.notification.username}" />
+		<constructor-arg name="password" value="${itsaw.server.notification.password}" />
+	</bean> -->
+	
+
+	<!-- controllers -->
+	<!-- scan graphium api controllers -->
+	<context:component-scan base-package="at.srfg.graphium.api.controller" />
+	
+	<!-- define controllers -->
+	<bean id="graphVersionMetadataApiController" class="at.srfg.graphium.api.controller.GraphVersionMetadataApiController">
+		<property name="graphVersionMetadataService" ref="graphVersionMetadataAPIService"/>
+	</bean>
+
+ 	<bean id="maintenanceApiController" class="at.srfg.graphium.api.controller.MaintenanceApiController">
+		<property name="serverStatusService" ref="serverStatusService"/>
+	</bean>
+
+	<bean id="genericGraphApiController" 
+		class="at.srfg.graphium.api.controller.GenericGraphApiController" >
+		<property name="graphApiReadService" ref="graphService"/>
+		<property name="metadataService" ref="graphVersionMetadataService"/>
+		<property name="adapter" ref="graphVersionMetadata2GraphVersionMetadataDTOAdapter"/>
+	</bean>
+	
+	<!-- not required would be a specific controller for the type IWaySegment -->
+	<bean id="graphApiController" parent="genericGraphApiController"
+		class="at.srfg.graphium.api.controller.GraphApiController" />
+	
+</beans>

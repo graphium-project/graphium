@@ -1,0 +1,77 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context.xsd">
+	
+	<description>
+		Beans for Input or Output of way segments. Requires (at least) a model factory defined as bean
+		(wayGraphModelFactory Bean). 
+		Can be configuired by simply importing  classpath:/application-context-graphium-model.xml)
+	</description>
+	
+	<!-- input formats -->
+	<bean id="jacksonQueuingSegmentInputFormat"
+    		class="at.srfg.graphium.io.inputformat.impl.jackson.GenericQueuingJacksonSegmentInputFormat" >
+    	<constructor-arg name="adapterRegistry" ref="autodetectingSegmentAdapterRegistry" />    
+    </bean>
+
+    <bean id="jacksonQueuingGraphInputFormat" parent="jacksonQueuingSegmentInputFormat"
+    		class="at.srfg.graphium.io.inputformat.impl.jackson.GenericQueuingJacksonGraphInputFormat" >
+    	<property name="metadataAdapter" ref="graphVersionMetadataDTO2GraphVersionMetadataAdapter"/>
+    </bean>
+
+	<!-- input format which dosn´t do any conversion it just reads the json as base segments dtos (used to input xinfo dtos) -->
+	<bean id="jacksonBaseSegmentDTOInputFormat"
+    		class="at.srfg.graphium.io.inputformat.impl.jackson.JacksonBaseSegmentDTOInputFormat" >
+    	<constructor-arg name="adapterRegistry" ref="autodetectingSegmentAdapterRegistry" />    
+    </bean>
+    
+	<!-- output formats -->
+	<bean id="jacksonSegmentOutputFormatFactory" class="at.srfg.graphium.io.outputformat.impl.jackson.GenericJacksonSegmentOutputFormatFactoryImpl">
+		<constructor-arg name="adapterRegistry" ref="autodetectingSegmentAdapterRegistry" />
+	</bean>
+	
+	<bean id="jacksonWayGraphOutputFormatFactory" class="at.srfg.graphium.io.outputformat.impl.jackson.GenericJacksonWayGraphOutputFormatFactoryImpl">
+		<constructor-arg name="segmentOutputFormatFactory" ref="jacksonSegmentOutputFormatFactory" />
+		<constructor-arg name="adapter" ref="graphVersionMetadata2GraphVersionMetadataDTOAdapter" />
+	</bean>
+	
+	<!-- Registries -->
+	<bean id="autodetectingSegmentAdapterRegistry" class="at.srfg.graphium.core.adapter.registry.AutodetectingSegmentAdapterRegistryImpl" />	
+	
+	<bean id="autodetectingSegmentXinfoAdapterRegistry" class="at.srfg.graphium.core.adapter.registry.AutodetectingSegmentXInfoAdapterRegistryImpl"/>	
+    <bean id="autodetectingConnectionXinfoAdapterRegistry" class="at.srfg.graphium.core.adapter.registry.AutodetectingConnectionXInfoAdapterRegistryImpl"/>	
+	
+	<!-- Adapter -->
+	<bean id="graphVersionMetadata2GraphVersionMetadataDTOAdapter"
+		class="at.srfg.graphium.io.adapter.impl.GraphVersionMetadata2GraphVersionMetadataDTOAdapter">
+	</bean>
+	
+	<bean id="graphVersionMetadataDTO2GraphVersionMetadataAdapter"
+		class="at.srfg.graphium.io.adapter.impl.GraphVersionMetadataDTO2GraphVersionMetadataAdapter">
+	</bean>
+
+	<bean id="abstractSegmentDTOAdapter" class="at.srfg.graphium.io.adapter.impl.AbstractSegmentDTOAdapter" abstract="true">
+		<property name="connectionXInfoAdapterRegistry" ref="autodetectingConnectionXinfoAdapterRegistry"/>
+		<property name="segmentXInfoAdapterRegistry" ref="autodetectingSegmentXinfoAdapterRegistry"/>
+	</bean>
+	
+	<bean id="baseSegment2SegmentDTOAdapter" class="at.srfg.graphium.io.adapter.impl.BaseSegment2SegmentDTOAdapter" parent="abstractSegmentDTOAdapter">
+		<constructor-arg name="dtoClass" value="at.srfg.graphium.io.dto.impl.BaseSegmentDTOImpl" />
+		<constructor-arg name="modelClass" value="at.srfg.graphium.model.impl.BaseSegment" />
+	</bean>
+	<bean id="baseWaySegment2SegmentDTOAdapter" class="at.srfg.graphium.io.adapter.impl.BaseWaySegment2SegmentDTOAdapter" parent="abstractSegmentDTOAdapter"/>
+	<bean id="waySegment2SegmentDTOAdapter" class="at.srfg.graphium.io.adapter.impl.WaySegment2SegmentDTOAdapter" parent="abstractSegmentDTOAdapter"/>
+		
+	<bean id="defaultSegmentXInfoAdapter" class="at.srfg.graphium.io.adapter.impl.DefaultSegmentXInfoAdapter"/>
+	<bean id="defaultConnectionXInfoAdapter" class="at.srfg.graphium.io.adapter.impl.DefaultConnectionXInfoAdapter"/>
+
+	<bean id="subscription2SubscriptionDTOAdapter" class="at.srfg.graphium.io.adapter.impl.Subscription2SubscriptionDTOAdapter"/>
+	
+</beans>

@@ -1,0 +1,99 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- RowMapper -->
+    <bean id="wayGraphSourceRowMapper" class="at.srfg.graphium.postgis.persistence.rowmapper.SourceRowMapper"/>
+    
+    <bean id="wayGraphVersionMetadataRowMapper" class="at.srfg.graphium.postgis.persistence.rowmapper.WayGraphVersionMetadataRowMapper"/>
+  
+    <bean id="wayGraphRowMapper" class="at.srfg.graphium.postgis.persistence.rowmapper.WayGraphRowMapper"/>
+
+    <bean id="wayGraphViewRowMapper" class="at.srfg.graphium.postgis.persistence.rowmapper.WayGraphViewRowMapper"/>
+
+    <bean id="subscriptionRowMapper" class="at.srfg.graphium.postgis.persistence.rowmapper.SubscriptionRowMapper"/>
+
+    <bean id="subscriptionGroupRowMapper" class="at.srfg.graphium.postgis.persistence.rowmapper.SubscriptionGroupRowMapper"/>
+    
+    <bean id="graphImportStateRowMapper" class="at.srfg.graphium.postgis.persistence.rowmapper.GraphImportStateRowMapper"/>
+    
+    <bean id="defaultSegmentXInfoRowMapper" class="at.srfg.graphium.postgis.persistence.rowmapper.DefaultSegmentXInfoRowMapper"/>
+
+    <!-- ResultSetExtractors -->
+    <!-- TODO: prüfen ob threadsafe. eigentlich kann nur der JtsBinaryParser nicht Thread safe sein aber der schaut auch Thread safe aus -->
+    <bean id="waySegmentResultSetExtractor" class="at.srfg.graphium.postgis.persistence.resultsetextractors.WaySegmentResultSetExtractor"/>    
+
+	<!-- dann würds auch keine Lookup method brauchen! -->
+    <bean id="segmentResultSetExtractorFactory" class="at.srfg.graphium.postgis.persistence.resultsetextractors.impl.SegmentResultSetExtractorFactoryImpl">
+    	<lookup-method bean="waySegmentResultSetExtractor" name="createResultSetExtractor"/>
+    	<property name="xInfoRowMapperFactory" ref="segmentXInfoRowMapperFactory"/>
+    </bean>
+
+    <bean id="segmentXInfoRowMapperFactory" class="at.srfg.graphium.postgis.persistence.rowmapper.SegmentXInfoRowMapperFactory"/>
+
+    <!-- DAOs -->
+    <bean id="graphiumAbstractPostgisDao" class="at.srfg.graphium.postgis.persistence.impl.AbstractDaoImpl"
+    	abstract="true">
+    	<property name="dataSource" ref="dataSourceMain"/>
+    	<property name="schema" value="${graphium.db.schema}"/>
+    </bean>
+    
+    <bean id="postgisWayGraphSourceDao" class="at.srfg.graphium.postgis.persistence.impl.SourceDaoImpl" parent="graphiumAbstractPostgisDao">
+    	<property name="dataSource" ref="dataSourceMain"/>
+    	<property name="rowMapper" ref="wayGraphSourceRowMapper"/>
+    </bean>
+    
+    <bean id="postgisWayGraphVersionMetadataDao" class="at.srfg.graphium.postgis.persistence.impl.WayGraphVersionMetadataDaoImpl" 
+     	parent="graphiumAbstractPostgisDao">
+    	<property name="metadataRowMapper" ref="wayGraphVersionMetadataRowMapper"/>
+    	<property name="wayGraphRowMapper" ref="wayGraphRowMapper"/>
+    	<property name="metadataFactory" ref="wayGraphModelFactory"/>
+    </bean>
+    
+    <bean id="postgisWayGraphReadDao" class="at.srfg.graphium.postgis.persistence.impl.WayGraphReadDaoImpl" parent="graphiumAbstractPostgisDao">
+    	<property name="viewDao" ref="wayGraphViewDao"/>
+    	<property name="resultSetExtractorFactory" ref="segmentResultSetExtractorFactory"/>
+    </bean>
+    
+    <bean id="postgisWayGraphWriteDao" class="at.srfg.graphium.postgis.persistence.impl.WayGraphWriteDaoImpl" parent="graphiumAbstractPostgisDao">
+    	<property name="xInfoDaoRegistry" ref="xInfoDaoRegistry"/>
+    	<property name="metadataDao" ref="postgisWayGraphVersionMetadataDao"/>
+    </bean>
+
+    <bean id="postgisWayBaseSegmentReadDao" class="at.srfg.graphium.postgis.persistence.impl.WayBaseSegmentReadDaoImpl">
+        <property name="xInfoDaoRegistry" ref="xInfoDaoRegistry"/>
+        <property name="segmentOutputFormatFactory" ref="jacksonSegmentOutputFormatFactory"/>
+    </bean>
+    
+    <bean id="postgisWayGraphImportDao" class="at.srfg.graphium.postgis.persistence.impl.WayGraphImportDaoImpl" parent="graphiumAbstractPostgisDao">
+    </bean>
+
+    <bean id="postgisWayGraphViewDao" class="at.srfg.graphium.postgis.persistence.impl.WayGraphViewDaoImpl" parent="graphiumAbstractPostgisDao">
+    	<property name="rowMapper" ref="wayGraphViewRowMapper"/>
+    	<property name="waySegmentRowMapper" ref="waySegmentResultSetExtractor"/>
+    </bean>
+
+    <bean id="postgisSubscriptionDao" class="at.srfg.graphium.postgis.persistence.impl.SubscriptionDaoImpl" parent="graphiumAbstractPostgisDao">
+    	<property name="subscriptionRowMapper" ref="subscriptionRowMapper"/>
+    	<property name="subscriptionGroupRowMapper" ref="subscriptionGroupRowMapper"/>
+    </bean>
+
+    <bean id="postgisGraphImportStateDao" class="at.srfg.graphium.postgis.persistence.impl.GraphImportStateDaoImpl" parent="graphiumAbstractPostgisDao">
+    	<property name="rowMapper" ref="graphImportStateRowMapper"/>
+    </bean>
+    
+    <bean id="defaultSegmentXInfoDao" class="at.srfg.graphium.postgis.persistence.impl.DefaultSegmentXInfoDaoImpl" parent="graphiumAbstractPostgisDao">
+    	<property name="fetchSize" value="${graphium.db.fetchsize}"/>
+    	<property name="metadataDao" ref="postgisWayGraphVersionMetadataDao"/>
+    	<property name="resultSetExtractorFactory" ref="segmentResultSetExtractorFactory"/>
+    	<property name="rowMapper" ref="defaultSegmentXInfoRowMapper"/>
+    	<property name="viewDao" ref="postgisWayGraphViewDao"/>
+    </bean>
+</beans>

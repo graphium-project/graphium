@@ -1,0 +1,26 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context.xsd">
+	
+	<!-- Adapter -->
+	<bean id="tutorialAdapter" class="at.srfg.graphium.tutorial.xinfo.adapter.impl.RoadDamageDTOAdapter"/>
+	
+	<!-- row mapper -->
+	<bean id="tutorialRowMapper" class="at.srfg.graphium.tutorial.xinfo.postgis.rowmapper.RoadDamageRowMapper" scope="singleton"/>
+
+	<!-- DAO -->
+    <bean id="tutorialDao" class="at.srfg.graphium.tutorial.xinfo.postgis.dao.RoadDamageDaoImpl" parent="graphiumAbstractPostgisDao">
+    	<property name="viewDao" ref="wayGraphViewDao"/>
+    	<property name="metadataDao" ref="wayGraphVersionMetadataDao"/>
+    	<property name="rowMapper" ref="tutorialRowMapper"/>
+    	<property name="resultSetExtractorFactory" ref="segmentResultSetExtractorFactory"/>
+    </bean>
+	
+</beans>

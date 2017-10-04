@@ -1,0 +1,120 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+ 
+	
+	<!--					cross cutting 						-->
+	<!-- BeanFactory PostProcessor that processes the given properties file
+		and injects the property value found into the respective beans. -->
+	<bean id="dbConfigurer"
+		class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+        <property name="location" value="#{environment.getProperty('graphium.conf.path','classpath:')}db.properties" />
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+		<property name="properties" >
+			<props>
+				<prop key="db.createMode">none</prop>
+			</props>
+		</property>
+	</bean>
+		
+  	<!-- enable the configuration of transactional behavior based on annotations -->
+  	<tx:annotation-driven transaction-manager="transactionManager" />
+  	
+    <!-- datasource transaction manager on main database -->	
+    <bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSourceMain"/>
+	</bean>
+  
+  	<!--  taken from 
+  		http://stackoverflow.com/questions/4190062/configure-spring-datasource-for-hibernate-and-transactional
+  		http://jolbox.com/ (Spring + Lazy Datasource)
+  		avoids checking out a connection at @Transactional borders. if @Transaction succeeds without query (cache hit, etc.)
+  		no database connection will be checked out from pool! -->
+  	<bean id="dataSourceMain"
+    		class="org.springframework.jdbc.datasource.LazyConnectionDataSourceProxy">
+        <property name="targetDataSource">
+			<ref bean="hikariDataSource" />
+        </property>
+    </bean>
+    <bean id="hikariDataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+        <property name="dataSource">
+            <bean class="org.postgresql.ds.PGPoolingDataSource">
+                <property name="url" value="${db.url}"/>
+            </bean>
+        </property>
+        <property name="jdbcUrl" value="${db.url}"/>
+        <property name="username" value="${db.username}"/>
+        <property name="password" value="${db.password}"/>
+        <property name="idleTimeout" value="240000"/>
+        <property name="connectionTimeout" value="60000"/>
+        <property name="maximumPoolSize" value="${db.maxPoolSize}"/>
+    </bean>
+    
+    <!-- Die funktioniert auch mit arrays! -->
+    <!-- <bean id="dataSourceMain"
+    		class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
+        <property name="url" value="${db.url}"/>
+        <property name="username" value="${db.username}"/>
+        <property name="password" value="${db.password}"/>
+		<property name="driverClass" value="${db.driver}"/>
+    </bean> -->
+    
+    <!-- <bean id="dataSourceMain"
+    		class="org.springframework.jdbc.datasource.SingleConnectionDataSource">
+        <property name="url" value="${db.url}"/>
+        <property name="username" value="${db.username}"/>
+        <property name="password" value="${db.password}"/>
+		<property name="driverClassName" value="${db.driver}"/>
+    </bean> -->
+    
+    <!-- <bean id="dataSourceMain"
+    		class="org.springframework.jdbc.datasource.LazyConnectionDataSourceProxy">
+        <property name="targetDataSource">
+			<ref bean="dbcpDataSourceMain" />
+        </property>
+    </bean>
+    <bean id="dbcpDataSourceMain"
+    		class="org.apache.commons.dbcp2.BasicDataSource">
+        <property name="url" value="${db.url}"/>
+        <property name="username" value="${db.username}"/>
+        <property name="password" value="${db.password}"/>
+		<property name="driverClassName" value="${db.driver}"/>
+    </bean> -->
+            
+	<!-- <bean id="dataSourceMain"
+    		class="org.springframework.jdbc.datasource.LazyConnectionDataSourceProxy">
+        <property name="targetDataSource">
+			<ref bean="c3p0DataSourceMain" />
+        </property>
+    </bean>
+    <bean id="c3p0DataSourceMain" 
+          class="com.mchange.v2.c3p0.ComboPooledDataSource" 
+          destroy-method="close">        
+        <property name="driverClass" value="${db.driver}"/>
+        <property name="jdbcUrl" value="${db.url}"/>
+        <property name="user" value="${db.username}"/>
+        <property name="password" value="${db.password}"/>
+        <property name="initialPoolSize" value="${db.initPoolSize}"/>
+        <property name="minPoolSize" value="${db.minPoolSize}"/>
+        <property name="maxPoolSize" value="${db.maxPoolSize}"/>
+        <property name="maxIdleTime" value="200"/>
+        <property name="idleConnectionTestPeriod" value="200"/>
+        <property name="acquireIncrement" value="1"/>
+        <property name="maxStatements" value="50"/>
+        <property name="numHelperThreads" value="3"/>   
+    </bean> -->
+
+</beans>

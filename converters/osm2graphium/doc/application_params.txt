@@ -1,0 +1,1 @@
+-i "D:/development/project_data/osm/austria-latest.osm.pbf" -o "D:/development/project_data/graphserver/osm2graphium/json" -n osm_at -v 161201 -t 4 --highwayTypes "motorway,trunk,primary,secondary,tertiary,motorway_link,trunk_link,primary_link,secondary_link,tertiary_link"
