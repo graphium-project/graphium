@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>at.srfg.graphium</groupId>
 	<artifactId>graphium-parent</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
   	<name>graphium-builder</name>
@@ -113,7 +113,7 @@
 	</build>
 
 	<properties>
-		<graphium.version>1.0.0</graphium.version>
+		<graphium.version>1.0.0-SNAPSHOT</graphium.version>
 		
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<slf4j-log4j12.version>1.7.21</slf4j-log4j12.version>
@@ -184,5 +184,11 @@
     	<module>tutorial/model_extension</module>
     	<module>tutorial/central_server</module>
   	</modules>
+
+	<scm>
+		<connection>scm:git:https://github.com/graphium-project/graphium.git</connection>
+		<url>http://github.com/graphium-project/graphium</url>
+		<developerConnection>scm:git:https://github.com/graphium-project/graphium.git</developerConnection>
+	</scm>
   
 </project>
