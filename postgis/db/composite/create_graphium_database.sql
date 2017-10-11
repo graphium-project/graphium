@@ -29,7 +29,9 @@ CREATE FUNCTION graphs.graphium_version(module char)
 		WHERE module_name = module
 $$
 LANGUAGE SQL;
-
+ALTER TABLE graphs.graphium_version
+  OWNER TO graphium;
+  
 --DROP FUNCTION graphs.graphium_version();
 CREATE FUNCTION graphs.graphium_version()
   RETURNS integer AS $$
@@ -51,6 +53,7 @@ CREATE FUNCTION graphs.db_schema_changed(version integer, script_name char)
 	SELECT graphs.db_schema_changed(version, script_name, 'graphium-core');
 $$
 LANGUAGE SQL;
+
 
 CREATE TABLE graphs.accesses
 (
@@ -213,9 +216,7 @@ INSERT INTO graphs.accesses ("type", id) VALUES ('COMBUSTIBLES', 20);
 INSERT INTO graphs.accesses ("type", id) VALUES ('HAZARDOUS_TO_WATER', 21);
 INSERT INTO graphs.accesses ("type", id) VALUES ('GARBAGE_COLLECTION_VEHICLE', 22);
 
-select graphs.db_schema_changed(1, '01_to_v1_create_base_model.sql');
-
-*/CREATE TABLE graphs.subscription_groups
+select graphs.db_schema_changed(1, '01_to_v1_create_base_model.sql');CREATE TABLE graphs.subscription_groups
 (
   id serial NOT NULL,
   name character varying(255) NOT NULL,
@@ -287,6 +288,7 @@ select graphs.db_schema_changed(2, '02_from_v1_to_v2_create_subscriptions.sql');
 WITH (
   OIDS=FALSE
 );
+ALTER TABLE graphs.waygraph_view_metadata OWNER TO graphium;
 
 select graphs.db_schema_changed(3, '03_from_v2_to_v3_create_views.sql');
 
