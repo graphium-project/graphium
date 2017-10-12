@@ -149,7 +149,7 @@ Example API call to generate a JSON file from GIP data:
 7. Convert OSM File into Graphium's JSON format:
 
    ```
-   java osm2graphium_1.0.0.one-jar -i /data/osm/austria-latest.osm.pbf -o /path/to/output -n osm_at -v 170929 -q 20000 -t 5 –highwayTypes "motorway, motorway_link, primary, primary_link"
+   java -jar osm2graphium_1.0.0.one-jar -i /data/osm/austria-latest.osm.pbf -o /path/to/output -n osm_at -v 170929 -q 20000 -t 5 -highwayTypes "motorway, motorway_link, primary, primary_link"
    ```
 
 8. Import OSM into Graphium central server
