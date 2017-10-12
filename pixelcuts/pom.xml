@@ -11,14 +11,14 @@
     <parent>
 		<groupId>at.srfg.graphium</groupId>
 		<artifactId>graphium-parent</artifactId>
-		<version>1.0.0</version>
+		<version>1.0.0-SNAPSHOT</version>
  	</parent>
  	 
   	<dependencies>
   		<dependency>
 	  		<groupId>at.srfg.graphium</groupId>
 			<artifactId>graphium-postgis</artifactId>
- 			<version>0.7.0</version>
+ 			<version>${graphium.version}</version>
 			<scope>provided</scope>
    		</dependency>
    		
