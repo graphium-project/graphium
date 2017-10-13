@@ -1,4 +1,6 @@
-![Graphium](doc/img/Graphium_Logo.png)
+<p align="right">
+<img src="doc/img/Graphium_Logo.png">
+</p>
 
 # Graphium
 
@@ -10,32 +12,41 @@ Graphium is an Open Source project to store, manage and version transport graphs
 
 There are several providers of transport graph data. Each of them uses its own data format. Using those transport graph data is easy with Graphium. Either use an existing converter or implement an custom one to convert transport graph data into a JSON file. Currently there are converters for OpenStreetMap and GIP (Graph Integration Platform - a joint, nationwide transport graph of Austria) available. The transport graph data is imported into the Graphium server using the JSON file. The Extended Information data model allows to import additional information to the basic transport graph.
 
-![import_from_different_sources](doc/img/import_from_different_sources.png)
+<p align="center">
+<img src="doc/img/import_from_different_sources.png">
+</p>
 
 ### Uniform and expandable data model to fulfill specific use cases
 
 After you have imported the transport graphs, you can access and process the data through its uniform data model. You can also enhance transport graphs and handle additional information.
 
-![uniform_model](doc/img/uniform_model.png)
+<p align="center">
+<img src="doc/img/uniform_model.png">
+</p>
 
 ### Manage time restricted versions
 
 Transport networks and their abstract mapping into digital transport graphs evolve over time. Graphium can import and manage several time restricted versions of one graph. This feature makes it possible to process data for real-time tasks as well as historic data processing.
 
-![versions](doc/img/versions.png)
+<p align="center">
+<img src="doc/img/versions.png">
+</p>
 
 ### Define Views
 
 One major design decision was to keep one (or more) graph version(s) including all kind of data needed and set up various views for data only needed for special use cases. This approach is similar to database views. Hence it is possible to import the whole data of a graph and extract only way segment used by car or by bike using views.
 
-![views](doc/img/views.png)
+<p align="center">
+<img src="doc/img/views.png">
+</p>
 
 ### Publish transport graphs to other servers
 
 Graphium is designed for use in distributed systems. If data processing based on graph data has to be parallalized using a number of machines, graph data has to be distributed and persisted on them. With Graphium it is possible to define one central Graphium server for administration of used graph versions. On worker machines clients - so called satellite Graphium servers - can deployed and subscribe on the central Graphium server for one or more specific views on graph versions. The publishing of graph versions will be done on central Graphium server's side and guarantees a consistent state over all subscribers of one view.
 
-![publishing](doc/img/publishing.png)
-
+<p align="center">
+<img src="doc/img/publishing.png">
+</p>
 
 
 ## Concepts
@@ -50,7 +61,9 @@ The base model is easy to expand if storage of additional data is needed. The en
 
 *PostgreSQL DB Scheme:*
 
-![waysegments_model](doc/img/waysegments_model.png)
+<p align="center">
+<img src="doc/img/waysegments_model.png">
+</p>
 
 ### Views
 
