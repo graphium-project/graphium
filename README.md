@@ -1,5 +1,5 @@
 <p align="right">
-<img src="doc/img/Graphium_Logo.png">
+<img src="doc/img/Graphium_225x130px.svg">
 </p>
 
 # Graphium
