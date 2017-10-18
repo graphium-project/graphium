@@ -14,8 +14,8 @@
 	<dependencies>
 		<dependency>
 			<groupId>at.srfg.graphium</groupId>
-  			<artifactId>graphium-utils</artifactId>
-  			<version>${graphium.version}</version>
-		</dependency>	
+			<artifactId>graphium-utils</artifactId>
+			<version>${graphium.version}</version>
+		</dependency>
 	</dependencies>
 </project>

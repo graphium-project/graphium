@@ -1,6 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>graphium-pixelcuts</artifactId>
 	<packaging>jar</packaging>
@@ -8,26 +8,25 @@
 	<name>graphium-pixelcuts</name>
 	<description>Graphium pixelcuts extension</description>
 
-    <parent>
+	<parent>
 		<groupId>at.srfg.graphium</groupId>
 		<artifactId>graphium-parent</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
- 	</parent>
- 	 
-  	<dependencies>
-  		<dependency>
-	  		<groupId>at.srfg.graphium</groupId>
+	</parent>
+
+	<dependencies>
+		<dependency>
+			<groupId>at.srfg.graphium</groupId>
 			<artifactId>graphium-postgis</artifactId>
- 			<version>${graphium.version}</version>
+			<version>${graphium.version}</version>
 			<scope>provided</scope>
-   		</dependency>
-   		
-   		<dependency>
+		</dependency>
+		
+		<dependency>
 			<groupId>net.sf.trove4j</groupId>
 			<artifactId>trove4j</artifactId>
 			<version>3.0.3</version>
 		</dependency>
-   		
-  	</dependencies>
-  	
+	</dependencies>
+	
 </project>

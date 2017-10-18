@@ -5,14 +5,14 @@
 	<name>graphium-io</name>
 	<description>Input / Output Package for graphium models (Serialisation etc.)	</description>
 
-	<parent>	
+	<parent>
 		<groupId>at.srfg.graphium</groupId>
 		<artifactId>graphium-parent</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 
 	<dependencies>
-		<!-- ==== graphium modules ==== -->	
+		<!-- ==== graphium modules ==== -->
 		<dependency>
 			<groupId>at.srfg.graphium</groupId>
 			<artifactId>graphium-model</artifactId>
@@ -21,21 +21,21 @@
 		
 		<!-- ==== external dependencies ==== -->
 		<dependency>
-      		<groupId>org.slf4j</groupId>
-      		<artifactId>slf4j-log4j12</artifactId>
-      		<version>${slf4j-log4j12.version}</version>
-    	</dependency>
-    	
-    	<dependency>
-    		<groupId>org.slf4j</groupId>
-    		<artifactId>jcl-over-slf4j</artifactId>
-    		<version>${slf4j-log4j12.version}</version>
-		</dependency>    	    	
-        
-        <dependency>
-		    <groupId>log4j</groupId>
-		    <artifactId>apache-log4j-extras</artifactId>
-		    <version>1.2.17</version>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>${slf4j-log4j12.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jcl-over-slf4j</artifactId>
+			<version>${slf4j-log4j12.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>apache-log4j-extras</artifactId>
+			<version>1.2.17</version>
 		</dependency>
 		
 		<dependency>
@@ -43,13 +43,14 @@
 			<artifactId>jackson-databind</artifactId>
 			<version>${jackson.json.version}</version>
 		</dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.4</version>
-            <scope>test</scope>
-        </dependency>
+		
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.4</version>
+			<scope>test</scope>
+		</dependency>
 
-    </dependencies>
+	</dependencies>
 
 </project>
