@@ -29,7 +29,7 @@ CREATE FUNCTION graphs.graphium_version(module char)
 		WHERE module_name = module
 $$
 LANGUAGE SQL;
-ALTER TABLE graphs.graphium_version
+ALTER FUNCTION graphs.graphium_version(char)
   OWNER TO graphium;
   
 --DROP FUNCTION graphs.graphium_version();
