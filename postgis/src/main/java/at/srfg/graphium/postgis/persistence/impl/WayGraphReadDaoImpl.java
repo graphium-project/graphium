@@ -40,11 +40,11 @@ import org.springframework.util.Assert;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
-import at.srfg.geomutils.GeometryUtils;
 import at.srfg.graphium.core.exception.GraphNotExistsException;
 import at.srfg.graphium.core.persistence.IWayGraphReadDao;
 import at.srfg.graphium.core.persistence.IWayGraphViewDao;
 import at.srfg.graphium.core.service.impl.GraphReadOrder;
+import at.srfg.graphium.geomutils.GeometryUtils;
 import at.srfg.graphium.io.exception.WaySegmentSerializationException;
 import at.srfg.graphium.io.outputformat.ISegmentOutputFormat;
 import at.srfg.graphium.io.outputformat.impl.QueueWrappingOutputFormat;

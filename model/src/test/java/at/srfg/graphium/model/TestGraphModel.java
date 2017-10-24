@@ -27,7 +27,7 @@ import org.junit.Test;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.io.ParseException;
 
-import at.srfg.geomutils.GeometryUtils;
+import at.srfg.graphium.geomutils.GeometryUtils;
 import at.srfg.graphium.model.impl.WayGraphModelFactory;
 import at.srfg.graphium.model.impl.WaySegment;
 

@@ -43,9 +43,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.vividsolutions.jts.geom.Point;
 
-import at.srfg.geomutils.GeometryUtils;
 import at.srfg.graphium.core.exception.GraphNotExistsException;
 import at.srfg.graphium.core.persistence.IWayGraphReadDao;
+import at.srfg.graphium.geomutils.GeometryUtils;
 import at.srfg.graphium.io.exception.WaySegmentSerializationException;
 import at.srfg.graphium.io.outputformat.ISegmentOutputFormat;
 import at.srfg.graphium.io.outputformat.ISegmentOutputFormatFactory;

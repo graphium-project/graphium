@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 
-import at.srfg.geomutils.GeometryUtils;
+import at.srfg.graphium.geomutils.GeometryUtils;
 import at.srfg.graphium.model.Access;
 import at.srfg.graphium.model.FormOfWay;
 import at.srfg.graphium.model.FuncRoadClass;

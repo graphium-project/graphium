@@ -21,7 +21,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.srfg.geomutils.GeometryUtils;
+import at.srfg.graphium.geomutils.GeometryUtils;
 import at.srfg.graphium.io.adapter.exception.XInfoNotSupportedException;
 import at.srfg.graphium.io.dto.IBaseWaySegmentDTO;
 import at.srfg.graphium.io.dto.IConnectionXInfoDTO;

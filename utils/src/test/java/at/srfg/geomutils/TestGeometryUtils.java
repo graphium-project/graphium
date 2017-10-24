@@ -27,7 +27,7 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 
-import at.srfg.geomutils.GeometryUtils;
+import at.srfg.graphium.geomutils.GeometryUtils;
 
 /**
  * @author mwimmer

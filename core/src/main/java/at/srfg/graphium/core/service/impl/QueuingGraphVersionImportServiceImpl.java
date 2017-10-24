@@ -36,7 +36,6 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
 
-import at.srfg.geomutils.GeometryUtils;
 import at.srfg.graphium.core.exception.GraphAlreadyExistException;
 import at.srfg.graphium.core.exception.GraphImportException;
 import at.srfg.graphium.core.exception.GraphNotExistsException;
@@ -48,6 +47,7 @@ import at.srfg.graphium.core.persistence.IWayGraphVersionMetadataDao;
 import at.srfg.graphium.core.persistence.IWayGraphViewDao;
 import at.srfg.graphium.core.persistence.IWayGraphWriteDao;
 import at.srfg.graphium.core.service.IGraphVersionImportService;
+import at.srfg.graphium.geomutils.GeometryUtils;
 import at.srfg.graphium.io.adapter.registry.ISegmentAdapterRegistry;
 import at.srfg.graphium.io.dto.IBaseSegmentDTO;
 import at.srfg.graphium.io.inputformat.IQueuingGraphInputFormat;

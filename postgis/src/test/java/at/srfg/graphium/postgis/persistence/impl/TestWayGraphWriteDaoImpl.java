@@ -33,9 +33,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 
-import at.srfg.geomutils.GeometryUtils;
 import at.srfg.graphium.core.exception.GraphStorageException;
 import at.srfg.graphium.core.persistence.IWayGraphWriteDao;
+import at.srfg.graphium.geomutils.GeometryUtils;
 import at.srfg.graphium.model.FuncRoadClass;
 import at.srfg.graphium.model.IWaySegment;
 import at.srfg.graphium.model.impl.WaySegment;
