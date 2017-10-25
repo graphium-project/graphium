@@ -91,7 +91,7 @@ To import transport graph data into Graphium data has to be converted into Graph
 
 Example API call to generate a JSON file from OSM data:
 
-`java osm2graphium_1.0.0.one-jar -i /path/to/osm-at-latest.osm.pbf -o /path/to/output -n osm_at -v 170701 -q 20000 -t 5 –highwayTypes "motorway, motorway_link, primary, primary_link"`
+`java osm2graphium_1.0.0.one-jar.jar -i /path/to/osm-at-latest.osm.pbf -o /path/to/output -n osm_at -v 170701 -q 20000 -t 5 –highwayTypes "motorway, motorway_link, primary, primary_link"`
 
 | short option | long option    | description                              |
 | :----------- | :------------- | ---------------------------------------- |
@@ -111,7 +111,7 @@ Example API call to generate a JSON file from OSM data:
 
 Example API call to generate a JSON file from GIP data:
 
-`java idf2graphium_1.0.0.one-jar -i /path/to/gip-at.txt -o /path/to/output -n gip_at_frc_0_8 -v 16_02_161111 --skip-pixel-cut -import-frcs "0,1,2,3,4,5,6,7,8"`
+`java idf2graphium_1.0.0.one-jar.jar -i /path/to/gip-at.txt -o /path/to/output -n gip_at_frc_0_8 -v 16_02_161111 --skip-pixel-cut -import-frcs "0,1,2,3,4,5,6,7,8"`
 
 | short option | long option                   | Beschreibung                             |
 | ------------ | ----------------------------- | ---------------------------------------- |
@@ -162,7 +162,7 @@ Example API call to generate a JSON file from GIP data:
 7. Convert OSM File into Graphium's JSON format:
 
    ```
-   java -jar osm2graphium_1.0.0.one-jar -i /data/osm/austria-latest.osm.pbf -o /path/to/output -n osm_at -v 170929 -q 20000 -t 5 -highwayTypes "motorway, motorway_link, primary, primary_link"
+   java -jar osm2graphium_1.0.0.one-jar.jar -i /data/osm/austria-latest.osm.pbf -o /path/to/output -n osm_at -v 170929 -q 20000 -t 5 -highwayTypes "motorway, motorway_link, primary, primary_link"
    ```
 
 8. Import OSM into Graphium central server
