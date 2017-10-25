@@ -116,7 +116,7 @@ public class TestWayGraphReadDaoImpl {
 	@Test
 	@Transactional(readOnly=false)
 	@Rollback(value=true)
-	public void testReadSegmentsWithIdFilter() {
+	public void testReadSegmentsWithIdFilter() throws GraphNotExistsException, WaySegmentSerializationException {
 		//gip_at_frc_0_15_10_151217
 //		String viewName = "test_view_gip";
 //		IWayGraph graph = metadataDao.getGraph(1);
@@ -125,21 +125,21 @@ public class TestWayGraphReadDaoImpl {
 //		viewDao.saveView(view);
 		
 		String viewName = "gip_at_frc_0_4";
-		String version = "16_02_160229";
+		String version = "17_02_170627";
 		Set<Long> ids = new HashSet<>();
 		ids.add(901551169L);
 		ids.add(901551109L);
 
 		OutputStream os = new ByteArrayOutputStream();
 		ISegmentOutputFormat<IWaySegment> graphOutputFormat;
-		try {
+//		try {
 			graphOutputFormat = (ISegmentOutputFormat<IWaySegment>) segmentOutputFormatFactory.getSegmentOutputFormat(os);
 //			dao.streamStreetSegments(graphOutputFormat, null, "gip_at_frc_0", "15_10_151217", false, null);
 			
 			dao.streamSegments(graphOutputFormat, viewName, version, ids);
-		} catch (GraphNotExistsException | WaySegmentSerializationException e) {
-			log.error("",e);
-		}
+//		} catch (GraphNotExistsException | WaySegmentSerializationException e) {
+//			log.error("",e);
+//		}
 
 //		
 //		

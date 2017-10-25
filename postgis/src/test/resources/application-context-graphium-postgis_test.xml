@@ -28,18 +28,6 @@
 		<property name="ignoreResourceNotFound" value="true" />		
 	</bean>
 
-    <bean id="gipModelFactory" class="at.srfg.graphium.postgis.gip_import.model.impl.GipModelFactory"/>
-
-    <bean id="gipParserImpl" class="at.srfg.graphium.postgis.gip_import.parser.impl.GipParserImpl">
-    	<property name="modelFactory" ref="gipModelFactory"/>
-    	<property name="segmentFactory" ref="wayGraphModelFactory"/>
-    	<property name="encoding" value="windows-1252" />
-    </bean>
-    
-    <bean id="gipLinkProducerImpl" class="at.srfg.graphium.postgis.gip_import.producer.impl.GipLinkProducerImpl">
-    	<property name="parser" ref="gipParserImpl"/>
-    </bean>
-    
     <!-- <bean id="jacksonSegmentOutputFormatFactory" class="at.srfg.graphium.io.outputformat.impl.jackson.JacksonSegmentOutputFormatFactoryImpl" />
  -->
     <bean id="xInfoTestRowMapper" class="at.srfg.graphium.postgis.persistence.rowmapper.XInfoTestRowMapper" scope="singleton"/>

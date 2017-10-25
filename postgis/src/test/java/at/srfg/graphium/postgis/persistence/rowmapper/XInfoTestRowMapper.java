@@ -47,14 +47,20 @@ public class XInfoTestRowMapper extends AbstractXInfoModelTypeAware<IXInfoTest> 
 	@Override
 	public IBaseSegment mapRow(ResultSet rs, int rowNum) throws SQLException {
 		IXInfoTest xit = new XInfoTest();
-		xit.setSegmentId(rs.getLong(QUERY_PREFIX + "_segment_id"));
-		xit.setDirectedId(rs.getLong(QUERY_PREFIX + "_directed_id"));
-		xit.setDirectionTow(rs.getBoolean(QUERY_PREFIX + "_direction_tow"));
-		xit.setGraphId(rs.getLong(QUERY_PREFIX + "_graph_id"));
-		IBaseSegment segment = new BaseSegment();
-		segment.addXInfo(xit);
-		segment.setId(xit.getSegmentId());
-		return segment;
+		ColumnFinder colFinder = new ColumnFinder(rs);
+		
+		if (colFinder.getColumnIndex(QUERY_PREFIX + "_segment_id") > -1) {
+			xit.setSegmentId(rs.getLong(QUERY_PREFIX + "_segment_id"));
+			xit.setDirectedId(rs.getLong(QUERY_PREFIX + "_directed_id"));
+			xit.setDirectionTow(rs.getBoolean(QUERY_PREFIX + "_direction_tow"));
+			xit.setGraphId(rs.getLong(QUERY_PREFIX + "_graph_id"));
+			IBaseSegment segment = new BaseSegment();
+			segment.addXInfo(xit);
+			segment.setId(xit.getSegmentId());
+			return segment;
+		} else {
+			return null;
+		}
 	}
 
 	@Override
