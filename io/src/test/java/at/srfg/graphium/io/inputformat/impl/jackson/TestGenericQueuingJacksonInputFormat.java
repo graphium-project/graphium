@@ -241,11 +241,8 @@ public class TestGenericQueuingJacksonInputFormat {
     }
 
     @Test
-    public void testDeserializationFromFile() throws IOException, WaySegmentDeserializationException {
-        Path path = Paths.get(this.inputFileName);
-        InputStream inputStream = Files.newInputStream(path);
+    public void testDeserializationSegmentXInfo() throws WaySegmentDeserializationException {
+        InputStream inputStream = new ByteArrayInputStream(this.inputSegmentXInfoTest.getBytes(StandardCharsets.UTF_8));
         this.inputFormat.deserialize(inputStream);
     }
-
-
 }
