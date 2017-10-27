@@ -92,8 +92,8 @@ public class TestWayGraphViewDaoImpl {
 	@Transactional(readOnly=false)
 	@Rollback(value=true)
 	public void testSaveDefaultView() {
-		String graphName = "gip_at_frc_0_4_test_2";
-		String version = "16_02_20160615";
+		String graphName = "osm_at";
+		String version = "1";
 		
 		Map<String, String> tags = new HashMap<String, String>();
 		tags.put("einSinnlosesTag", "holladrio");

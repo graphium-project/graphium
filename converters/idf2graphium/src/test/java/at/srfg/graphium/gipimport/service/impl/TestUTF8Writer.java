@@ -15,6 +15,7 @@
  */
 package at.srfg.graphium.gipimport.service.impl;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -30,6 +31,7 @@ import java.util.List;
  */
 public class TestUTF8Writer {
 
+	@Ignore
     @Test
     public void testWriteURF8() throws IOException {
         Path path = Paths.get("D:/data/vao/Gip_Import/test.sql");

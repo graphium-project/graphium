@@ -16,11 +16,7 @@
 package at.srfg.graphium.postgis.persistence.impl;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,15 +26,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import at.srfg.graphium.core.exception.GraphAlreadyExistException;
+import at.srfg.graphium.core.exception.GraphNotExistsException;
 import at.srfg.graphium.core.persistence.IWayGraphVersionMetadataDao;
-import at.srfg.graphium.model.Access;
 import at.srfg.graphium.model.IWayGraphVersionMetadata;
 import at.srfg.graphium.model.State;
-import at.srfg.graphium.model.management.impl.Source;
-
-import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.io.ParseException;
-import com.vividsolutions.jts.io.WKTReader;
 
 /**
  * @author mwimmer
@@ -50,7 +42,7 @@ import com.vividsolutions.jts.io.WKTReader;
 		"classpath:application-context-graphium-postgis.xml",
 		"classpath:application-context-graphium-postgis-datasource.xml",
 		"classpath:application-context-graphium-postgis-aliasing.xml"})
-public class TestWayGraphVersionMetadataDaoImpl {
+public class TestWayGraphVersionMetadataDaoImpl extends AbstractTestWayGraphWriteDao {
 
 	@Autowired
 	private IWayGraphVersionMetadataDao dao;
@@ -58,36 +50,12 @@ public class TestWayGraphVersionMetadataDaoImpl {
 	@Test
 	@Transactional(readOnly=false)
 	@Rollback(true)
-	public void testGraphVersionMetadataDao() {
+	public void testGraphVersionMetadataDao() throws GraphAlreadyExistException, GraphNotExistsException {
 		String graphName = "testgraph";
-		String version = "1.0";
+		String version = "1_0";
 		Date now = new Date();
-		Map<String, String> tags = new HashMap<String, String>();
-		tags.put("einSinnlosesTag", "holladrio");
-		
-		List<String> graphNames = dao.getGraphs();
-		for (String name : graphNames) {
-			System.out.println("Waygraph '" + name + "'");
-		}
-		
-		if (dao.checkIfGraphExists(graphName)) {
-			System.out.println("Waygraph '" + graphName + "' existiert bereits");
-		} else {
-			System.out.println("Waygraph '" + graphName + "' existiert noch nicht");
-			dao.saveGraph(graphName);
-			System.out.println("Waygraph '" + graphName + "' wurde gespeichert");
-		}
-		
-		IWayGraphVersionMetadata metadata;
-		System.out.println("\nWayGraphVersionMetadata wird erzeugt...");
-		Set<Access> accessTypes = new HashSet<Access>();
-		accessTypes.add(Access.PRIVATE_CAR);
-		metadata = dao.newWayGraphVersionMetadata(0, 1, graphName, version, 
-				graphName, "1.0_orig", State.INITIAL, now, null, getBoundsAustria(), 1000, 2000, accessTypes, tags, new Source(1, ""), 
-				"Graph für Tests", "keine Beschreibung...", now, now, "ich", "http://0815.echt.org");
-		
-		System.out.println("\nWayGraphVersionMetadata wird gespeichert...");
-		dao.saveGraphVersion(metadata);
+
+		IWayGraphVersionMetadata metadata = writeTestMetadata(graphName, version, State.INITIAL);
 		
 		System.out.println("\nLese WayGraphVersionMetadata mit graphname = '" + graphName + "' und version = '" + version + "'...");
 		metadata = dao.getWayGraphVersionMetadata(graphName, version);
@@ -126,19 +94,6 @@ public class TestWayGraphVersionMetadataDaoImpl {
 		metadata = dao.getWayGraphVersionMetadata(metadata.getId());
 		System.out.println(metadata);
 
-	}
-
-	private Polygon getBoundsAustria() {
-		WKTReader reader = new WKTReader();
-		String poly = "POLYGON((9.5282778 46.3704647,9.5282778 49.023522,17.1625438 49.023522,17.1625438 46.3704647,9.5282778 46.3704647))";
-		Polygon bounds = null;
-		try {
-			bounds = (Polygon) reader.read(poly);
-			bounds.setSRID(4326);
-		} catch (ParseException e) {
-			//log.error("error parsing geometry of reference point");
-		}
-		return bounds;
 	}
 
 	@Test

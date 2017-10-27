@@ -31,8 +31,10 @@ import org.postgis.jts.JtsBinaryParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.io.ParseException;
@@ -40,9 +42,12 @@ import com.vividsolutions.jts.io.WKBReader;
 import com.vividsolutions.jts.io.WKBWriter;
 import com.vividsolutions.jts.io.WKTReader;
 
+import at.srfg.graphium.core.exception.GraphAlreadyExistException;
 import at.srfg.graphium.core.exception.GraphNotExistsException;
 import at.srfg.graphium.core.persistence.IWayGraphReadDao;
 import at.srfg.graphium.model.IWaySegment;
+import at.srfg.graphium.model.State;
+import at.srfg.graphium.postgis.persistence.impl.AbstractTestWayGraphWriteDao;
 
 /**
  * @author mwimmer
@@ -51,8 +56,9 @@ import at.srfg.graphium.model.IWaySegment;
 @ContextConfiguration(locations = { "classpath:/application-context-graphium-core.xml",
 		"classpath:application-context-graphium-postgis-datasource.xml",
 		"classpath:application-context-graphium-postgis.xml",
+		"classpath:application-context-graphium-postgis-aliasing.xml",
 		"classpath:application-context-graphium-postgis_test.xml"})
-public class TestWkbWriterAndReader {
+public class TestWkbWriterAndReader extends AbstractTestWayGraphWriteDao {
 
 	private static Logger log = LoggerFactory.getLogger(TestWkbWriterAndReader.class);
 
@@ -64,11 +70,16 @@ public class TestWkbWriterAndReader {
 	private JtsBinaryParser bp = new JtsBinaryParser();
 	
 	@Test
-	public void testWkbWriterAndReader() {
-		String graphName = "gip_at_frc_0_4";
-		String version = "16_02_160229";
+	@Transactional(readOnly=false)
+	@Rollback(true)
+	public void testWkbWriterAndReader() throws GraphAlreadyExistException, GraphNotExistsException {
+		String graphName = "osm_at";
+		String version = "1";
+		writeTestMetadata(graphName, version, State.INITIAL);
+		writeTestSegment(graphName, version);
+		
 		List<Long> segmentIds = new ArrayList<>();
-		segmentIds.add(901456170L);
+		segmentIds.add(Long.MAX_VALUE);
 		List<IWaySegment> segments = null;
 		try {
 			segments = dao.getSegmentsById(graphName, version, segmentIds, false);

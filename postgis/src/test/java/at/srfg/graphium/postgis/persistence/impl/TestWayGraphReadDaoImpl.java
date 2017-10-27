@@ -29,6 +29,7 @@ import javax.annotation.Resource;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -43,6 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.vividsolutions.jts.geom.Point;
 
+import at.srfg.graphium.core.exception.GraphAlreadyExistException;
 import at.srfg.graphium.core.exception.GraphNotExistsException;
 import at.srfg.graphium.core.persistence.IWayGraphReadDao;
 import at.srfg.graphium.geomutils.GeometryUtils;
@@ -51,6 +53,7 @@ import at.srfg.graphium.io.outputformat.ISegmentOutputFormat;
 import at.srfg.graphium.io.outputformat.ISegmentOutputFormatFactory;
 import at.srfg.graphium.model.IBaseSegment;
 import at.srfg.graphium.model.IWaySegment;
+import at.srfg.graphium.model.State;
 import at.srfg.graphium.postgis.persistence.resultsetextractors.ISegmentResultSetExtractorFactory;
 
 /**
@@ -63,7 +66,7 @@ import at.srfg.graphium.postgis.persistence.resultsetextractors.ISegmentResultSe
 		"classpath:application-context-graphium-postgis.xml",
 		"classpath:application-context-graphium-postgis-datasource.xml",
 		"classpath:application-context-graphium-postgis-aliasing.xml"})
-public class TestWayGraphReadDaoImpl {
+public class TestWayGraphReadDaoImpl extends AbstractTestWayGraphWriteDao {
 	
 	private static Logger log = LoggerFactory.getLogger(TestWayGraphReadDaoImpl.class);
 
@@ -76,10 +79,15 @@ public class TestWayGraphReadDaoImpl {
 	@Autowired
 	private ISegmentResultSetExtractorFactory resultSetExtractorFactory;
 
+	private void init(String graphName, String version) throws GraphAlreadyExistException, GraphNotExistsException {
+		writeTestMetadata(graphName, version, State.ACTIVE);
+		writeTestSegment(graphName, version);
+	}
+
 	@Test
 	@Transactional(readOnly=false)
 	@Rollback(value=true)
-	public void testReadSegments() {
+	public void testReadSegments() throws GraphNotExistsException, GraphAlreadyExistException {
 		//gip_at_frc_0_15_10_151217
 //		String viewName = "test_view_gip";
 //		IWayGraph graph = metadataDao.getGraph(1);
@@ -87,14 +95,17 @@ public class TestWayGraphReadDaoImpl {
 //		IWayGraphView view = new WayGraphView(viewName, graph, filter, null, 100, 139, null);
 //		viewDao.saveView(view);
 		
-		String viewName = "gip_at_frc_0_4";
-		
+		String graphName = "osm_at";
+		String version = "1";
+		writeTestMetadata(graphName, version, State.INITIAL);
+		writeTestSegment(graphName, version);
+				
 		OutputStream os = new ByteArrayOutputStream();
 		ISegmentOutputFormat<IWaySegment> graphOutputFormat;
 		try {
 			graphOutputFormat = (ISegmentOutputFormat<IWaySegment>) segmentOutputFormatFactory.getSegmentOutputFormat(os);
 
-			dao.streamSegments(graphOutputFormat, null, viewName, new Date());
+			dao.streamSegments(graphOutputFormat, null, graphName, version);
 		} catch (GraphNotExistsException | WaySegmentSerializationException e) {
 			log.error("",e);
 		}
@@ -116,7 +127,7 @@ public class TestWayGraphReadDaoImpl {
 	@Test
 	@Transactional(readOnly=false)
 	@Rollback(value=true)
-	public void testReadSegmentsWithIdFilter() throws GraphNotExistsException, WaySegmentSerializationException {
+	public void testReadSegmentsWithIdFilter() throws GraphNotExistsException, WaySegmentSerializationException, GraphAlreadyExistException {
 		//gip_at_frc_0_15_10_151217
 //		String viewName = "test_view_gip";
 //		IWayGraph graph = metadataDao.getGraph(1);
@@ -124,46 +135,33 @@ public class TestWayGraphReadDaoImpl {
 //		IWayGraphView view = new WayGraphView(viewName, graph, filter, null, 100, 139, null);
 //		viewDao.saveView(view);
 		
-		String viewName = "gip_at_frc_0_4";
-		String version = "17_02_170627";
+		String graphName = "osm_at";
+		String version = "1";
+		init(graphName, version);
+		
 		Set<Long> ids = new HashSet<>();
-		ids.add(901551169L);
-		ids.add(901551109L);
+		ids.add(Long.MAX_VALUE);
 
 		OutputStream os = new ByteArrayOutputStream();
 		ISegmentOutputFormat<IWaySegment> graphOutputFormat;
-//		try {
-			graphOutputFormat = (ISegmentOutputFormat<IWaySegment>) segmentOutputFormatFactory.getSegmentOutputFormat(os);
-//			dao.streamStreetSegments(graphOutputFormat, null, "gip_at_frc_0", "15_10_151217", false, null);
-			
-			dao.streamSegments(graphOutputFormat, viewName, version, ids);
-//		} catch (GraphNotExistsException | WaySegmentSerializationException e) {
-//			log.error("",e);
-//		}
-
-//		
-//		
-//		ISource source = new Source(1, "neue Source");
-//		
-//		dao.save(source);
-//		
-//		ISource savedSource = dao.getSource(1);
-//		
-//		Assert.notNull(savedSource);
-//
-//		System.out.println(source);
+		graphOutputFormat = (ISegmentOutputFormat<IWaySegment>) segmentOutputFormatFactory.getSegmentOutputFormat(os);
 		
+		dao.streamSegments(graphOutputFormat, graphName, version, ids);
+
 	}
 		
+
 	@Test
-	@Transactional(readOnly=true)
-	public void testGetSegmentById() {
-		String viewName = "gip_at_frc_0_4";
-		String version = "16_02_160229";
-		long segmentId = 901551206;
+	@Transactional(readOnly=false)
+	public void testGetSegmentById() throws GraphAlreadyExistException, GraphNotExistsException {
+		String graphName = "osm_at";
+		String version = "1";
+		init(graphName, version);
+		
+		long segmentId = Long.MAX_VALUE;
 		IWaySegment segment = null;
 		try {
-			segment = dao.getSegmentById(viewName, version, segmentId, true);
+			segment = dao.getSegmentById(graphName, version, segmentId, true);
 		} catch (GraphNotExistsException e) {
 			log.error("",e);
 		}
@@ -172,36 +170,38 @@ public class TestWayGraphReadDaoImpl {
 	}
 	
 	@Test
-	@Transactional(readOnly=true)
-	public void testGetSegmentsById() {
-		String viewName = "gip_at_frc_0_4";
-		String version = "16_02_160229";
-		long segmentId1 = 901551206;
-		long segmentId2 = 901551190;
+	@Transactional(readOnly=false)
+	public void testGetSegmentsById() throws GraphAlreadyExistException, GraphNotExistsException {
+		String graphName = "osm_at";
+		String version = "1";
+		init(graphName, version);
+		
+		long segmentId1 = Long.MAX_VALUE;
 		List<Long> segmentIds = new ArrayList<>();
 		segmentIds.add(segmentId1);
-		segmentIds.add(segmentId2);
 		List<IWaySegment> segments = null;
 		try {
-			segments = dao.getSegmentsById(viewName, version, segmentIds, true);
+			segments = dao.getSegmentsById(graphName, version, segmentIds, true);
 		} catch (GraphNotExistsException e) {
 			log.error("",e);
 		}
 		Assert.assertNotNull(segments);
-		Assert.assertEquals(2, segments.size());
+		Assert.assertEquals(1, segments.size());
 	}
 	
 	@Test
-	@Transactional(readOnly=true)
-	public void testFindNearestSegments() {
-		String viewName = "gip_at_frc_0_4";
-		String version = "16_02_160229";
-		Point referencePoint = GeometryUtils.createPoint2D(13.04378, 47.80464, 4326);
+	@Transactional(readOnly=false)
+	public void testFindNearestSegments() throws GraphAlreadyExistException, GraphNotExistsException {
+		String graphName = "osm_at";
+		String version = "1";
+		init(graphName, version);
+		
+		Point referencePoint = GeometryUtils.createPoint2D(13.10001, 47.10001, 4326);
 		float radiusInKm = 0.2f;
 		int maxNrOfSegments = 10;
 		List<IWaySegment> segments = null;
 		try {
-			segments = dao.findNearestSegments(viewName, version, referencePoint, radiusInKm, maxNrOfSegments);
+			segments = dao.findNearestSegments(graphName, version, referencePoint, radiusInKm, maxNrOfSegments);
 		} catch (GraphNotExistsException e) {
 			log.error("",e);
 		}
@@ -251,7 +251,7 @@ public class TestWayGraphReadDaoImpl {
 	@Rollback(value=true)
 	public void testReadSegmentsWithXInfoTest() {
 		
-		String viewName = "gip_at_frc_0_4_xinfo_test";
+		String viewName = "osm_at_xinfo_test";
 		
 		OutputStream os = new ByteArrayOutputStream();
 		ISegmentOutputFormat<IWaySegment> graphOutputFormat;
@@ -265,6 +265,7 @@ public class TestWayGraphReadDaoImpl {
 	
 	}
 
+	@Ignore
 	@Test
 	public void testResultSetExtractorPrototypeInstantiation() {
 		Set<String> tableAliases = new HashSet<>();

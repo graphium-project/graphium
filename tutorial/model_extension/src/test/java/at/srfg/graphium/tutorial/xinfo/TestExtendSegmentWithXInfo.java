@@ -34,6 +34,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -188,11 +189,13 @@ public class TestExtendSegmentWithXInfo {
 	
 	}
 	
+	@Ignore
 	@Test
 	public void readSegments() throws GraphNotExistsException, WaySegmentSerializationException, InterruptedException {
 		readSegments(graphName, version);
 	}
 	
+	@Ignore
 	@Test
 	public void readSegmentsWithCustomView() throws GraphNotExistsException, WaySegmentSerializationException, InterruptedException {
 		readSegments(customViewName, version);

@@ -75,8 +75,12 @@ public class TestPostgisGraphVersionValidityPeriodValidator {
 	
 	private void initialize() throws ParseException {
 		int sourceId = 815;
-		ISource source = new Source(sourceId, "neue Source");
-		sourceDao.save(source);
+		String sourceName = "neue Source";
+		ISource source = null;
+		if ((source = sourceDao.getSource(sourceName)) == null) {
+			source = new Source(sourceId, sourceName);
+			sourceDao.save(source);
+		}
 
 		String graphName = "testgraph";
 //		String version = "1.0";
@@ -128,19 +132,19 @@ public class TestPostgisGraphVersionValidityPeriodValidator {
 		metadataToUpdate.setValidFrom(df.parse("2017-03-25"));
 		messages = validator.validateValidityPeriod(metadataToUpdate);
 		Assert.assertNotNull(messages);
-		Assert.assertEquals("validFrom overlaps with existing version 1.0", messages.get(0));
+		Assert.assertEquals("new version (2017-03-25 00:00:00 - 2017-05-01 00:00:00) overlaps with existing version 1.0 (2017-03-01 00:00:00 - 2017-03-31 00:00:00)", messages.get(0));
 		
 		metadataToUpdate.setValidTo(df.parse("2017-05-03"));
 		messages = validator.validateValidityPeriod(metadataToUpdate);
 		Assert.assertNotNull(messages);
-		Assert.assertEquals("validFrom overlaps with existing version 1.0", messages.get(0));
-		Assert.assertEquals("validTo overlaps with existing version 3.0", messages.get(1));
+		Assert.assertEquals("new version (2017-03-25 00:00:00 - 2017-05-03 00:00:00) overlaps with existing version 1.0 (2017-03-01 00:00:00 - 2017-03-31 00:00:00)", messages.get(0));
+		Assert.assertEquals("new version (2017-03-25 00:00:00 - 2017-05-03 00:00:00) overlaps with existing version 3.0 (2017-05-01 00:00:00 - 2017-05-31 00:00:00)", messages.get(1));
 
 		metadataToUpdate.setValidFrom(df.parse("2017-04-01"));
 //		metadataToUpdate.setValidTo(df.parse("2017-05-03"));
 		messages = validator.validateValidityPeriod(metadataToUpdate);
 		Assert.assertNotNull(messages);
-		Assert.assertEquals("validTo overlaps with existing version 3.0", messages.get(0));
+		Assert.assertEquals("new version (2017-04-01 00:00:00 - 2017-05-03 00:00:00) overlaps with existing version 3.0 (2017-05-01 00:00:00 - 2017-05-31 00:00:00)", messages.get(0));
 		
 	}
 	

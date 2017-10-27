@@ -32,6 +32,8 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Resource;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -93,7 +95,7 @@ public class TestExtendSegmentWithHstoreTags {
 	@Autowired
 	private ISourceDao sourceDao;
 
-	@Autowired
+	@Resource(name="postgisWayGraphViewDao")
 	private IWayGraphViewDao viewDao;
 
 	@Test

@@ -16,7 +16,6 @@
 package at.srfg.graphium.api;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,9 +34,12 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import at.srfg.graphium.core.exception.GraphAlreadyExistException;
+import at.srfg.graphium.core.exception.GraphNotExistsException;
 import at.srfg.graphium.core.service.impl.GraphVersionMetadataServiceImpl;
 import at.srfg.graphium.model.IWayGraphVersionMetadata;
 
@@ -63,7 +65,7 @@ public class TestGraphApiController {
 	private Map<String,List<String>> graphVersions;
 
 	@Before
-	public void setup() {
+	public void setup() throws GraphNotExistsException, GraphAlreadyExistException {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
 		this.graphVersions = getGraphVersions();
 	}
@@ -85,8 +87,12 @@ public class TestGraphApiController {
 	@Test
 	public void testGetGraph() throws Exception {
 		for (String graphName : this.graphVersions.keySet()) {
-			mockMvc.perform(get("/segments/graphs/" + graphName + "/versions/current"))
-					.andExpect(status().isOk());
+			MvcResult result = mockMvc.perform(get("/metadata/graphs/"))
+					.andReturn();
+			log.info("Status graphs request: " + result.getResponse().getStatus());
+			result = mockMvc.perform(get("/segments/graphs/" + graphName + "/versions/current"))
+					.andReturn();
+			log.info("Status current graph's version request: " + result.getResponse().getStatus());
 		}
 	}
 
@@ -94,8 +100,12 @@ public class TestGraphApiController {
 	public void testGetGraphSegments() throws Exception {
 		for (String graphName : this.graphVersions.keySet()) {
 			for (String version : this.graphVersions.get(graphName)) {
-				mockMvc.perform(get("/segments/graphs/"+ graphName + "/versions/" + version))
-						.andExpect(status().isOk());
+				MvcResult result = mockMvc.perform(get("/metadata/graphs/"))
+						.andReturn();
+				log.info("Status graphs request: " + result.getResponse().getStatus());
+				result = mockMvc.perform(get("/segments/graphs/"+ graphName + "/versions/" + version))
+						.andReturn();
+				log.info("Status current graph's version request: " + result.getResponse().getStatus());
 			}
 		}
 	}

@@ -45,7 +45,10 @@ import at.srfg.graphium.model.management.impl.Source;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "classpath:/application-context-graphium-core.xml",
+		"classpath:application-context-graphium-postgis-datasource.xml",
+		"classpath:application-context-graphium-postgis-aliasing.xml",
 		"classpath:application-context-graphium-postgis.xml",
+		"classpath:application-context-graphium-postgis-services.xml",
 		"classpath:application-context-graphium-postgis_test.xml"})
 public class TestQueuingGraphVersionImportServiceImpl {
 

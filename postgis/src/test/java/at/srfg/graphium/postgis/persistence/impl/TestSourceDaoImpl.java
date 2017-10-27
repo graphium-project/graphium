@@ -45,14 +45,20 @@ public class TestSourceDaoImpl {
 	@Test
 	@Rollback(value=true)
 	public void testStoreAndReadSource() {
-		ISource source = new Source(1, "neue Source");
 		
-		dao.save(source);
+		String sourceName = "neue Source";
 		
-		ISource savedSource = dao.getSource(1);
+		ISource source = dao.getSource(sourceName);
 		
-		Assert.notNull(savedSource);
+		if (source == null) {
+			source = new Source(1, sourceName);
+			dao.save(source);
 
+			ISource savedSource = dao.getSource(sourceName);
+			
+			Assert.notNull(savedSource);
+		}
+		
 		System.out.println(source);
 		
 	}

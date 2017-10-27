@@ -15,31 +15,18 @@
  */
 package at.srfg.graphium.postgis.persistence.impl;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import at.srfg.graphium.core.exception.GraphNotExistsException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineString;
-
-import at.srfg.graphium.core.exception.GraphStorageException;
-import at.srfg.graphium.core.persistence.IWayGraphWriteDao;
-import at.srfg.graphium.geomutils.GeometryUtils;
-import at.srfg.graphium.model.FuncRoadClass;
-import at.srfg.graphium.model.IWaySegment;
-import at.srfg.graphium.model.impl.WaySegment;
-import at.srfg.graphium.postgis.model.impl.XInfoTest;
+import at.srfg.graphium.core.exception.GraphAlreadyExistException;
+import at.srfg.graphium.core.exception.GraphNotExistsException;
+import at.srfg.graphium.model.State;
 
 /**
  * @author mwimmer
@@ -51,55 +38,19 @@ import at.srfg.graphium.postgis.model.impl.XInfoTest;
 		"classpath:application-context-graphium-postgis.xml",
 		"classpath:application-context-graphium-postgis-datasource.xml",
 		"classpath:application-context-graphium-postgis-aliasing.xml"})
-public class TestWayGraphWriteDaoImpl {
+public class TestWayGraphWriteDaoImpl extends AbstractTestWayGraphWriteDao {
 	
 	private static Logger log = LoggerFactory.getLogger(TestWayGraphWriteDaoImpl.class);
 
-	@Autowired
-	private IWayGraphWriteDao<IWaySegment> dao;
-
 	@Test
 	@Transactional(readOnly=false)
-	@Rollback(value=false)
-	public void testReadSegments() throws GraphNotExistsException {
-		WaySegment segment = new WaySegment();
-		Coordinate c1 = new Coordinate(13.1, 47.1);
-		Coordinate c2 = new Coordinate(13.2, 47.2);
-		LineString geom = GeometryUtils.createLineString(new Coordinate[] {c1, c2}, 4326);
-		segment.setId(Long.MAX_VALUE);
-		segment.setGeometry(geom);
-		segment.setMaxSpeedBkw((short)50);
-		segment.setMaxSpeedTow((short)50);
-		segment.setSpeedCalcBkw((short)50);
-		segment.setSpeedCalcTow((short)50);
-		segment.setLanesBkw((short)1);
-		segment.setLanesTow((short)1);
-		segment.setFrc(FuncRoadClass.MOTORWAY_FREEWAY_OR_OTHER_MAJOR_MOTORWAY);
-		segment.setWayId(segment.getId());
-		segment.setStartNodeId(1);
-		segment.setStartNodeIndex(1);
-		segment.setEndNodeId(2);
-		segment.setEndNodeIndex(2);
-		segment.setTimestamp(new Date());
+	@Rollback(value=true)
+	public void testWriteSegments() throws GraphNotExistsException, GraphAlreadyExistException {
+		String graphName = "osm_at";
+		String version = "1";
 		
-		XInfoTest xInfo = new XInfoTest();
-		xInfo.setDirectedId(1);
-		xInfo.setDirectionTow(true);
-		xInfo.setGraphId(1);
-		xInfo.setSegmentId(segment.getId());
-		segment.addXInfo(xInfo);
-		
-		List<IWaySegment> segments = new ArrayList<>();
-		segments.add(segment);
-		
-		String graphName = "gip_at_frc_0_4";
-		String version = "16_02_160415";
-		
-		try {
-			dao.saveSegments(segments, graphName, version);
-		} catch (GraphStorageException e) {
-			log.error("error during storing segments",e);
-		}
-		
+		writeTestMetadata(graphName, version, State.INITIAL);
+		writeTestSegment(graphName, version);
 	}
+	
 }
