@@ -1,7 +1,7 @@
 CREATE EXTENSION IF NOT EXISTS hstore;
 CREATE EXTENSION IF NOT EXISTS postgis;
 
-CREATE SCHEMA IF NOT EXISTS graphs /*AUTHORIZATION graphium*/;
+CREATE SCHEMA IF NOT EXISTS graphs AUTHORIZATION graphium;
 
 -- Table: graphs.schema_versioning
 

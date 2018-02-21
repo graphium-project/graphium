@@ -50,7 +50,7 @@ public class SubtestSourceDaoImpl implements ITestGraphiumPostgis {
 	public void testStoreAndReadSource() {
 		ISource source = new Source(sourceID, sourceName);
 		dao.save(source);
-		ISource savedSource = dao.getSource(sourceID);
+		ISource savedSource = dao.getSource(source.getId());
 		Assert.notNull(savedSource);
 		log.info(source.toString());
 	}

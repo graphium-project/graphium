@@ -17,18 +17,19 @@ package at.srfg.graphium.postgis.persistence.impl;
 
 import java.util.List;
 
-import at.srfg.graphium.ITestGraphiumPostgis;
-import at.srfg.graphium.core.exception.GraphNotExistsException;
-import at.srfg.graphium.core.persistence.IWayGraphVersionMetadataDao;
-import at.srfg.graphium.core.persistence.IWayGraphViewDao;
-import at.srfg.graphium.model.IWayGraph;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 
+import at.srfg.graphium.ITestGraphiumPostgis;
+import at.srfg.graphium.core.exception.GraphNotExistsException;
 import at.srfg.graphium.core.persistence.ISubscriptionDao;
+import at.srfg.graphium.core.persistence.IWayGraphVersionMetadataDao;
+import at.srfg.graphium.core.persistence.IWayGraphViewDao;
+import at.srfg.graphium.model.IWayGraph;
 import at.srfg.graphium.model.management.ISubscription;
 import at.srfg.graphium.model.management.ISubscriptionGroup;
 import at.srfg.graphium.model.management.impl.Subscription;

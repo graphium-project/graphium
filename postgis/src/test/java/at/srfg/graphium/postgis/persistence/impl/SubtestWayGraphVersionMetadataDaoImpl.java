@@ -21,19 +21,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import at.srfg.graphium.HelpMethods;
-import at.srfg.graphium.ITestGraphiumPostgis;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 
+import at.srfg.graphium.HelpMethods;
+import at.srfg.graphium.ITestGraphiumPostgis;
+import at.srfg.graphium.core.persistence.ISourceDao;
 import at.srfg.graphium.core.persistence.IWayGraphVersionMetadataDao;
 import at.srfg.graphium.model.Access;
+import at.srfg.graphium.model.ISource;
+import at.srfg.graphium.model.IWayGraph;
 import at.srfg.graphium.model.IWayGraphVersionMetadata;
 import at.srfg.graphium.model.State;
-import at.srfg.graphium.model.management.impl.Source;
 
 /**
  * @author mwimmer
@@ -44,6 +46,8 @@ public class SubtestWayGraphVersionMetadataDaoImpl implements ITestGraphiumPostg
 
 	@Autowired
 	private IWayGraphVersionMetadataDao dao;
+	@Autowired
+	private ISourceDao sourceDao;
     @Value("${db.graphName}")
     String graphName;
     @Value("${db.graphVersion}")
@@ -52,6 +56,8 @@ public class SubtestWayGraphVersionMetadataDaoImpl implements ITestGraphiumPostg
     Date now;
     @Value("#{${db.tags}}") //assign hashmap using spEL
     Map<String, String> tags;
+	@Value("${db.sourceName}")
+	String sourceName;
 
 	private static Logger log = LoggerFactory.getLogger(SubtestWayGraphVersionMetadataDaoImpl.class);
 
@@ -70,13 +76,16 @@ public class SubtestWayGraphVersionMetadataDaoImpl implements ITestGraphiumPostg
 			log.info("Waygraph '" + graphName + "' wurde gespeichert");
 		}
 		
+		IWayGraph wayGraph = dao.getGraph(graphName);
+		ISource source = sourceDao.getSource(sourceName);
+		
 		IWayGraphVersionMetadata metadata;
 		log.info("\nWayGraphVersionMetadata wird erzeugt...");
 
 		Set<Access> accessTypes = new HashSet<Access>();
 		accessTypes.add(Access.PRIVATE_CAR);
-		metadata = dao.newWayGraphVersionMetadata(0, 1, graphName, version, 
-				graphName, "1.0_orig", State.INITIAL, now, null, HelpMethods.getBoundsAustria(), 1000, 2000, accessTypes, tags, new Source(1, ""),
+		metadata = dao.newWayGraphVersionMetadata(0, wayGraph.getId(), graphName, version, 
+				graphName, "1.0_orig", State.INITIAL, now, null, HelpMethods.getBoundsAustria(), 1000, 2000, accessTypes, tags, source,
 				"Graph für Tests", "keine Beschreibung...", now, now, "ich", "http://0815.echt.org");
 
 		log.info("\nWayGraphVersionMetadata wird gespeichert...");
