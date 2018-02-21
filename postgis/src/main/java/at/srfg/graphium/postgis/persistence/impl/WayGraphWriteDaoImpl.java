@@ -50,7 +50,14 @@ public class WayGraphWriteDaoImpl<W extends IWaySegment> extends WayBaseGraphWri
 		Connection con = getConnection();
 		args.addValue("accessTow",  convertToArray(con, segment.getAccessTow()));
 		args.addValue("accessBkw",  convertToArray(con, segment.getAccessBkw()));
-		
+
+		if (segment.isTunnel() == null) {
+			segment.setTunnel(false);
+		}
+		if (segment.isBridge() == null) {
+			segment.setBridge(false);
+		}
+
 		args.addValue("tunnel", segment.isTunnel());
 		args.addValue("bridge", segment.isBridge());
 		args.addValue("urban", segment.isUrban());

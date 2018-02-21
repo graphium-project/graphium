@@ -34,7 +34,7 @@ import at.srfg.graphium.model.view.IWayGraphView;
  *
  */
 
-public class TestWayGraphViewDaoImpl implements ITestGraphiumPostgis {
+public class SubtestWayGraphViewDaoImpl implements ITestGraphiumPostgis {
 	@Autowired
 	private IWayGraphViewDao dao;
 
@@ -46,7 +46,7 @@ public class TestWayGraphViewDaoImpl implements ITestGraphiumPostgis {
 	@Value("${db.version}")
 	String version;
 
-	private static Logger log = LoggerFactory.getLogger(TestWayGraphViewDaoImpl.class);
+	private static Logger log = LoggerFactory.getLogger(SubtestWayGraphViewDaoImpl.class);
 
 	public IWayGraph saveWayGraph(String graphName, String version) {
 		if (graphName == null) {

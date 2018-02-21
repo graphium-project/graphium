@@ -40,7 +40,7 @@ import at.srfg.graphium.model.view.IWayGraphView;
  *
  */
 
-public class TestSubscriptionDaoImpl implements ITestGraphiumPostgis{
+public class SubtestSubscriptionDaoImpl implements ITestGraphiumPostgis{
 
 	@Autowired
 	private ISubscriptionDao sDao;
@@ -68,7 +68,7 @@ public class TestSubscriptionDaoImpl implements ITestGraphiumPostgis{
     @Value("${db.subscriptionGroupID}")
     int subscriptionID;
 
-	private static Logger log = LoggerFactory.getLogger(TestSubscriptionDaoImpl.class);
+	private static Logger log = LoggerFactory.getLogger(SubtestSubscriptionDaoImpl.class);
 
 	@Transactional(readOnly=false)
 	public void testSubscriptionDao() {

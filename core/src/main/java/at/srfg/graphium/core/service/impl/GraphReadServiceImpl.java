@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 
+import at.srfg.graphium.io.outputformat.impl.jackson.GenericJacksonSegmentOutputFormat;
 import at.srfg.graphium.model.*;
 
 import com.vividsolutions.jts.geom.Polygon;

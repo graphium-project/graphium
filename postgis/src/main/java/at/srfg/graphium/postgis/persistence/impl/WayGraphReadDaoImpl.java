@@ -117,9 +117,11 @@ public class WayGraphReadDaoImpl<T extends IBaseSegment, X extends ISegmentXInfo
 		// 		use aliases to avoid duplicate field names, ...)
 		String query = ViewParseUtil.prepareViewFilterQuery(view, version, schema, rsExtractor, null);
 		String segmentIdsClause = StringUtils.join(segmentIds, ", ");
+
+		/*
 		int lastIndexOfWaySegmentsTableName = query.lastIndexOf(AbstractWayGraphDaoImpl.SEGMENT_TABLE_PREFIX);
 		if (lastIndexOfWaySegmentsTableName < 0) {
-			throw new RuntimeException("No waysegments table definition found in view " + view.getViewName());
+ 			throw new RuntimeException("No waysegments table definition found in view " + view.getViewName());
 		}
 		String lastQueryPart = query.substring(lastIndexOfWaySegmentsTableName);
 		if (lastQueryPart != null && lastQueryPart.toUpperCase().contains("WHERE")) {
@@ -127,6 +129,9 @@ public class WayGraphReadDaoImpl<T extends IBaseSegment, X extends ISegmentXInfo
 		} else {
 			query += " WHERE id in (" + segmentIdsClause + ")";
 		}
+		*/
+
+		query = "SELECT * FROM (" + query + ") AS res WHERE id in (" + segmentIdsClause + ")";
 		
 		List<T> segments = queryForList(query, rsExtractor);
 		return segments;
@@ -141,6 +146,7 @@ public class WayGraphReadDaoImpl<T extends IBaseSegment, X extends ISegmentXInfo
 			conn = DataSourceUtils.getConnection(getDataSource());
 			conn.setAutoCommit(false);
 			ps = conn.prepareStatement(query);
+			//System.out.println(query);
 			ps.setFetchSize(fetchSize);
 			rs = ps.executeQuery();
 			T segment = null;
@@ -183,16 +189,18 @@ public class WayGraphReadDaoImpl<T extends IBaseSegment, X extends ISegmentXInfo
 		// 		use aliases to avoid duplicate field names, ...)
 		String query = ViewParseUtil.prepareViewFilterQuery(view, version, schema, rsExtractor, null);
 		
-		String bbox = GeometryUtils.createRectangleWithSideLengthInMetersAsWkt(referencePoint, 2*radiusInKm*1000);
-		String geoClause = rsExtractor.getPrefix() + ".geometry && '" + bbox +
-							"' ORDER BY " + rsExtractor.getPrefix() + ".geometry <-> '" + bbox + "'"; 
+		String bbox = "st_geomFromText('" +  GeometryUtils.createRectangleWithSideLengthInMetersAsWkt(referencePoint, 2*radiusInKm*1000) + "', " + SRID + ")";
+		String geoClause = rsExtractor.getPrefix() + ".wayseg_geometry_ewkb && " + bbox +
+							" ORDER BY " + rsExtractor.getPrefix() + ".wayseg_geometry_ewkb <-> " + bbox;
 		
-		if (ViewParseUtil.hasWhereClause(query.toUpperCase())) {
+		query = "SELECT * FROM (" + query + ") AS wayseg WHERE " + geoClause;
+		/*if (ViewParseUtil.hasWhereClause(query.toUpperCase())) {
 			query += " AND ";
 		} else {
 			query += " WHERE ";
 		}
 		query += geoClause;
+		*/
 		
 		if (maxNrOfSegments > 0) {
 			query += " LIMIT " + maxNrOfSegments;
@@ -250,6 +258,7 @@ public class WayGraphReadDaoImpl<T extends IBaseSegment, X extends ISegmentXInfo
 			IWayGraphView view, String graphVersion, GraphReadOrder order) throws WaySegmentSerializationException {
 
 		// parse filter query to detect concerned tables
+
 		Set<String> tableAliases = ViewParseUtil.parseTableAliases(viewDao.getViewDefinition(view));
 		
 		// use object factory to retrieved all needed ResultSetExtractors
@@ -325,6 +334,7 @@ public class WayGraphReadDaoImpl<T extends IBaseSegment, X extends ISegmentXInfo
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("graphName", view.getGraph().getName());
 		paramMap.put("timestamp", timestamp);
+
 		List<String> versionList = getNamedParameterJdbcTemplate().query("SELECT version FROM " + schema + METADATA_TABLE_NAME + 
 				" WHERE graphname = :graphName AND valid_from <= :timestamp AND (valid_to is null OR valid_to >= :timestamp)" +
 				" AND state = 'ACTIVE'", 

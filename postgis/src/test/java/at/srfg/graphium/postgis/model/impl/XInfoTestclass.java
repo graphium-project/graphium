@@ -22,12 +22,12 @@ import at.srfg.graphium.postgis.model.IXInfoTest;
  * @author mwimmer
  *
  */
-public class XInfoTest extends AbstractSegmentXInfo implements IXInfoTest {
+public class XInfoTestclass extends AbstractSegmentXInfo implements IXInfoTest {
 
 	private long directedId;
 	private long graphId;
 
-	public XInfoTest() {
+	public XInfoTestclass() {
 		super("test");
 	}
 

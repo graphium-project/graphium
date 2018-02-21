@@ -74,14 +74,20 @@ public class TestConnectionsBuilder {
 		IWaySegment segmentFrom = new WaySegment();
 		segmentFrom.setId(segmentFromId);
 		segmentFrom.setStartNodeId(nodeId);
+		segmentFrom.setAccessBkw(defaultAccesses);
+		segmentFrom.setAccessTow(defaultAccesses);
 		
 		IWaySegment segmentTo = new WaySegment();
 		segmentTo.setId(segmentToId);
 		segmentTo.setEndNodeId(nodeId);
+		segmentTo.setAccessTow(defaultAccesses);
+		segmentTo.setAccessBkw(defaultAccesses);
 		
 		IWaySegment segmentTo2 = new WaySegment();
 		segmentTo2.setId(segmentTo2Id);
 		segmentTo2.setEndNodeId(nodeId);
+		segmentTo2.setAccessTow(defaultAccesses);
+		segmentTo2.setAccessBkw(defaultAccesses);
 		
 		List<IWaySegment> segmentsTo = new ArrayList<>();
 		segmentsTo.add(segmentTo);

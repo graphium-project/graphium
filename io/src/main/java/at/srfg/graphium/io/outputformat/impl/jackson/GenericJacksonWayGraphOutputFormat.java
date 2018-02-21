@@ -82,8 +82,7 @@ public class GenericJacksonWayGraphOutputFormat<T extends IBaseWaySegment> imple
             throw new WaySegmentSerializationException(e.getMessage(), e);
         }
 	}
-	
-	
+
 	@Override
 	public void serialize(T segment) throws WaySegmentSerializationException {
 		if(metadataToSerialize != null) {

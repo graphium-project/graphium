@@ -18,6 +18,7 @@
 
 	<!-- central server specific services -->
 	<bean id="subscribedGraphserverImportStateService" class="at.srfg.graphium.api.service.impl.SubscribedGraphserverImportStateServiceImpl">
+
 		<property name="dao" ref="graphImportStateDao"/>
 		<property name="subscriptionDao" ref="subscriptionDao"/>
 		<property name="metadataService" ref="graphVersionMetadataService"/>
@@ -44,6 +45,7 @@
 		<property name="serverName" value="${graphium.server.name}"/>
 		<property name="restTemplate" ref="notificationRestTemplate"/>
 		<!-- <property name="servletContext" ref=""/> -->
+
 		<property name="subscriptionDao" ref="subscriptionDao"/>
 		<property name="graphImportStateDao" ref="graphImportStateDao"/>
 	</bean>

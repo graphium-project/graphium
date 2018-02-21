@@ -36,14 +36,14 @@ import at.srfg.graphium.geomutils.GeometryUtils;
 import at.srfg.graphium.model.FuncRoadClass;
 import at.srfg.graphium.model.IWaySegment;
 import at.srfg.graphium.model.impl.WaySegment;
-import at.srfg.graphium.postgis.model.impl.XInfoTest;
+import at.srfg.graphium.postgis.model.impl.XInfoTestclass;
 
 /**
  * @author mwimmer
  *
  */
 
-public class TestWayGraphWriteDaoImpl implements ITestGraphiumPostgis{
+public class SubtestWayGraphWriteDaoImpl implements ITestGraphiumPostgis{
 
 	@Autowired
 	private IWayGraphWriteDao<IWaySegment> dao;
@@ -55,7 +55,7 @@ public class TestWayGraphWriteDaoImpl implements ITestGraphiumPostgis{
     @Value("${db.SRID}")
     int SRID;
 
-	private static Logger log = LoggerFactory.getLogger(TestWayGraphWriteDaoImpl.class);
+	private static Logger log = LoggerFactory.getLogger(SubtestWayGraphWriteDaoImpl.class);
 
 	@Transactional(readOnly=false)
 	public void testReadSegments() throws GraphNotExistsException {
@@ -79,7 +79,7 @@ public class TestWayGraphWriteDaoImpl implements ITestGraphiumPostgis{
 		segment.setEndNodeIndex(2);
 		segment.setTimestamp(new Date());
 		
-		XInfoTest xInfo = new XInfoTest();
+		XInfoTestclass xInfo = new XInfoTestclass();
 		xInfo.setDirectedId(1);
 		xInfo.setDirectionTow(true);
 		xInfo.setGraphId(1);

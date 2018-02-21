@@ -25,16 +25,16 @@ import at.srfg.graphium.model.impl.AbstractSegmentXInfo;
  * Project: graphium
  * Created by sschwarz on 08.02.2018.
  */
-public class XInfoTest extends AbstractSegmentXInfo implements IXInfoTest {
+public class XInfoTestclass extends AbstractSegmentXInfo implements IXInfoTest {
 
     private long directedId;
     private long graphId;
 
-    public XInfoTest() {
+    public XInfoTestclass() {
         super("test");
     }
 
-    public XInfoTest(long directedId, boolean directionTow, long graphId, long segmentId){
+    public XInfoTestclass(long directedId, boolean directionTow, long graphId, long segmentId){
         super("test");
         this.directedId = directedId;
         this.directionTow = directionTow;

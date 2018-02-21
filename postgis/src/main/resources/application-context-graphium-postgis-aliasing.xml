@@ -20,6 +20,5 @@
     <alias name="postgisWayBaseSegmentReadDao" alias="baseSegmentReadDao"/>
   	
   	<alias name="postgisQueuingGraphVersionImportService" alias="queuingGraphVersionImportService"/>
-  				
-    
+
 </beans>

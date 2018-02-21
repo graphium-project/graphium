@@ -32,12 +32,14 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import at.srfg.graphium.tutorial.ITestGraphiumModelExtension;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -72,15 +74,18 @@ import at.srfg.graphium.model.management.impl.Source;
  * @author mwimmer
  *
  */
+
+/*
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "classpath:/application-context-graphium-tutorial_test.xml",
 		"classpath:/application-context-graphium-core.xml",
 		"classpath:application-context-graphium-postgis.xml",
 		"classpath:application-context-graphium-postgis-datasource.xml",
 		"classpath:application-context-graphium-postgis-aliasing.xml"})
-public class TestExtendSegmentWithHstoreTags {
+*/
+public class SubtestExtendSegmentWithHstoreTags implements ITestGraphiumModelExtension{
 
-	private static Logger log = LoggerFactory.getLogger(TestExtendSegmentWithHstoreTags.class);
+	private static Logger log = LoggerFactory.getLogger(SubtestExtendSegmentWithHstoreTags.class);
 
 	@Autowired
 	private IWayGraphWriteDao<IWaySegment> writeDao;
@@ -98,13 +103,15 @@ public class TestExtendSegmentWithHstoreTags {
 	@Autowired
 	private IWayGraphViewDao viewDao;
 
-	@Test
-	@Transactional(readOnly=false)
-	@Rollback(true)
-	public void testExtendSegmentWithHstoreTags() throws GraphAlreadyExistException, GraphNotExistsException, InterruptedException, WaySegmentSerializationException {
-		String graphName = "tutorialgraph";
-		String version = "1_0";
+	@Value("${db.graphName}")
+	private String graphName;
+	@Value("${db.graphVersion}")
+	private String version;
 
+	//@Test
+	@Transactional(readOnly=false)
+	//@Rollback(true)
+	public void testExtendSegmentWithHstoreTags() throws GraphAlreadyExistException, GraphNotExistsException, InterruptedException, WaySegmentSerializationException {
 		// store base data
 		createBaseData(graphName, version);
 		
@@ -228,4 +235,18 @@ public class TestExtendSegmentWithHstoreTags {
 		return bounds;
 	}
 
+	@Override
+	public void run() {
+		try {
+			testExtendSegmentWithHstoreTags();
+		} catch (GraphAlreadyExistException e) {
+			e.printStackTrace();
+		} catch (GraphNotExistsException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (WaySegmentSerializationException e) {
+			e.printStackTrace();
+		}
+	}
 }

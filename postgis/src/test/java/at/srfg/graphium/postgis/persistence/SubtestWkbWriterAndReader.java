@@ -44,7 +44,7 @@ import at.srfg.graphium.model.IWaySegment;
  * @author mwimmer
  */
 
-public class TestWkbWriterAndReader implements ITestGraphiumPostgis {
+public class SubtestWkbWriterAndReader implements ITestGraphiumPostgis {
 
 	@Autowired
 	private IWayGraphReadDao<IWaySegment> dao;
@@ -60,7 +60,7 @@ public class TestWkbWriterAndReader implements ITestGraphiumPostgis {
 	private WKBReader wkbReader = new WKBReader();
 	private JtsBinaryParser bp = new JtsBinaryParser();
 
-	private static Logger log = LoggerFactory.getLogger(TestWkbWriterAndReader.class);
+	private static Logger log = LoggerFactory.getLogger(SubtestWkbWriterAndReader.class);
 
 	public void testWkbWriterAndReader() {
 		List<IWaySegment> segments = null;

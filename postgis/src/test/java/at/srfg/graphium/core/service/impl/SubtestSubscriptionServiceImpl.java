@@ -43,9 +43,9 @@ import at.srfg.graphium.model.view.impl.WayGraphView;
  *
  */
 
-public class TestSubscriptionServiceImpl implements ITestGraphiumPostgis{
+public class SubtestSubscriptionServiceImpl implements ITestGraphiumPostgis{
 
-	private static Logger log = LoggerFactory.getLogger(TestSubscriptionServiceImpl.class);
+	private static Logger log = LoggerFactory.getLogger(SubtestSubscriptionServiceImpl.class);
     @Value("${db.graphNameSubscriptionTest}")
     String graphName;
 	@Value("${db.graphNameSubscriptionTest2}")

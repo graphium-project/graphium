@@ -24,7 +24,6 @@ import at.srfg.graphium.model.IWayGraph;
 import at.srfg.graphium.model.IWaySegment;
 import at.srfg.graphium.postgis.persistence.IWayGraphImportDao;
 
-
 /**
  * @author mwimmer
  *
@@ -33,7 +32,6 @@ public class PostgisQueuingGraphVersionImportServiceImpl<T extends IWaySegment> 
 		QueuingGraphVersionImportServiceImpl<T> {
 
 	private static Logger log = LoggerFactory.getLogger(PostgisQueuingGraphVersionImportServiceImpl.class);
-
 	private IWayGraphImportDao importDao;
 	
 	@Override

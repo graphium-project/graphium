@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.zip.GZIPOutputStream;
 
+import at.srfg.graphium.api.service.impl.GraphServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -64,9 +65,8 @@ public abstract class AbstractGraphApiController<T extends IBaseWaySegment> {
 	private IAdapter<IGraphVersionMetadataDTO, IWayGraphVersionMetadata> adapter;
 	
 	private String charset = "UTF-8";
-	
-	
-//	curl -X POST "http://localhost:8080/graphium-central-server/api/import?graphName=gip_at_frc_0_4&version=15_02_150414&originGraphName=gip_at&originVersion=15_02_150331&validFrom=1428932718000&source=GIP&overrideIfExists=true&creator=Michi&originUrl=http://gip.at" -F "file=@D:/development/project_data/graphserver/gip_15_02_frc0_4_private_car_small.json"
+
+	//	curl -X POST "http://localhost:8080/graphium-central-server/api/import?graphName=gip_at_frc_0_4&version=15_02_150414&originGraphName=gip_at&originVersion=15_02_150331&validFrom=1428932718000&source=GIP&overrideIfExists=true&creator=Michi&originUrl=http://gip.at" -F "file=@D:/development/project_data/graphserver/gip_15_02_frc0_4_private_car_small.json"
 	@RequestMapping(value="/graphs/{graph}/versions/{version}", method=RequestMethod.POST)
 	@ResponseBody
     public IGraphVersionMetadataDTO importGraphVersion(
@@ -89,7 +89,6 @@ public abstract class AbstractGraphApiController<T extends IBaseWaySegment> {
 	}
 	
 	// TODO: Sollte nur ein SuperUser ausführen dürfen!
-
 	@RequestMapping(value = "/graphs/{graph}/versions/{version}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public IGraphVersionMetadataDTO deleteGraphVersion(
@@ -174,4 +173,11 @@ public abstract class AbstractGraphApiController<T extends IBaseWaySegment> {
 		this.metadataService = metadataService;
 	}
 
+	public void setGraphApiService(IGraphService graphApiService) {
+		this.graphApiService = graphApiService;
+	}
+
+	public IGraphService<T> getGraphApiService() {
+		return graphApiService;
+	}
 }

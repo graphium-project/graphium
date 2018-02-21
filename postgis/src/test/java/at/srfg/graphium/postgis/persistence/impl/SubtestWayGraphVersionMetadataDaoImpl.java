@@ -40,7 +40,7 @@ import at.srfg.graphium.model.management.impl.Source;
  *
  */
 
-public class TestWayGraphVersionMetadataDaoImpl implements ITestGraphiumPostgis{
+public class SubtestWayGraphVersionMetadataDaoImpl implements ITestGraphiumPostgis{
 
 	@Autowired
 	private IWayGraphVersionMetadataDao dao;
@@ -53,7 +53,7 @@ public class TestWayGraphVersionMetadataDaoImpl implements ITestGraphiumPostgis{
     @Value("#{${db.tags}}") //assign hashmap using spEL
     Map<String, String> tags;
 
-	private static Logger log = LoggerFactory.getLogger(TestWayGraphVersionMetadataDaoImpl.class);
+	private static Logger log = LoggerFactory.getLogger(SubtestWayGraphVersionMetadataDaoImpl.class);
 
 	@Transactional(readOnly=false)
 	public void testGraphVersionMetadataDao() {

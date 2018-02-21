@@ -43,22 +43,14 @@ import at.srfg.graphium.osmimport.reader.pbf.SegmentationNodesSink;
 public class TestPbfReader {
 
 	private static Logger log = LoggerFactory.getLogger(TestPbfReader.class);
-	
-//	private String osmFileName = "C:/development/Graphserver/osm/austria-latest.osm.pbf";
-//	private String osmFileName = "C:/development/Graphserver/osm/liechtenstein-latest.osm.pbf";
-//	private String osmFileName = "D:/development/project_data/osm/germany-latest.osm.pbf";
-	private String osmFileName = "D:/development/project_data/osm/liechtenstein-latest.osm.pbf";
-	
-	//private String osmFileName = "/development/project_data/graphium/testdata/osm/20160708/liechtenstein-latest.osm.pbf";
-	//private String osmFileName = "/development/project_data/graphium/testdata/osm/20160708/austria-latest.osm.pbf";
-//	private String osmFileName = "/development/project_data/graphium/testdata/osm/20160708/germany-latest.osm.pbf";
-	
+    private String osmFileName = System.getProperty("user.dir") + "\\src\\test\\resources\\monaco-latest.osm.pbf";
+
 	@Test
 	public void testSimpleRead() {
         log.info("Start reading PBF");
 
         DummySink sink = new DummySink();
-        
+
         PbfReader reader = new PbfReader(new File(osmFileName), 3);
         reader.setSink(sink);
 //        Thread pbfReaderThread = new Thread(reader, "PBF Reader");

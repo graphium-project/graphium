@@ -24,9 +24,9 @@ import org.slf4j.LoggerFactory;
  * @author mwimmer
  *
  */
-public class TestWaySegmentResultSetExtractor implements ITestGraphiumPostgis{
+public class SubtestWaySegmentResultSetExtractor implements ITestGraphiumPostgis{
 
-	private static Logger log = LoggerFactory.getLogger(TestWaySegmentResultSetExtractor.class);
+	private static Logger log = LoggerFactory.getLogger(SubtestWaySegmentResultSetExtractor.class);
 
 	public void testParseConString() {
 		String serializedCon = "(100000833,960301,101021339,\"{15,4,22,2,9,19,11,13,12,1,10,3}\",24)";

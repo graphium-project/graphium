@@ -64,6 +64,10 @@ public class CompositeGraphMetadataDaoImpl implements IWayGraphVersionMetadataDa
 			throw new RuntimeException("primary dao is not included in write daos list");
 		}
 	}
+
+	public CompositeGraphMetadataDaoImpl(){
+
+	}
 	
 	@Override
 	public IWayGraphVersionMetadata newWayGraphVersionMetadata() {

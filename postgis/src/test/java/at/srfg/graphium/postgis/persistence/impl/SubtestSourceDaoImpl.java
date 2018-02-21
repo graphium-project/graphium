@@ -31,7 +31,7 @@ import at.srfg.graphium.model.management.impl.Source;
  *
  */
 
-public class TestSourceDaoImpl implements ITestGraphiumPostgis {
+public class SubtestSourceDaoImpl implements ITestGraphiumPostgis {
 
 	@Autowired
 	private ISourceDao dao;
@@ -39,7 +39,7 @@ public class TestSourceDaoImpl implements ITestGraphiumPostgis {
 	int sourceID;
 	@Value("${db.sourceName}")
 	String sourceName;
-	private static Logger log = LoggerFactory.getLogger(TestSourceDaoImpl.class);
+	private static Logger log = LoggerFactory.getLogger(SubtestSourceDaoImpl.class);
 
 	@Override
 	public void run(){

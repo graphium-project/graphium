@@ -32,12 +32,14 @@ import at.srfg.graphium.model.ISource;
 import at.srfg.graphium.model.IWayGraphVersionMetadata;
 import at.srfg.graphium.model.State;
 import at.srfg.graphium.model.view.IWayGraphView;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author mwimmer
  *
  */
 public class GraphVersionMetadataServiceImpl extends Observable implements IGraphVersionMetadataService {
+
 
 	private IWayGraphVersionMetadataDao metadataDao;
 	private IWayGraphViewDao viewDao;
@@ -59,8 +61,7 @@ public class GraphVersionMetadataServiceImpl extends Observable implements IGrap
 		return metadata;
 	}
 
-	public List<IWayGraphVersionMetadata> getWayGraphVersionMetadataList(
-			String graphName) {
+	public List<IWayGraphVersionMetadata> getWayGraphVersionMetadataList(String graphName) {
 		return metadataDao.getWayGraphVersionMetadataList(graphName);
 	}
 

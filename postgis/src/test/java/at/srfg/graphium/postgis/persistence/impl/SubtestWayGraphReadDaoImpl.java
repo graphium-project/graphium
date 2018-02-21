@@ -55,9 +55,9 @@ import at.srfg.graphium.postgis.persistence.resultsetextractors.ISegmentResultSe
  *
  */
 
-public class TestWayGraphReadDaoImpl implements ITestGraphiumPostgis{
+public class SubtestWayGraphReadDaoImpl implements ITestGraphiumPostgis{
 	
-	private static Logger log = LoggerFactory.getLogger(TestWayGraphReadDaoImpl.class);
+	private static Logger log = LoggerFactory.getLogger(SubtestWayGraphReadDaoImpl.class);
 
 	@Autowired
 	private IWayGraphReadDao<IWaySegment> dao;

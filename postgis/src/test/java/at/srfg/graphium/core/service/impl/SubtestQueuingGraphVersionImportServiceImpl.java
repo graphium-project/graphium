@@ -27,9 +27,6 @@ import at.srfg.graphium.ITestGraphiumPostgis;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.core.convert.ConversionService;
-import org.springframework.format.support.DefaultFormattingConversionService;
 
 import com.vividsolutions.jts.geom.Polygon;
 
@@ -45,9 +42,9 @@ import at.srfg.graphium.model.management.impl.Source;
  *
  */
 
-public class TestQueuingGraphVersionImportServiceImpl implements ITestGraphiumPostgis{
+public class SubtestQueuingGraphVersionImportServiceImpl implements ITestGraphiumPostgis{
 
-	private static Logger log = LoggerFactory.getLogger(TestQueuingGraphVersionImportServiceImpl.class);
+	private static Logger log = LoggerFactory.getLogger(SubtestQueuingGraphVersionImportServiceImpl.class);
 
 	@Value("${db.graphNameImport}")
 	String graphName;

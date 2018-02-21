@@ -52,8 +52,6 @@ public class TestGenericQueuingJacksonInputFormat {
 
     private String inputSegmentXInfoTest;
 
-    private String inputFileName;
-
     @Before
     public void setup() {
 
@@ -231,7 +229,6 @@ public class TestGenericQueuingJacksonInputFormat {
                 "    \"bridge\" : false,\n" +
                 "    \"urban\" : true\n" +
                 "  }]}";
-        this.inputFileName = "D:\\data\\graphium\\turncalcxinfos.json";
     }
 
     @Test
@@ -239,13 +236,5 @@ public class TestGenericQueuingJacksonInputFormat {
         InputStream inputStream = new ByteArrayInputStream(this.inputConnectioXInfoText.getBytes(StandardCharsets.UTF_8));
         this.inputFormat.deserialize(inputStream);
     }
-
-    @Test
-    public void testDeserializationFromFile() throws IOException, WaySegmentDeserializationException {
-        Path path = Paths.get(this.inputFileName);
-        InputStream inputStream = Files.newInputStream(path);
-        this.inputFormat.deserialize(inputStream);
-    }
-
 
 }
