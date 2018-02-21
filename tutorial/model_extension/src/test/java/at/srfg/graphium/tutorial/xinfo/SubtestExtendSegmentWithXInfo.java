@@ -19,7 +19,7 @@
  * All rights reserved.
  *
  */
-package at.srfg.graphium.tutorial.hstore;
+package at.srfg.graphium.tutorial.xinfo;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,6 +31,8 @@ import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
+
+import javax.annotation.Resource;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -63,23 +65,28 @@ import at.srfg.graphium.model.ISource;
 import at.srfg.graphium.model.IWayGraph;
 import at.srfg.graphium.model.IWayGraphVersionMetadata;
 import at.srfg.graphium.model.IWaySegment;
+import at.srfg.graphium.model.IXInfo;
 import at.srfg.graphium.model.State;
 import at.srfg.graphium.model.impl.WaySegment;
 import at.srfg.graphium.model.management.impl.Source;
+import at.srfg.graphium.tutorial.xinfo.dao.ViewDao;
+import at.srfg.graphium.tutorial.xinfo.model.IRoadDamage;
+import at.srfg.graphium.tutorial.xinfo.model.impl.RoadDamageImpl;
 
 /**
  * @author mwimmer
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "classpath:/application-context-graphium-tutorial_test.xml",
+@ContextConfiguration(locations = { "classpath:/application-context-graphium-tutorial.xml",
+		"classpath:/application-context-graphium-tutorial_test.xml",
 		"classpath:/application-context-graphium-core.xml",
 		"classpath:application-context-graphium-postgis.xml",
 		"classpath:application-context-graphium-postgis-datasource.xml",
 		"classpath:application-context-graphium-postgis-aliasing.xml"})
-public class TestExtendSegmentWithHstoreTags {
+public class TestExtendSegmentWithXInfo {
 
-	private static Logger log = LoggerFactory.getLogger(TestExtendSegmentWithHstoreTags.class);
+	private static Logger log = LoggerFactory.getLogger(TestExtendSegmentWithXInfo.class);
 
 	@Autowired
 	private IWayGraphWriteDao<IWaySegment> writeDao;
@@ -93,18 +100,25 @@ public class TestExtendSegmentWithHstoreTags {
 	@Autowired
 	private ISourceDao sourceDao;
 
-	@Autowired
+	@Resource(name="postgisWayGraphViewDao")
 	private IWayGraphViewDao viewDao;
+
+	@Autowired
+	private ViewDao testViewDao;
+
+	private String graphName = "osm_at";
+	private String version = "1_0";
+	private String customViewName = "roaddamages";
 
 	@Test
 	@Transactional(readOnly=false)
 	@Rollback(true)
-	public void testExtendSegmentWithHstoreTags() throws GraphAlreadyExistException, GraphNotExistsException, InterruptedException, WaySegmentSerializationException {
-		String graphName = "tutorialgraph";
-		String version = "1_0";
+	public void testExtendSegmentWithXInfo() throws GraphAlreadyExistException, GraphNotExistsException, InterruptedException, WaySegmentSerializationException {
 
 		// store base data
-		createBaseData(graphName, version);
+		IWayGraph wayGraph = createBaseData(graphName, version);
+		
+		IWayGraphVersionMetadata metadata = metadataDao.getWayGraphVersionMetadata(graphName, version);
 		
 		// create dummy segments
 		List<IWaySegment> segments = new ArrayList<IWaySegment>();
@@ -125,9 +139,8 @@ public class TestExtendSegmentWithHstoreTags {
 		segment1.setUrban(false);
 		segment1.setTunnel(false);
 		segment1.setGeometry(createDummyGeometry());
-		Map<String, String> tags = new HashMap<String, String>();
-		tags.put("like", "true");
-		segment1.setTags(tags);
+		IRoadDamage roadDamage1 = new RoadDamageImpl(segment1.getId(), metadata.getId(), true, 0.2f, 0.4f, "lane groove");
+		segment1.addXInfo(roadDamage1);
 		
 		IWaySegment segment2 = new WaySegment();
 		segment2.setId(2);
@@ -141,9 +154,8 @@ public class TestExtendSegmentWithHstoreTags {
 		segment2.setUrban(false);
 		segment2.setTunnel(false);
 		segment2.setGeometry(createDummyGeometry());
-		tags = new HashMap<String, String>();
-		tags.put("like", "false");
-		segment2.setTags(tags);
+		IRoadDamage roadDamage2 = new RoadDamageImpl(segment2.getId(), metadata.getId(), true, 0.5f, 0.55f, "pothole");
+		segment2.addXInfo(roadDamage2);
 		
 		segments.add(segment1);
 		segments.add(segment2);
@@ -158,16 +170,59 @@ public class TestExtendSegmentWithHstoreTags {
 		}
 		
 		// read segments
+		readSegments(graphName, version);
+		
+		log.info("We have not found any XInfo - why?");
+		log.info("There is no view defined for reading additional XInfo from database! Let's create it...");
+		
+		// safe custom view
+		testViewDao.saveTestXInfoView(wayGraph, customViewName);
+		log.info("Custom view created");
+
+		readSegments(customViewName, version);
+
+		
+		// TODO: print DTOs => JSON
+		
+		
+	
+	}
+	
+	@Test
+	public void readSegments() throws GraphNotExistsException, WaySegmentSerializationException, InterruptedException {
+		readSegments(graphName, version);
+	}
+	
+	@Test
+	public void readSegmentsWithCustomView() throws GraphNotExistsException, WaySegmentSerializationException, InterruptedException {
+		readSegments(customViewName, version);
+	}
+	
+	/**
+	 * @param graphName
+	 * @param version
+	 * @throws WaySegmentSerializationException 
+	 * @throws GraphNotExistsException 
+	 * @throws InterruptedException 
+	 */
+	private void readSegments(String graphName, String version) throws GraphNotExistsException, WaySegmentSerializationException, InterruptedException {
 		BlockingQueue<IWaySegment> segmentsQueue = new ArrayBlockingQueue<IWaySegment>(10);
 		readDao.readStreetSegments(segmentsQueue, graphName, version);
 		log.info("Stored segments:");
 		while (!segmentsQueue.isEmpty()) {
 			IWaySegment seg = segmentsQueue.poll(10, TimeUnit.MILLISECONDS);
 			log.info(seg.toString());
+			log.info("XInfo:");
+			if (seg.getXInfo() == null || seg.getXInfo().isEmpty()) {
+				log.info("empty");
+			} else {
+				for (IXInfo xinfo : seg.getXInfo()) {
+					log.info(xinfo.toString());
+				}
+			}
 		}
-	
 	}
-	
+
 	private LineString createDummyGeometry() {
 		WKTReader wktReader = new WKTReader();
 		LineString ls = null;
@@ -179,7 +234,7 @@ public class TestExtendSegmentWithHstoreTags {
 		return ls;
 	}
 
-	private void createBaseData(String graphName, String version) throws GraphAlreadyExistException, GraphNotExistsException {
+	private IWayGraph createBaseData(String graphName, String version) throws GraphAlreadyExistException, GraphNotExistsException {
 		
 		ISource source = new Source(1, "testSource");
 		sourceDao.save(source);
@@ -198,7 +253,7 @@ public class TestExtendSegmentWithHstoreTags {
 			log.info("Waygraph '" + graphName + "' saved");
 			wayGraph = metadataDao.getGraph(graphName);
 			viewDao.saveDefaultView(wayGraph);
-			log.info("Waygraph '" + graphName + "' saved");
+			log.info("default view 'vw_" + graphName + "' saved");
 		}
 		
 		IWayGraphVersionMetadata metadata;
@@ -211,6 +266,8 @@ public class TestExtendSegmentWithHstoreTags {
 		log.info("\nWayGraphVersionMetadata saved");
 
 		writeDao.createGraphVersion(graphName, version, true, false);
+		
+		return wayGraph;
 
 	}
 

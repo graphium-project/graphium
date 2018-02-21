@@ -15,16 +15,19 @@
  */
 package at.srfg.graphium.postgis.persistence.resultsetextractors;
 
+import at.srfg.graphium.ITestGraphiumPostgis;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author mwimmer
  *
  */
-public class TestWaySegmentResultSetExtractor {
+public class TestWaySegmentResultSetExtractor implements ITestGraphiumPostgis{
 
-	@Test
+	private static Logger log = LoggerFactory.getLogger(TestWaySegmentResultSetExtractor.class);
+
 	public void testParseConString() {
 		String serializedCon = "(100000833,960301,101021339,\"{15,4,22,2,9,19,11,13,12,1,10,3}\",24)";
 		
@@ -36,16 +39,19 @@ public class TestWaySegmentResultSetExtractor {
 		String[] tokens = splitCons[0].split(",");
 		String[] accessTypeIdsArray = splitCons[1].split(","); //[15, 4, 22, 2, 9, 19, 11, 13, 12, 1, 10, 3, 24] 
 
-		System.out.println("tokens:");
+		log.info("tokens:");
 		for (String token : tokens) {
-			System.out.println(token);
+			log.info(token);
 		}
 
-		System.out.println("\naccessTypes:");
+		log.info("\naccessTypes:");
 		for (String accessTypeId : accessTypeIdsArray) {
-			System.out.println(accessTypeId);
+			log.info(accessTypeId);
 		}
-
 	}
-	
+
+	@Override
+	public void run() {
+		testParseConString();
+	}
 }

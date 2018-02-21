@@ -18,15 +18,11 @@ package at.srfg.graphium.core.service.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import at.srfg.graphium.ITestGraphiumPostgis;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 
 import at.srfg.graphium.core.exception.GraphNotExistsException;
@@ -46,15 +42,30 @@ import at.srfg.graphium.model.view.impl.WayGraphView;
  * @author mwimmer
  *
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "classpath:/application-context-graphium-postgis_test.xml",
-		"classpath:/application-context-graphium-core.xml",
-		"classpath:application-context-graphium-postgis.xml",
-		"classpath:application-context-graphium-postgis-datasource.xml",
-		"classpath:application-context-graphium-postgis-aliasing.xml"})
-public class TestSubscriptionServiceImpl {
+
+public class TestSubscriptionServiceImpl implements ITestGraphiumPostgis{
 
 	private static Logger log = LoggerFactory.getLogger(TestSubscriptionServiceImpl.class);
+    @Value("${db.graphNameSubscriptionTest}")
+    String graphName;
+	@Value("${db.graphNameSubscriptionTest2}")
+	String graphName2;
+    @Value("${db.graphVersionSubscriptionTest}")
+    String version;
+    @Value("${db.viewNameSubscriptionTest}")
+    String viewName;
+    @Value("${db.serverName}")
+    String serverName;
+    @Value("${db.serverURL}")
+    String serverURL;
+    @Value("${db.test.user}")
+    String user;
+    @Value("${db.test.pw}")
+    String pw;
+    @Value("${db.subscriptionGroupID}")
+    int subscriptionGroupID;
+    @Value("#{new java.text.SimpleDateFormat(\"${db.dateFormat}\").parse(\"${db.subscriptionDateString}\")}") //using spEL
+    Date subscriptionDate;
 	
 	@Autowired
 	private ISubscriptionService subscriptionService;
@@ -62,20 +73,16 @@ public class TestSubscriptionServiceImpl {
 	private IWayGraphViewDao viewDao;
 	@Autowired
 	private IWayGraphVersionMetadataDao metaDao;
-	
-	@Test
+
 	@Transactional(readOnly=false)
-	@Rollback(value=true)
 	public void testCreateValidSubscriptionForDefaultView() {
-		String graphName = "gip_at";
-		String version = "1";
 		IWayGraph wayGraph = saveWayGraph(graphName, version);
 		viewDao.saveDefaultView(wayGraph);
 		
-		ISubscription subscription = new Subscription("test_server", graphName, "http://irgend.wo", "user", "pwd", new Date());
+		ISubscription subscription = new Subscription(serverName, graphName, serverURL, user, pw, subscriptionDate);
 		List<ISubscription> subscriptions = new ArrayList<>();
 		subscriptions.add(subscription);
-		ISubscriptionGroup subscriptionGroup = new SubscriptionGroup(100, graphName, wayGraph, subscriptions);
+		ISubscriptionGroup subscriptionGroup = new SubscriptionGroup(subscriptionGroupID, graphName, wayGraph, subscriptions);
 		subscription.setSubscriptionGroup(subscriptionGroup);
 		
 		try {
@@ -84,23 +91,18 @@ public class TestSubscriptionServiceImpl {
 			log.error(e.getMessage(), e);
 		}
 	}
-	
-	@Test
+
 	@Transactional(readOnly=false)
-	@Rollback(false)
 	public void testCreateValidSubscriptionForCustomView() {
-		String graphName = "gip_at";
-		String version = "1";
-		String viewName = "gip_at_sub";
-		IWayGraph wayGraph = saveWayGraph(graphName, version);
+		IWayGraph wayGraph = saveWayGraph(graphName2, version);
 		saveView(wayGraph, viewName, version);
-		
-		ISubscription subscription = new Subscription("test_server", viewName, "http://irgend.wo", "user", "pwd", new Date());
+
+		ISubscription subscription = new Subscription(serverName, viewName, serverURL, user, pw, subscriptionDate);
 		List<ISubscription> subscriptions = new ArrayList<>();
 		subscriptions.add(subscription);
-		ISubscriptionGroup subscriptionGroup = new SubscriptionGroup(100, graphName, wayGraph, subscriptions);
+		ISubscriptionGroup subscriptionGroup = new SubscriptionGroup(subscriptionGroupID, graphName2, wayGraph, subscriptions);
 		subscription.setSubscriptionGroup(subscriptionGroup);
-		
+
 		try {
 			subscriptionService.subscribeOnView(subscription);
 		} catch (GraphNotExistsException | SubscriptionFailedException e) {
@@ -118,7 +120,6 @@ public class TestSubscriptionServiceImpl {
 			wayGraph = metaDao.getGraph(graphName);
 			log.info("Waygraph '" + graphName + "' wurde gespeichert");
 		}
-		
 		return wayGraph;
 	}
 	
@@ -127,4 +128,9 @@ public class TestSubscriptionServiceImpl {
 		viewDao.saveView(view);
 	}
 
+	@Override
+	public void run() {
+		testCreateValidSubscriptionForDefaultView();
+		testCreateValidSubscriptionForCustomView();
+	}
 }

@@ -15,18 +15,12 @@
  */
 package at.srfg.graphium.postgis.persistence.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import at.srfg.graphium.ITestGraphiumPostgis;
 import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 
 import at.srfg.graphium.core.exception.GraphNotExistsException;
@@ -39,25 +33,24 @@ import at.srfg.graphium.model.view.IWayGraphView;
  * @author mwimmer
  *
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "classpath:/application-context-graphium-postgis_test.xml",
-		"classpath:/application-context-graphium-core.xml",
-		"classpath:application-context-graphium-postgis.xml",
-		"classpath:application-context-graphium-postgis-datasource.xml",
-		"classpath:application-context-graphium-postgis-aliasing.xml"})
-public class TestWayGraphViewDaoImpl {
-	
-	private static Logger log = LoggerFactory.getLogger(TestWayGraphViewDaoImpl.class);
-	
+
+public class TestWayGraphViewDaoImpl implements ITestGraphiumPostgis {
 	@Autowired
 	private IWayGraphViewDao dao;
 
 	@Autowired
 	private IWayGraphVersionMetadataDao metaDao;
 
+	@Value("${db.graphName}")
+	String graphName;
+	@Value("${db.version}")
+	String version;
+
+	private static Logger log = LoggerFactory.getLogger(TestWayGraphViewDaoImpl.class);
+
 	public IWayGraph saveWayGraph(String graphName, String version) {
 		if (graphName == null) {
-			graphName = "gip_at";
+			graphName = "osm_lu_180213";
 		}
 		if (version == null) {
 			version = "1.0";
@@ -65,14 +58,13 @@ public class TestWayGraphViewDaoImpl {
 		
 		IWayGraph wayGraph = metaDao.getGraph(graphName);
 		if (wayGraph != null) {
-			System.out.println("Waygraph '" + graphName + "' existiert bereits");
+			log.info("Waygraph '" + graphName + "' existiert bereits");
 		} else {
-			System.out.println("Waygraph '" + graphName + "' existiert noch nicht");
+			log.info("Waygraph '" + graphName + "' existiert noch nicht");
 			metaDao.saveGraph(graphName);
 			wayGraph = metaDao.getGraph(graphName);
-			System.out.println("Waygraph '" + graphName + "' wurde gespeichert");
+			log.info("Waygraph '" + graphName + "' wurde gespeichert");
 		}
-		
 		return wayGraph;
 	}
 	
@@ -87,21 +79,15 @@ public class TestWayGraphViewDaoImpl {
 		}
 		return null;
 	}
-	
-	@Test
-	@Transactional(readOnly=false)
-	@Rollback(value=true)
-	public void testSaveDefaultView() {
-		String graphName = "gip_at_frc_0_4_test_2";
-		String version = "16_02_20160615";
-		
-		Map<String, String> tags = new HashMap<String, String>();
-		tags.put("einSinnlosesTag", "holladrio");
-		
-		IWayGraphView view = saveView(graphName, version);
 
+	@Transactional(readOnly=false)
+	public void testSaveDefaultView() {
+		IWayGraphView view = saveView(graphName, version);
 		Assert.assertNotNull(view);
-		
 	}
 
+	@Override
+	public void run() {
+		testSaveDefaultView();
+	}
 }
