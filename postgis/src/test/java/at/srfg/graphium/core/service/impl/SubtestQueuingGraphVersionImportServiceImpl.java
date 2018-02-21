@@ -23,12 +23,10 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import at.srfg.graphium.ITestGraphiumPostgis;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.beans.factory.annotation.Value;
 
 import com.vividsolutions.jts.geom.Polygon;
 
@@ -43,38 +41,50 @@ import at.srfg.graphium.model.management.impl.Source;
  * @author mwimmer
  *
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "classpath:/application-context-graphium-core.xml",
-		"classpath:application-context-graphium-postgis-datasource.xml",
-		"classpath:application-context-graphium-postgis-aliasing.xml",
-		"classpath:application-context-graphium-postgis.xml",
-		"classpath:application-context-graphium-postgis-services.xml",
-		"classpath:application-context-graphium-postgis_test.xml"})
-public class TestQueuingGraphVersionImportServiceImpl {
 
-	private static Logger log = LoggerFactory.getLogger(TestQueuingGraphVersionImportServiceImpl.class);
+public class SubtestQueuingGraphVersionImportServiceImpl implements ITestGraphiumPostgis{
+
+	private static Logger log = LoggerFactory.getLogger(SubtestQueuingGraphVersionImportServiceImpl.class);
+
+	@Value("${db.graphNameImport}")
+	String graphName;
+	@Value("${db.graphVersionImport}")
+	String version;
+	@Value("${db.originGraphNameImport}")
+	String originGraphName;
+	@Value("${db.originVersionImport}")
+	String originVersion;
+	@Value("${db.validFromDateString}")
+	String validFromDateString;
+	@Value("${db.dateFormat}")
+	String dateFormat;
+	@Value("#{new java.text.SimpleDateFormat(\"${db.dateFormat}\").parse(\"${db.validFromDateString}\")}") //using spEL
+	Date validFrom;
+	@Value("#{null}")
+	Date validTo;
+	@Value("#{${db.tags}}") //assign hashmap using spEL
+	Map<String, String> tags;
+	@Value("${db.sourceId}")
+	int sourceId;
+	@Value("${db.type}")
+	String type;
+	@Value("${db.description}")
+	String description;
+	@Value("${db.creator}")
+	String creator;
+	@Value("${db.originUrl}")
+	String originUrl;
+	@Value("${db.inputFileName}")
+	String inputFileName;
+	@Value("#{helper.getBoundsAustria()}") //assign return-value of helper-bean method: getBoundsAustria using spEL (the helper bean is initialized in application-context-graphium-postgis-testsuite.xml)
+	Polygon coveredArea;
+	@Value("#{null}")
+	InputStream stream;
 
 	@Resource(name="postgisQueuingGraphVersionImportService")
 	private IGraphVersionImportService importService;
-	
-	@Test
+
 	public void testImportGraphVersion() {
-		String graphName = "gip_at_frc_0_4";
-		String version = "16_02_160415";
-		String originGraphName = "gip_at";
-		String originVersion = "test";
-		Date validFrom = new Date();
-		Date validTo = null;
-		Map<String, String> tags = null;
-		int sourceId = 1;
-		String type = "graph";
-		String description = "die GIP";
-		String creator = "ich";
-		String originUrl = "http://gip.at";
-		String inputFileName = "C:/development/Graphserver/working_data/graphs_for_import/gip_at_frc_0_4_15_02_151120.json";
-		Polygon coveredArea = null;
-		InputStream stream = null;
-		
 		try {
 			stream = new FileInputStream(inputFileName);
 			
@@ -102,7 +112,10 @@ public class TestQueuingGraphVersionImportServiceImpl {
 		} catch (GraphAlreadyExistException e) {
 			log.error("error, graph already exists", e);
 		}
-		
 	}
-	
+
+	@Override
+	public void run() {
+		testImportGraphVersion();
+	}
 }

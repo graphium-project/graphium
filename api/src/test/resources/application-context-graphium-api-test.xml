@@ -1,0 +1,108 @@
+<!--
+ * Salzburg Research ForschungsgesmbH (c) 2018
+ *
+ * Project: graphium
+ * Created by sschwarz on 06.02.2018.
+ *
+ * Configuration-file for TestGraphApiController
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       default-lazy-init="true"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+    <context:annotation-config/>
+    <context:component-scan base-package="at.srfg.graphium" /> <!--search beans in at.srfg.graphium -->
+    <mvc:annotation-driven />
+
+    <!-- Dao-Mocks -->
+    <!-- <context:annotation-config/> -->
+    <bean id="wayGraphVersionMetadataDao" class="at.srfg.graphium.api.springconfig.MockBeansConfig" factory-method="getWayGraphVersionMetadataDaoMock"/>
+
+    <bean id="wayGraphReadDao" class="at.srfg.graphium.api.springconfig.MockBeansConfig" factory-method="getWayGraphReadDaoMock">
+    </bean>
+
+    <bean id="wayGraphViewDao" class="at.srfg.graphium.api.springconfig.MockBeansConfig" factory-method="getWayGraphViewDaoMock"/>
+
+    <!-- Controller -->
+    <bean id="genericGraphApiController" parent="abstractGraphApiController" class="at.srfg.graphium.api.controller.GenericGraphApiController" >
+        <property name="metadataService" ref="graphVersionMetadataService"/>
+        <property name="graphApiReadService" ref="graphService"/>
+        <property name="graphApiService" ref="graphApiService"/>
+    </bean>
+
+    <bean id="abstractGraphApiController" class="at.srfg.graphium.api.controller.AbstractGraphApiController" abstract="true">
+    </bean>
+
+    <!-- not required would be a specific controller for the type IWaySegment -->
+    <bean id="graphApiController" parent="genericGraphApiController"
+          class="at.srfg.graphium.api.controller.GraphApiController" />
+
+    <!-- Services -->
+    <bean id="graphApiService" class="at.srfg.graphium.api.service.impl.GraphServiceImpl">
+        <property name="graphOutputFormatFactory" ref="jacksonWayGraphOutputFormatFactory"/>
+        <property name="metadataService" ref="graphVersionMetadataService"/>
+        <property name="graphReadService" ref="graphReadService"/>
+    </bean>
+
+    <bean id="graphService" class="at.srfg.graphium.api.service.impl.GraphServiceImpl">
+        <property name="graphReadService" ref="graphReadService"/>
+        <property name="metadataService" ref="graphVersionMetadataService"/>
+        <property name="graphOutputFormatFactory" ref="jacksonWayGraphOutputFormatFactory"/>
+    </bean>
+
+    <!-- require backing by some persistence application context. e.g. application-context-graphium-postgis.xml, use
+       application-context-graphium-postgis-aliasing.xml to ensure correct bean names -->
+    <bean id="graphReadService"
+          class="at.srfg.graphium.core.service.impl.GraphReadServiceImpl">
+        <property name="readDao" ref="wayGraphReadDao"/>
+    </bean>
+
+    <bean id="graphVersionMetadataService"
+          class="at.srfg.graphium.core.service.impl.GraphVersionMetadataServiceImpl">
+        <property name="metadataDao" ref="wayGraphVersionMetadataDao"/>
+    </bean>
+
+    <bean id="baseSegmentXInfoService" class="at.srfg.graphium.api.service.impl.BaseSegmentXInfoService">
+    </bean>
+
+    <!-- output formats -->
+    <bean id="jacksonWayGraphOutputFormatFactory" class="at.srfg.graphium.io.outputformat.impl.jackson.GenericJacksonWayGraphOutputFormatFactoryImpl">
+        <constructor-arg name="segmentOutputFormatFactory" ref="jacksonSegmentOutputFormatFactory" />
+        <constructor-arg name="adapter" ref="graphVersionMetadata2GraphVersionMetadataDTOAdapter" />
+    </bean>
+
+    <bean id="jacksonSegmentOutputFormatFactory" class="at.srfg.graphium.io.outputformat.impl.jackson.GenericJacksonSegmentOutputFormatFactoryImpl">
+        <constructor-arg name="adapterRegistry" ref="autodetectingSegmentAdapterRegistry" />
+    </bean>
+
+    <!-- Registries -->
+    <bean id="autodetectingSegmentAdapterRegistry" class="at.srfg.graphium.core.adapter.registry.AutodetectingSegmentAdapterRegistryImpl" />
+
+    <bean id="segmentAdapterRegistryImpl" class="at.srfg.graphium.io.adapter.registry.impl.SegmentAdapterRegistryImpl">
+    </bean>
+
+    <bean id="autodetectingSegmentXinfoAdapterRegistry" class="at.srfg.graphium.core.adapter.registry.AutodetectingSegmentXInfoAdapterRegistryImpl"/>
+    <bean id="autodetectingConnectionXinfoAdapterRegistry" class="at.srfg.graphium.core.adapter.registry.AutodetectingConnectionXInfoAdapterRegistryImpl"/>
+
+    <!-- Adapter -->
+    <bean id="graphVersionMetadata2GraphVersionMetadataDTOAdapter"
+          class="at.srfg.graphium.io.adapter.impl.GraphVersionMetadata2GraphVersionMetadataDTOAdapter">
+    </bean>
+
+    <bean id="abstractSegmentDTOAdapter" class="at.srfg.graphium.io.adapter.impl.AbstractSegmentDTOAdapter" abstract="true">
+        <property name="connectionXInfoAdapterRegistry" ref="autodetectingConnectionXinfoAdapterRegistry"/>
+        <property name="segmentXInfoAdapterRegistry" ref="autodetectingSegmentXinfoAdapterRegistry"/>
+    </bean>
+
+    <bean id="baseSegment2SegmentDTOAdapter" class="at.srfg.graphium.io.adapter.impl.BaseSegment2SegmentDTOAdapter" parent="abstractSegmentDTOAdapter">
+        <constructor-arg name="dtoClass" value="at.srfg.graphium.io.dto.impl.BaseSegmentDTOImpl" />
+        <constructor-arg name="modelClass" value="at.srfg.graphium.model.impl.BaseSegment" />
+    </bean>
+    <bean id="baseWaySegment2SegmentDTOAdapter" class="at.srfg.graphium.io.adapter.impl.BaseWaySegment2SegmentDTOAdapter" parent="abstractSegmentDTOAdapter"/>
+    <bean id="waySegment2SegmentDTOAdapter" class="at.srfg.graphium.io.adapter.impl.WaySegment2SegmentDTOAdapter" parent="abstractSegmentDTOAdapter"/>
+</beans>

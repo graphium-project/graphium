@@ -82,13 +82,14 @@ public class WayBaseGraphWriteDaoImpl<W extends IBaseWaySegment>
 				throw new GraphAlreadyExistException("graph " + graphVersionName + " already exists");
 			}
 		}
+
 		getJdbcTemplate().execute("CREATE TABLE " + schema + SEGMENT_TABLE_PREFIX + graphVersionName + 
 			" (CONSTRAINT " + SEGMENT_TABLE_PREFIX + graphVersionName + "_pk PRIMARY KEY (id)) INHERITS (" +
 				schema + PARENT_SEGMENT_TABLE_NAME + ") WITH (OIDS=FALSE)");
 
 		getJdbcTemplate().execute("CREATE TABLE " + schema + CONNECTION_TABLE_PREFIX + graphVersionName + 
 			" () INHERITS (" +	schema + PARENT_CONNECTION_TABLE_NAME + ") WITH (OIDS=FALSE)");
-	}
+}
 
 	@Override
 	public void createGraphVersion(String graphName, String version,  boolean overrideGraphIfExsists,
@@ -200,15 +201,15 @@ public class WayBaseGraphWriteDaoImpl<W extends IBaseWaySegment>
 		args.addValue("endNodeId", segment.getEndNodeId());
 		args.addValue("endNodeIndex", segment.getEndNodeIndex());
 		args.addValue("timestamp", now);
-		args.addValue("tags", segment.getTags());		
+		args.addValue("tags", segment.getTags());
 		return args;
 	}
 	
 	protected String getInsertStatement(String graphVersionName) {
 		return "INSERT INTO "+ schema + SEGMENT_TABLE_PREFIX + graphVersionName + " (id, graphversion_id, geometry, length, name, streettype, way_id, " +
-		 		"startnode_id, startnode_index, endnode_id, endnode_index, timestamp, tags)" +
-				" VALUES (:id, :graphVersionId, ST_GeomFromEWKT(:geometry), :length, " +
-		 		" :name, :streetType, :wayId, :startNodeId, :startNodeIndex, :endNodeId, :endNodeIndex, :timestamp, :tags)";
+				"startnode_id, startnode_index, endnode_id, endnode_index, timestamp, tags)" +
+		  	" VALUES (:id, :graphVersionId, ST_GeomFromEWKT(:geometry), :length, " +
+				" :name, :streetType, :wayId, :startNodeId, :startNodeIndex, :endNodeId, :endNodeIndex, :timestamp, :tags)";
 	}
 	
 	protected String getUpdateStatement(String graphVersionName) {

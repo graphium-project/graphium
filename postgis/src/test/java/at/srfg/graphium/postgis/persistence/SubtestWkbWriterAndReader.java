@@ -21,65 +21,48 @@
  */
 package at.srfg.graphium.postgis.persistence;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import at.srfg.graphium.ITestGraphiumPostgis;
 import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.postgis.jts.JtsBinaryParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.transaction.annotation.Transactional;
-
+import org.springframework.beans.factory.annotation.Value;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKBReader;
 import com.vividsolutions.jts.io.WKBWriter;
 import com.vividsolutions.jts.io.WKTReader;
 
-import at.srfg.graphium.core.exception.GraphAlreadyExistException;
 import at.srfg.graphium.core.exception.GraphNotExistsException;
 import at.srfg.graphium.core.persistence.IWayGraphReadDao;
 import at.srfg.graphium.model.IWaySegment;
-import at.srfg.graphium.model.State;
-import at.srfg.graphium.postgis.persistence.impl.AbstractTestWayGraphWriteDao;
 
 /**
  * @author mwimmer
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "classpath:/application-context-graphium-core.xml",
-		"classpath:application-context-graphium-postgis-datasource.xml",
-		"classpath:application-context-graphium-postgis.xml",
-		"classpath:application-context-graphium-postgis-aliasing.xml",
-		"classpath:application-context-graphium-postgis_test.xml"})
-public class TestWkbWriterAndReader extends AbstractTestWayGraphWriteDao {
 
-	private static Logger log = LoggerFactory.getLogger(TestWkbWriterAndReader.class);
+public class SubtestWkbWriterAndReader implements ITestGraphiumPostgis {
 
 	@Autowired
 	private IWayGraphReadDao<IWaySegment> dao;
+
+	@Value("${db.graphName}")
+	String graphName;
+	@Value("${db.version}")
+	String version;
+	@Value("#{'${db.segmentId1}'.split(',')}") //using spEL
+	List<Long> segmentIds;
 	
 	private WKBWriter wkbWriter = new WKBWriter();
 	private WKBReader wkbReader = new WKBReader();
 	private JtsBinaryParser bp = new JtsBinaryParser();
-	
-	@Test
-	@Transactional(readOnly=false)
-	@Rollback(true)
-	public void testWkbWriterAndReader() throws GraphAlreadyExistException, GraphNotExistsException {
-		String graphName = "osm_at";
-		String version = "1";
-		writeTestMetadata(graphName, version, State.INITIAL);
-		writeTestSegment(graphName, version);
-		
-		List<Long> segmentIds = new ArrayList<>();
-		segmentIds.add(Long.MAX_VALUE);
+
+	private static Logger log = LoggerFactory.getLogger(SubtestWkbWriterAndReader.class);
+
+	public void testWkbWriterAndReader() {
 		List<IWaySegment> segments = null;
 		try {
 			segments = dao.getSegmentsById(graphName, version, segmentIds, false);
@@ -103,7 +86,6 @@ public class TestWkbWriterAndReader extends AbstractTestWayGraphWriteDao {
 		Assert.assertNotNull(geomFromBinary);
 		
 		Assert.assertEquals(geom.toText(), geomFromBinary.toText());
-	
 		
 		geomFromBinary = (LineString) bp.parse(geomBin);
 		
@@ -111,9 +93,9 @@ public class TestWkbWriterAndReader extends AbstractTestWayGraphWriteDao {
 		
 		Assert.assertEquals(geom.toText(), geomFromBinary.toText());
 	}
-	
-	@Test
+
 	public void testWkbWriterAndReader2() {
+		//TODO define correct linestring????
 		String linestringWkt = "LINESTRING (13.045996812 47.810134412, 13.0460128 47.810128, 13.046028 47.8101184, 13.0460408 47.810112, "
 				+ "13.0460504 47.810096, 13.046056 47.8100864, 13.0460576 47.8100736, 13.046056 47.8100576, 13.0460504 47.810048, "
 				+ "13.046044 47.8100384)";
@@ -141,13 +123,17 @@ public class TestWkbWriterAndReader extends AbstractTestWayGraphWriteDao {
 		Assert.assertNotNull(geomFromBinary);
 		
 		Assert.assertEquals(geom.toText(), geomFromBinary.toText());
-	
-		
+
 		geomFromBinary = (LineString) bp.parse(geomBin);
 		
 		Assert.assertNotNull(geomFromBinary);
 		
 		Assert.assertEquals(geom.toText(), geomFromBinary.toText());
 	}
-	
+
+	@Override
+	public void run() {
+		testWkbWriterAndReader();
+		testWkbWriterAndReader2();
+	}
 }

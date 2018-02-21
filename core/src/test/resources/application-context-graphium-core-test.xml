@@ -1,0 +1,29 @@
+<!--
+ * Salzburg Research ForschungsgesmbH (c) 2018
+ *
+ * Project: graphium
+ * Created by sschwarz on 01.02.2018.
+ *
+ * Configuration-file for TestGraphiumGraphVersionValidityPeriodValidator
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+
+   <!-- <context:annotation-config/> -->
+    <bean id="wayGraphVersionMetadataDao" class="at.srfg.graphium.core.springconfig.MockBeansConfig" factory-method="getWayGraphVersionMetadataDaoMock"/>
+
+    <bean id="graphVersionValidityPeriodValidator"
+          class="at.srfg.graphium.core.helper.GraphVersionValidityPeriodValidator">
+          <property name="metadataService" ref="graphVersionMetadataService"/>
+    </bean>
+
+    <bean id="graphVersionMetadataService"
+          class="at.srfg.graphium.core.service.impl.GraphVersionMetadataServiceImpl">
+        <property name="metadataDao" ref="wayGraphVersionMetadataDao"/>
+    </bean>
+</beans>

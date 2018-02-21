@@ -366,7 +366,8 @@ public class WayGraphVersionMetadataDaoImpl extends AbstractWayGraphDaoImpl impl
 	}
 
 	@Override
-	@Transactional(readOnly=false, propagation=Propagation.REQUIRES_NEW)
+	//@Transactional(readOnly=false, propagation=Propagation.REQUIRES_NEW)
+	@Transactional(readOnly=false)
 	public void setGraphVersionState(String graphName, String version, State state) {
 		Map<String, Object> paramMap = new HashMap<String, Object>();
 		paramMap.put("graphName", graphName);

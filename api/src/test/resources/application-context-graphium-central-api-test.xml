@@ -5,9 +5,10 @@
     <import resource="classpath:application-context-graphium-central-api.xml"/>
     <import resource="classpath:application-context-graphium-api.xml"/>
     <import resource="classpath:application-context-graphium-core.xml"/>
+    <!--
     <import resource="classpath:application-context-graphium-postgis-datasource.xml"/>
     <import resource="classpath:application-context-graphium-postgis-services.xml"/>
     <import resource="classpath:application-context-graphium-postgis-aliasing.xml"/>
     <import resource="classpath:application-context-graphium-postgis.xml"/>
-
+    -->
 </beans>

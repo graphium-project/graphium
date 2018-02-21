@@ -178,16 +178,11 @@ public class WayGraphReadDaoImpl<T extends IBaseSegment, X extends ISegmentXInfo
 		// 		use aliases to avoid duplicate field names, ...)
 		String query = ViewParseUtil.prepareViewFilterQuery(view, version, schema, rsExtractor, null);
 		
-		String bbox = GeometryUtils.createRectangleWithSideLengthInMetersAsWkt(referencePoint, 2*radiusInKm*1000);
-		String geoClause = rsExtractor.getPrefix() + ".geometry && '" + bbox +
-							"' ORDER BY " + rsExtractor.getPrefix() + ".geometry <-> '" + bbox + "'"; 
+		String bbox = "st_geomFromText('" +  GeometryUtils.createRectangleWithSideLengthInMetersAsWkt(referencePoint, 2*radiusInKm*1000) + "', " + SRID + ")";
+		String geoClause = rsExtractor.getPrefix() + ".wayseg_geometry_ewkb && " + bbox +
+							" ORDER BY " + rsExtractor.getPrefix() + ".wayseg_geometry_ewkb <-> " + bbox;
 		
-		if (ViewParseUtil.hasWhereClause(query.toUpperCase())) {
-			query += " AND ";
-		} else {
-			query += " WHERE ";
-		}
-		query += geoClause;
+		query = "SELECT * FROM (" + query + ") AS wayseg WHERE " + geoClause;
 		
 		if (maxNrOfSegments > 0) {
 			query += " LIMIT " + maxNrOfSegments;

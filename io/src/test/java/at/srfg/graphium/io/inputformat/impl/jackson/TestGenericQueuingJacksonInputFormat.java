@@ -52,8 +52,6 @@ public class TestGenericQueuingJacksonInputFormat {
 
     private String inputSegmentXInfoTest;
 
-    private String inputFileName;
-
     @Before
     public void setup() {
 
@@ -240,9 +238,4 @@ public class TestGenericQueuingJacksonInputFormat {
         this.inputFormat.deserialize(inputStream);
     }
 
-    @Test
-    public void testDeserializationSegmentXInfo() throws WaySegmentDeserializationException {
-        InputStream inputStream = new ByteArrayInputStream(this.inputSegmentXInfoTest.getBytes(StandardCharsets.UTF_8));
-        this.inputFormat.deserialize(inputStream);
-    }
 }

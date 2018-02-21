@@ -88,8 +88,7 @@ public class ViewParseUtil {
 		StringBuilder filters = new StringBuilder();
 		
 		if (view.isWaySegmentsIncluded() && graphVersion != null) {
-			filters.append("wayseg_graphversion_id = (SELECT id FROM " + schema +"waygraphmetadata WHERE graphname = '" + view.getGraph().getName() + "'" +
-						   " AND version = '" + graphVersion + "')");
+			filters.append("wayseg_graphversion_id = f_current_graphversion_immutable('" + view.getGraph().getName() + "', '" + graphVersion + "')");
 		}
 		
 		if (additionalFilter != null && !additionalFilter.isEmpty()) {

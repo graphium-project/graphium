@@ -21,8 +21,6 @@
  */
 package at.srfg.graphium.osmimport.service;
 
-import java.util.Date;
-
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,32 +37,13 @@ public class TestOsmImporterServiceImpl {
 	private static Logger log = LoggerFactory.getLogger(TestOsmImporterServiceImpl.class);
 	
 	// OSM Land
-	private String country = "liechtenstein";
-	
+	private String country = "monaco";
+
 	// Wo liegt das OSM-File?
-//	private String osmFileName = "C:/development/osm/" + country + "-latest.osm.pbf";
-//	private String osmFileName = "D:/development/project_data/osm/" + country + "-latest.osm.pbf";
-	private String osmFileName = "C:/development/Graphserver/osm/" + country + "-latest.osm.pbf";
+	private String osmFileName = System.getProperty("user.dir") + "\\src\\test\\resources\\" + country + "-latest.osm.pbf";
 
-//	private String osmFileName = "C:/development/Graphserver/osm/austria-latest.osm.pbf";
-//	private String osmFileName = "C:/development/Graphserver/osm/liechtenstein-latest.osm.pbf";
-//	private String osmFileName = "D:/development/project_data/osm/germany-latest.osm.pbf";
-//	private String osmFileName = "D:/development/project_data/osm/liechtenstein-latest.osm.pbf";
-//	private String osmFileName = "D:/development/project_data/osm/austria-latest.osm.pbf";
-	
-	//private String osmFileName = "/development/project_data/graphium/testdata/osm/20160708/liechtenstein-latest.osm.pbf";
-	//private String osmFileName = "/development/project_data/graphium/testdata/osm/20160708/austria-latest.osm.pbf";
-//	private String osmFileName = "/development/project_data/graphium/testdata/osm/20160708/germany-latest.osm.pbf";
-	
 	// Wohin soll das JSON geschrieben werden?
-//	private String outputDirectory = "D:/development/project_data/graphserver/osm2graphium/json";
-	private String outputDirectory = "C:/development/Graphserver/working_data/osm2graphium/json/";
-
-//	private String boundsFile = "C:/development/Graphserver/working_data/osm2graphium/config/salzburg.poly";
-
-	// Welche geografischen Einschränkungen gibt es?
-//	private String boundsFile = "src/test/resources/dachi.poly";
-//	private String boundsFile = "src/test/resources/salzburg.poly";
+	private String outputDirectory = System.getProperty("user.home");
 	private String boundsFile = null;
 	
     private int queueSize = 20000;
@@ -79,7 +58,6 @@ public class TestOsmImporterServiceImpl {
 		IImportConfig config = ImportConfig.getConfig("osm-" + country, "test", osmFileName)
 											.outPutDir(outputDirectory)
 											.boundsFile(boundsFile)
-											.validFrom(new Date())
 											.queueSize(queueSize)
 											.workerThreads(workerThreads)
 											.highwayList("motorway", "motorway_link", "trunk", "trunk_link", "primary", "primary_link", 

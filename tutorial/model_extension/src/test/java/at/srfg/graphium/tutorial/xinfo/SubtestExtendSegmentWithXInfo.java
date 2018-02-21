@@ -34,12 +34,13 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
 
-import org.junit.Ignore;
+import at.srfg.graphium.tutorial.ITestGraphiumModelExtension;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -78,6 +79,8 @@ import at.srfg.graphium.tutorial.xinfo.model.impl.RoadDamageImpl;
  * @author mwimmer
  *
  */
+
+/*
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "classpath:/application-context-graphium-tutorial.xml",
 		"classpath:/application-context-graphium-tutorial_test.xml",
@@ -85,9 +88,10 @@ import at.srfg.graphium.tutorial.xinfo.model.impl.RoadDamageImpl;
 		"classpath:application-context-graphium-postgis.xml",
 		"classpath:application-context-graphium-postgis-datasource.xml",
 		"classpath:application-context-graphium-postgis-aliasing.xml"})
-public class TestExtendSegmentWithXInfo {
+*/
+public class SubtestExtendSegmentWithXInfo implements ITestGraphiumModelExtension{
 
-	private static Logger log = LoggerFactory.getLogger(TestExtendSegmentWithXInfo.class);
+	private static Logger log = LoggerFactory.getLogger(SubtestExtendSegmentWithXInfo.class);
 
 	@Autowired
 	private IWayGraphWriteDao<IWaySegment> writeDao;
@@ -107,13 +111,15 @@ public class TestExtendSegmentWithXInfo {
 	@Autowired
 	private ViewDao testViewDao;
 
-	private String graphName = "tutorialgraph";
-	private String version = "1_0";
+	@Value("${db.graphName2}")
+	private String graphName;
+	@Value("${db.graphVersion2}")
+	private String version;
 	private String customViewName = "roaddamages";
 
-	@Test
+	//@Test
 	@Transactional(readOnly=false)
-	@Rollback(true)
+	//@Rollback(true)
 	public void testExtendSegmentWithXInfo() throws GraphAlreadyExistException, GraphNotExistsException, InterruptedException, WaySegmentSerializationException {
 
 		// store base data
@@ -189,14 +195,12 @@ public class TestExtendSegmentWithXInfo {
 	
 	}
 	
-	@Ignore
-	@Test
+	//@Test
 	public void readSegments() throws GraphNotExistsException, WaySegmentSerializationException, InterruptedException {
 		readSegments(graphName, version);
 	}
 	
-	@Ignore
-	@Test
+	//@Test
 	public void readSegmentsWithCustomView() throws GraphNotExistsException, WaySegmentSerializationException, InterruptedException {
 		readSegments(customViewName, version);
 	}
@@ -239,7 +243,7 @@ public class TestExtendSegmentWithXInfo {
 
 	private IWayGraph createBaseData(String graphName, String version) throws GraphAlreadyExistException, GraphNotExistsException {
 		
-		ISource source = new Source(1, "testSource");
+		ISource source = new Source(11, "testSourceModelExtension");
 		sourceDao.save(source);
 		
 		Date now = new Date();
@@ -286,4 +290,21 @@ public class TestExtendSegmentWithXInfo {
 		return bounds;
 	}
 
+	@Override
+	public void run() {
+		try {
+			testExtendSegmentWithXInfo();
+			readSegments();
+			readSegmentsWithCustomView();
+		} catch (GraphAlreadyExistException e) {
+			e.printStackTrace();
+		} catch (GraphNotExistsException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (WaySegmentSerializationException e) {
+			e.printStackTrace();
+		}
+
+	}
 }

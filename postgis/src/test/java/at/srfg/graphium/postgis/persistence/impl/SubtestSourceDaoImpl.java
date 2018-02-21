@@ -15,12 +15,11 @@
  */
 package at.srfg.graphium.postgis.persistence.impl;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import at.srfg.graphium.ITestGraphiumPostgis;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.Assert;
 
 import at.srfg.graphium.core.persistence.ISourceDao;
@@ -31,36 +30,28 @@ import at.srfg.graphium.model.management.impl.Source;
  * @author mwimmer
  *
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "classpath:/application-context-graphium-postgis_test.xml",
-		"classpath:/application-context-graphium-core.xml",
-		"classpath:application-context-graphium-postgis.xml",
-		"classpath:application-context-graphium-postgis-datasource.xml",
-		"classpath:application-context-graphium-postgis-aliasing.xml"})
-public class TestSourceDaoImpl {
+
+public class SubtestSourceDaoImpl implements ITestGraphiumPostgis {
 
 	@Autowired
 	private ISourceDao dao;
-	
-	@Test
-	@Rollback(value=true)
-	public void testStoreAndReadSource() {
-		
-		String sourceName = "neue Source";
-		
-		ISource source = dao.getSource(sourceName);
-		
-		if (source == null) {
-			source = new Source(1, sourceName);
-			dao.save(source);
+	@Value("${db.sourceId}")
+	int sourceID;
+	@Value("${db.sourceName}")
+	String sourceName;
+	private static Logger log = LoggerFactory.getLogger(SubtestSourceDaoImpl.class);
 
-			ISource savedSource = dao.getSource(sourceName);
-			
-			Assert.notNull(savedSource);
-		}
-		
-		System.out.println(source);
-		
+	@Override
+	public void run(){
+		//call all test-methods
+		testStoreAndReadSource();
 	}
-	
+
+	public void testStoreAndReadSource() {
+		ISource source = new Source(sourceID, sourceName);
+		dao.save(source);
+		ISource savedSource = dao.getSource(source.getId());
+		Assert.notNull(savedSource);
+		log.info(source.toString());
+	}
 }
