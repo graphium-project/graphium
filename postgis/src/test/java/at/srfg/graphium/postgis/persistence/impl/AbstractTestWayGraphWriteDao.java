@@ -35,7 +35,7 @@ import at.srfg.graphium.model.IWaySegment;
 import at.srfg.graphium.model.State;
 import at.srfg.graphium.model.impl.WaySegment;
 import at.srfg.graphium.model.management.impl.Source;
-import at.srfg.graphium.postgis.model.impl.XInfoTest;
+import at.srfg.graphium.postgis.model.impl.XInfoTestclass;
 
 public class AbstractTestWayGraphWriteDao {
 
@@ -77,7 +77,7 @@ public class AbstractTestWayGraphWriteDao {
 		segment.setBridge(false);
 		segment.setUrban(false);
 		
-		XInfoTest xInfo = new XInfoTest();
+		XInfoTestclass xInfo = new XInfoTestclass();
 		xInfo.setDirectedId(1);
 		xInfo.setDirectionTow(true);
 		xInfo.setGraphId(1);
