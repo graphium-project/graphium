@@ -37,6 +37,11 @@
 			<name>Stefan Henneberger</name>
 			<email>stefan.henneberger@salzburgresearch.at</email>
 		</developer>
+		<developer>
+			<id>schwarzst</id>
+			<name>Stefan Schwarz</name>
+			<email>stefan.schwarz@salzburgresearch.at</email>
+		</developer>
 	</developers>
  	
 	<build>
