@@ -15,13 +15,13 @@
  */
 package at.srfg.graphium.core.helper;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
-
 import at.srfg.graphium.core.service.IGraphVersionMetadataService;
 import at.srfg.graphium.model.IWayGraphVersionMetadata;
 import at.srfg.graphium.model.State;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author mwimmer

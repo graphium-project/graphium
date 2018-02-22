@@ -1,7 +1,7 @@
 CREATE EXTENSION IF NOT EXISTS hstore;
 CREATE EXTENSION IF NOT EXISTS postgis;
 
-CREATE SCHEMA IF NOT EXISTS graphs /*AUTHORIZATION graphium*/;
+CREATE SCHEMA IF NOT EXISTS graphs AUTHORIZATION graphium;
 
 -- Table: graphs.schema_versioning
 
@@ -321,3 +321,19 @@ ALTER TABLE graphs.graph_import_states
       ON UPDATE NO ACTION ON DELETE CASCADE;
 
 select graphs.db_schema_changed(7, '07_from_v6_to_v7_correct_subscription_fk_constraints.sql');
+
+CREATE FUNCTION f_current_graphversion_immutable(in_graph text, in_version text)
+  RETURNS integer AS
+$func$
+	select id as graphversion_id from graphs.waygraphmetadata
+        where graph_id = (select graph_id as graph_id from graphs.waygraph_view_metadata  where viewname = in_graph)
+        and
+        case when 'null' != in_version
+            THEN version = in_version
+            ELSE state = 'ACTIVE'
+
+        END
+        order by valid_from desc limit 1
+$func$  LANGUAGE sql IMMUTABLE;
+ALTER FUNCTION f_current_graphversion_immutable(text, text)
+  OWNER TO graphium;

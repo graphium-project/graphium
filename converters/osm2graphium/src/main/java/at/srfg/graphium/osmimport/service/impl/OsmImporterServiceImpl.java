@@ -231,13 +231,12 @@ public class OsmImporterServiceImpl {
 	}
 	
 	private SinkSource createWayTagFilter(IImportConfig config) {
-        Set<String> keys = new HashSet<String>();
-        Map<String, Set<String>> keyValues = new HashMap<String, Set<String>>();
-        keyValues.put("highway", config.getHighwayList());
-        
-        TagFilter filterSink = new TagFilter("accept-way", keys, keyValues);
-
-        return filterSink;
+        Set<String> keys = new HashSet<>();
+        Map<String, Set<String>> keyValues = new HashMap<>();
+        if (config.getHighwayList() != null && !config.getHighwayList().isEmpty()) {
+			keyValues.put("highway", config.getHighwayList());
+		}
+		return new TagFilter("accept-way", keys, keyValues);
 	}
 	
 	private SinkSource createRelationTagFilter() {

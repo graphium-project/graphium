@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -115,18 +116,12 @@ public class WayGraphReadDaoImpl<T extends IBaseSegment, X extends ISegmentXInfo
 		
 		// prepare filter query (change parent table names with versioned table names; change "SELECT * " to "SELECT id, name, ...", 
 		// 		use aliases to avoid duplicate field names, ...)
-		String query = ViewParseUtil.prepareViewFilterQuery(view, version, schema, rsExtractor, null);
-		String segmentIdsClause = StringUtils.join(segmentIds, ", ");
-		int lastIndexOfWaySegmentsTableName = query.lastIndexOf(AbstractWayGraphDaoImpl.SEGMENT_TABLE_PREFIX);
-		if (lastIndexOfWaySegmentsTableName < 0) {
-			throw new RuntimeException("No waysegments table definition found in view " + view.getViewName());
+		Map<String, Set<Long>> idsMap = null;
+		if (segmentIds != null && !segmentIds.isEmpty()) {
+			idsMap = new HashMap<>();
+			idsMap.put("id", new HashSet<Long>(segmentIds));
 		}
-		String lastQueryPart = query.substring(lastIndexOfWaySegmentsTableName);
-		if (lastQueryPart != null && lastQueryPart.toUpperCase().contains("WHERE")) {
-			query += " AND id in (" + segmentIdsClause + ")";
-		} else {
-			query += " WHERE id in (" + segmentIdsClause + ")";
-		}
+		String query = ViewParseUtil.prepareViewFilterQuery(view, version, schema, rsExtractor, null, idsMap);
 		
 		List<T> segments = queryForList(query, rsExtractor);
 		return segments;
@@ -183,16 +178,11 @@ public class WayGraphReadDaoImpl<T extends IBaseSegment, X extends ISegmentXInfo
 		// 		use aliases to avoid duplicate field names, ...)
 		String query = ViewParseUtil.prepareViewFilterQuery(view, version, schema, rsExtractor, null);
 		
-		String bbox = GeometryUtils.createRectangleWithSideLengthInMetersAsWkt(referencePoint, 2*radiusInKm*1000);
-		String geoClause = rsExtractor.getPrefix() + ".geometry && '" + bbox +
-							"' ORDER BY " + rsExtractor.getPrefix() + ".geometry <-> '" + bbox + "'"; 
+		String bbox = "st_geomFromText('" +  GeometryUtils.createRectangleWithSideLengthInMetersAsWkt(referencePoint, 2*radiusInKm*1000) + "', " + SRID + ")";
+		String geoClause = rsExtractor.getPrefix() + ".wayseg_geometry_ewkb && " + bbox +
+							" ORDER BY " + rsExtractor.getPrefix() + ".wayseg_geometry_ewkb <-> " + bbox;
 		
-		if (ViewParseUtil.hasWhereClause(query.toUpperCase())) {
-			query += " AND ";
-		} else {
-			query += " WHERE ";
-		}
-		query += geoClause;
+		query = "SELECT * FROM (" + query + ") AS wayseg WHERE " + geoClause;
 		
 		if (maxNrOfSegments > 0) {
 			query += " LIMIT " + maxNrOfSegments;

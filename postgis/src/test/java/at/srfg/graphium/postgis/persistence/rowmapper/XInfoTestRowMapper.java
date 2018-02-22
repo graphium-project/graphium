@@ -18,24 +18,25 @@ package at.srfg.graphium.postgis.persistence.rowmapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import at.srfg.graphium.ITestGraphiumPostgis;
 import at.srfg.graphium.model.IBaseSegment;
 import at.srfg.graphium.model.impl.AbstractXInfoModelTypeAware;
 import at.srfg.graphium.model.impl.BaseSegment;
 import at.srfg.graphium.postgis.model.IXInfoTest;
-import at.srfg.graphium.postgis.model.impl.XInfoTest;
+import at.srfg.graphium.postgis.model.impl.XInfoTestclass;
 import at.srfg.graphium.postgis.persistence.ISegmentXInfoRowMapper;
 
 /**
  * @author mwimmer
  *
  */
-public class XInfoTestRowMapper extends AbstractXInfoModelTypeAware<IXInfoTest> implements ISegmentXInfoRowMapper<IXInfoTest> {
+public class XInfoTestRowMapper extends AbstractXInfoModelTypeAware<IXInfoTest> implements ISegmentXInfoRowMapper<IXInfoTest>, ITestGraphiumPostgis {
 
 	/**
 	 * @param object
 	 */
 	public XInfoTestRowMapper() {
-		super(new XInfoTest());
+		super(new XInfoTestclass());
 	}
 
 	private static final String QUERY_PREFIX = "xit";
@@ -46,15 +47,21 @@ public class XInfoTestRowMapper extends AbstractXInfoModelTypeAware<IXInfoTest> 
 
 	@Override
 	public IBaseSegment mapRow(ResultSet rs, int rowNum) throws SQLException {
-		IXInfoTest xit = new XInfoTest();
-		xit.setSegmentId(rs.getLong(QUERY_PREFIX + "_segment_id"));
-		xit.setDirectedId(rs.getLong(QUERY_PREFIX + "_directed_id"));
-		xit.setDirectionTow(rs.getBoolean(QUERY_PREFIX + "_direction_tow"));
-		xit.setGraphId(rs.getLong(QUERY_PREFIX + "_graph_id"));
-		IBaseSegment segment = new BaseSegment();
-		segment.addXInfo(xit);
-		segment.setId(xit.getSegmentId());
-		return segment;
+		IXInfoTest xit = new XInfoTestclass();
+		ColumnFinder colFinder = new ColumnFinder(rs);
+		if (colFinder.getColumnIndex(QUERY_PREFIX + "_segment_id") > -1) {
+			xit.setSegmentId(rs.getLong(QUERY_PREFIX + "_segment_id"));
+			xit.setDirectedId(rs.getLong(QUERY_PREFIX + "_directed_id"));
+			xit.setDirectionTow(rs.getBoolean(QUERY_PREFIX + "_direction_tow"));
+			xit.setGraphId(rs.getLong(QUERY_PREFIX + "_graph_id"));
+			IBaseSegment segment = new BaseSegment();
+			segment.addXInfo(xit);
+			segment.setId(xit.getSegmentId());
+			return segment;
+		}else{
+			return null;
+		}
+
 	}
 
 	@Override
@@ -77,4 +84,8 @@ public class XInfoTestRowMapper extends AbstractXInfoModelTypeAware<IXInfoTest> 
 		return false;
 	}
 
+	@Override
+	public void run() {
+
+	}
 }

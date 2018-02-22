@@ -19,7 +19,7 @@
  * All rights reserved.
  *
  */
-package at.srfg.graphium.tutorial.xinfo;
+package at.srfg.graphium.tutorial.hstore;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,13 +32,14 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Resource;
-
+import at.srfg.graphium.tutorial.ITestGraphiumModelExtension;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -65,28 +66,26 @@ import at.srfg.graphium.model.ISource;
 import at.srfg.graphium.model.IWayGraph;
 import at.srfg.graphium.model.IWayGraphVersionMetadata;
 import at.srfg.graphium.model.IWaySegment;
-import at.srfg.graphium.model.IXInfo;
 import at.srfg.graphium.model.State;
 import at.srfg.graphium.model.impl.WaySegment;
 import at.srfg.graphium.model.management.impl.Source;
-import at.srfg.graphium.tutorial.xinfo.dao.ViewDao;
-import at.srfg.graphium.tutorial.xinfo.model.IRoadDamage;
-import at.srfg.graphium.tutorial.xinfo.model.impl.RoadDamageImpl;
 
 /**
  * @author mwimmer
  *
  */
+
+/*
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "classpath:/application-context-graphium-tutorial.xml",
-		"classpath:/application-context-graphium-tutorial_test.xml",
+@ContextConfiguration(locations = { "classpath:/application-context-graphium-tutorial_test.xml",
 		"classpath:/application-context-graphium-core.xml",
 		"classpath:application-context-graphium-postgis.xml",
 		"classpath:application-context-graphium-postgis-datasource.xml",
 		"classpath:application-context-graphium-postgis-aliasing.xml"})
-public class TestExtendSegmentWithXInfo {
+*/
+public class SubtestExtendSegmentWithHstoreTags implements ITestGraphiumModelExtension{
 
-	private static Logger log = LoggerFactory.getLogger(TestExtendSegmentWithXInfo.class);
+	private static Logger log = LoggerFactory.getLogger(SubtestExtendSegmentWithHstoreTags.class);
 
 	@Autowired
 	private IWayGraphWriteDao<IWaySegment> writeDao;
@@ -100,25 +99,21 @@ public class TestExtendSegmentWithXInfo {
 	@Autowired
 	private ISourceDao sourceDao;
 
-	@Resource(name="postgisWayGraphViewDao")
+	@Qualifier("postgisWayGraphViewDao")
+	@Autowired
 	private IWayGraphViewDao viewDao;
 
-	@Autowired
-	private ViewDao testViewDao;
+	@Value("${db.graphName}")
+	private String graphName;
+	@Value("${db.graphVersion}")
+	private String version;
 
-	private String graphName = "tutorialgraph";
-	private String version = "1_0";
-	private String customViewName = "roaddamages";
-
-	@Test
+	//@Test
 	@Transactional(readOnly=false)
-	@Rollback(true)
-	public void testExtendSegmentWithXInfo() throws GraphAlreadyExistException, GraphNotExistsException, InterruptedException, WaySegmentSerializationException {
-
+	//@Rollback(true)
+	public void testExtendSegmentWithHstoreTags() throws GraphAlreadyExistException, GraphNotExistsException, InterruptedException, WaySegmentSerializationException {
 		// store base data
-		IWayGraph wayGraph = createBaseData(graphName, version);
-		
-		IWayGraphVersionMetadata metadata = metadataDao.getWayGraphVersionMetadata(graphName, version);
+		createBaseData(graphName, version);
 		
 		// create dummy segments
 		List<IWaySegment> segments = new ArrayList<IWaySegment>();
@@ -139,8 +134,9 @@ public class TestExtendSegmentWithXInfo {
 		segment1.setUrban(false);
 		segment1.setTunnel(false);
 		segment1.setGeometry(createDummyGeometry());
-		IRoadDamage roadDamage1 = new RoadDamageImpl(segment1.getId(), metadata.getId(), true, 0.2f, 0.4f, "lane groove");
-		segment1.addXInfo(roadDamage1);
+		Map<String, String> tags = new HashMap<String, String>();
+		tags.put("like", "true");
+		segment1.setTags(tags);
 		
 		IWaySegment segment2 = new WaySegment();
 		segment2.setId(2);
@@ -154,8 +150,9 @@ public class TestExtendSegmentWithXInfo {
 		segment2.setUrban(false);
 		segment2.setTunnel(false);
 		segment2.setGeometry(createDummyGeometry());
-		IRoadDamage roadDamage2 = new RoadDamageImpl(segment2.getId(), metadata.getId(), true, 0.5f, 0.55f, "pothole");
-		segment2.addXInfo(roadDamage2);
+		tags = new HashMap<String, String>();
+		tags.put("like", "false");
+		segment2.setTags(tags);
 		
 		segments.add(segment1);
 		segments.add(segment2);
@@ -170,59 +167,16 @@ public class TestExtendSegmentWithXInfo {
 		}
 		
 		// read segments
-		readSegments(graphName, version);
-		
-		log.info("We have not found any XInfo - why?");
-		log.info("There is no view defined for reading additional XInfo from database! Let's create it...");
-		
-		// safe custom view
-		testViewDao.saveTestXInfoView(wayGraph, customViewName);
-		log.info("Custom view created");
-
-		readSegments(customViewName, version);
-
-		
-		// TODO: print DTOs => JSON
-		
-		
-	
-	}
-	
-	@Test
-	public void readSegments() throws GraphNotExistsException, WaySegmentSerializationException, InterruptedException {
-		readSegments(graphName, version);
-	}
-	
-	@Test
-	public void readSegmentsWithCustomView() throws GraphNotExistsException, WaySegmentSerializationException, InterruptedException {
-		readSegments(customViewName, version);
-	}
-	
-	/**
-	 * @param graphName
-	 * @param version
-	 * @throws WaySegmentSerializationException 
-	 * @throws GraphNotExistsException 
-	 * @throws InterruptedException 
-	 */
-	private void readSegments(String graphName, String version) throws GraphNotExistsException, WaySegmentSerializationException, InterruptedException {
 		BlockingQueue<IWaySegment> segmentsQueue = new ArrayBlockingQueue<IWaySegment>(10);
 		readDao.readStreetSegments(segmentsQueue, graphName, version);
 		log.info("Stored segments:");
 		while (!segmentsQueue.isEmpty()) {
 			IWaySegment seg = segmentsQueue.poll(10, TimeUnit.MILLISECONDS);
 			log.info(seg.toString());
-			log.info("XInfo:");
-			if (seg.getXInfo() == null || seg.getXInfo().isEmpty()) {
-				log.info("empty");
-			} else {
-				for (IXInfo xinfo : seg.getXInfo()) {
-					log.info(xinfo.toString());
-				}
-			}
 		}
+	
 	}
-
+	
 	private LineString createDummyGeometry() {
 		WKTReader wktReader = new WKTReader();
 		LineString ls = null;
@@ -234,7 +188,7 @@ public class TestExtendSegmentWithXInfo {
 		return ls;
 	}
 
-	private IWayGraph createBaseData(String graphName, String version) throws GraphAlreadyExistException, GraphNotExistsException {
+	private void createBaseData(String graphName, String version) throws GraphAlreadyExistException, GraphNotExistsException {
 		
 		ISource source = new Source(1, "testSource");
 		sourceDao.save(source);
@@ -253,7 +207,7 @@ public class TestExtendSegmentWithXInfo {
 			log.info("Waygraph '" + graphName + "' saved");
 			wayGraph = metadataDao.getGraph(graphName);
 			viewDao.saveDefaultView(wayGraph);
-			log.info("default view 'vw_" + graphName + "' saved");
+			log.info("Waygraph '" + graphName + "' saved");
 		}
 		
 		IWayGraphVersionMetadata metadata;
@@ -266,8 +220,6 @@ public class TestExtendSegmentWithXInfo {
 		log.info("\nWayGraphVersionMetadata saved");
 
 		writeDao.createGraphVersion(graphName, version, true, false);
-		
-		return wayGraph;
 
 	}
 
@@ -283,4 +235,18 @@ public class TestExtendSegmentWithXInfo {
 		return bounds;
 	}
 
+	@Override
+	public void run() {
+		try {
+			testExtendSegmentWithHstoreTags();
+		} catch (GraphAlreadyExistException e) {
+			e.printStackTrace();
+		} catch (GraphNotExistsException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (WaySegmentSerializationException e) {
+			e.printStackTrace();
+		}
+	}
 }

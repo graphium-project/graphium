@@ -21,19 +21,15 @@
  */
 package at.srfg.graphium.postgis.persistence;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import at.srfg.graphium.ITestGraphiumPostgis;
 import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.postgis.jts.JtsBinaryParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
+import org.springframework.beans.factory.annotation.Value;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKBReader;
@@ -47,28 +43,26 @@ import at.srfg.graphium.model.IWaySegment;
 /**
  * @author mwimmer
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "classpath:/application-context-graphium-core.xml",
-		"classpath:application-context-graphium-postgis-datasource.xml",
-		"classpath:application-context-graphium-postgis.xml",
-		"classpath:application-context-graphium-postgis_test.xml"})
-public class TestWkbWriterAndReader {
 
-	private static Logger log = LoggerFactory.getLogger(TestWkbWriterAndReader.class);
+public class SubtestWkbWriterAndReader implements ITestGraphiumPostgis {
 
 	@Autowired
 	private IWayGraphReadDao<IWaySegment> dao;
+
+	@Value("${db.graphName}")
+	String graphName;
+	@Value("${db.version}")
+	String version;
+	@Value("#{'${db.segmentId1}'.split(',')}") //using spEL
+	List<Long> segmentIds;
 	
 	private WKBWriter wkbWriter = new WKBWriter();
 	private WKBReader wkbReader = new WKBReader();
 	private JtsBinaryParser bp = new JtsBinaryParser();
-	
-	@Test
+
+	private static Logger log = LoggerFactory.getLogger(SubtestWkbWriterAndReader.class);
+
 	public void testWkbWriterAndReader() {
-		String graphName = "gip_at_frc_0_4";
-		String version = "16_02_160229";
-		List<Long> segmentIds = new ArrayList<>();
-		segmentIds.add(901456170L);
 		List<IWaySegment> segments = null;
 		try {
 			segments = dao.getSegmentsById(graphName, version, segmentIds, false);
@@ -92,7 +86,6 @@ public class TestWkbWriterAndReader {
 		Assert.assertNotNull(geomFromBinary);
 		
 		Assert.assertEquals(geom.toText(), geomFromBinary.toText());
-	
 		
 		geomFromBinary = (LineString) bp.parse(geomBin);
 		
@@ -100,9 +93,9 @@ public class TestWkbWriterAndReader {
 		
 		Assert.assertEquals(geom.toText(), geomFromBinary.toText());
 	}
-	
-	@Test
+
 	public void testWkbWriterAndReader2() {
+		//TODO define correct linestring????
 		String linestringWkt = "LINESTRING (13.045996812 47.810134412, 13.0460128 47.810128, 13.046028 47.8101184, 13.0460408 47.810112, "
 				+ "13.0460504 47.810096, 13.046056 47.8100864, 13.0460576 47.8100736, 13.046056 47.8100576, 13.0460504 47.810048, "
 				+ "13.046044 47.8100384)";
@@ -130,13 +123,17 @@ public class TestWkbWriterAndReader {
 		Assert.assertNotNull(geomFromBinary);
 		
 		Assert.assertEquals(geom.toText(), geomFromBinary.toText());
-	
-		
+
 		geomFromBinary = (LineString) bp.parse(geomBin);
 		
 		Assert.assertNotNull(geomFromBinary);
 		
 		Assert.assertEquals(geom.toText(), geomFromBinary.toText());
 	}
-	
+
+	@Override
+	public void run() {
+		testWkbWriterAndReader();
+		testWkbWriterAndReader2();
+	}
 }

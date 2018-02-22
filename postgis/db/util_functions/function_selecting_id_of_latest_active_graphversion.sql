@@ -16,3 +16,5 @@ $func$
         END
         order by valid_from desc limit 1
 $func$  LANGUAGE sql IMMUTABLE;
+ALTER FUNCTION f_current_graphversion_immutable(text, text)
+  OWNER TO graphium;
