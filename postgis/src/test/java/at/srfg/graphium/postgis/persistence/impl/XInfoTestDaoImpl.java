@@ -37,7 +37,7 @@ public class XInfoTestDaoImpl extends AbstractSegmentXInfoTypeAwareDao<IXInfoTes
 
 	private final String TABLENAME = "xinfo_test";
 	private String CREATE_STMT = "CREATE TABLE " + "%SCHEMA%" + TABLENAME + "	( " +
-			  " directed_id bigint ) INHERITS (graphs.xinfo) WITH ( OIDS=FALSE )";
+			  " graph_id bigint, directed_id bigint ) INHERITS (graphs.xinfo) WITH ( OIDS=FALSE )";
 
 	public XInfoTestDaoImpl() {
 		super(new XInfoTestclass());

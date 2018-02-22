@@ -17,6 +17,7 @@ package at.srfg.graphium.pixelcuts.service.impl;
 
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.vividsolutions.jts.geom.Coordinate;

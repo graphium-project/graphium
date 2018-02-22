@@ -93,11 +93,9 @@ public class TestConnectionsBuilder {
 		segmentsTo.add(segmentTo);
 		segmentsTo.add(segmentTo2);
 		
-		
 		connectionsBuilder.createConnections(segmentFrom, segmentsTo, nodeId, defaultAccesses, wayRelations);
 		
 		Assert.assertEquals(1, segmentFrom.getStartNodeCons().size());
-		
 		
 	}
 	

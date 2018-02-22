@@ -15,7 +15,21 @@
  */
 package at.srfg.graphium.io.inputformat.impl.jackson;
 
-import at.srfg.graphium.io.adapter.impl.*;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import at.srfg.graphium.io.adapter.impl.AbstractSegmentDTOAdapter;
+import at.srfg.graphium.io.adapter.impl.BaseSegment2SegmentDTOAdapter;
+import at.srfg.graphium.io.adapter.impl.DefaultConnectionXInfoAdapter;
+import at.srfg.graphium.io.adapter.impl.DefaultSegmentXInfoAdapter;
+import at.srfg.graphium.io.adapter.impl.WaySegment2SegmentDTOAdapter;
 import at.srfg.graphium.io.adapter.registry.ISegmentAdapterRegistry;
 import at.srfg.graphium.io.adapter.registry.impl.GenericXInfoAdapterRegistry;
 import at.srfg.graphium.io.adapter.registry.impl.SegmentAdapterRegistryImpl;
@@ -27,19 +41,6 @@ import at.srfg.graphium.io.exception.WaySegmentDeserializationException;
 import at.srfg.graphium.model.IBaseSegment;
 import at.srfg.graphium.model.IWaySegment;
 import at.srfg.graphium.model.impl.BaseSegment;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Created by shennebe on 10.10.2016.
