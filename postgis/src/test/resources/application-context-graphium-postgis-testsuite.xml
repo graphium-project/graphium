@@ -1,0 +1,94 @@
+<!--
+        * Salzburg Research ForschungsgesmbH (c) 2018
+        *
+        * Project: graphium
+        * Created by sschwarz on 12.02.2018.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+
+    <context:component-scan base-package="at.srfg.graphium"/>
+
+
+
+    <import resource="classpath:/application-context-graphium-io.xml" />
+    <import resource="classpath:/application-context-graphium-core.xml" />
+
+    <import resource="classpath:/application-context-graphium-postgis-services.xml" />
+    <import resource="classpath:/application-context-graphium-postgis.xml" />
+    <import resource="classpath:/application-context-graphium-postgis-aliasing.xml" />
+    <import resource="classpath:/application-context-graphium-postgis-datasource.xml" />
+
+    <!-- define helper-bean -->
+    <bean id="helper" class="at.srfg.graphium.HelpMethods"/>
+
+    <!-- define all testclass-beans -->
+    <bean id="testQueuingGraphVersionImportService" class="at.srfg.graphium.core.service.impl.SubtestQueuingGraphVersionImportServiceImpl"></bean>
+    <bean id="testSubscriptionService" class="at.srfg.graphium.core.service.impl.SubtestSubscriptionServiceImpl"></bean>
+    <bean id="testSourceDao" class="at.srfg.graphium.postgis.persistence.impl.SubtestSourceDaoImpl"></bean>
+    <bean id="testSubscriptionDao" class="at.srfg.graphium.postgis.persistence.impl.SubtestSubscriptionDaoImpl"></bean>
+    <bean id="testWayGraphReadDao" class="at.srfg.graphium.postgis.persistence.impl.SubtestWayGraphReadDaoImpl"></bean>
+    <bean id="testWayGraphVersionMetadataDao" class="at.srfg.graphium.postgis.persistence.impl.SubtestWayGraphVersionMetadataDaoImpl"></bean>
+    <bean id="testWayGraphViewDao" class="at.srfg.graphium.postgis.persistence.impl.SubtestWayGraphViewDaoImpl"></bean>
+    <bean id="testWayGraphWriteDao" class="at.srfg.graphium.postgis.persistence.impl.SubtestWayGraphWriteDaoImpl"></bean>
+    <bean id="xInfoTestDao" class="at.srfg.graphium.postgis.persistence.impl.XInfoTestDaoImpl" parent="graphiumAbstractPostgisDao"/>
+    <bean id="testWaySegmentResultSetExtractor" class="at.srfg.graphium.postgis.persistence.resultsetextractors.SubtestWaySegmentResultSetExtractor"></bean>
+    <bean id="XInfoTestRowMapper" class="at.srfg.graphium.postgis.persistence.rowmapper.XInfoTestRowMapper"></bean>
+    <bean id="TestWkbWriterAndReader" class="at.srfg.graphium.postgis.persistence.SubtestWkbWriterAndReader"></bean>
+
+    <!-- list of testclass-beans
+    order necessary (write before read)-->
+    <util:list id="testclasses">
+        <ref bean="testQueuingGraphVersionImportService"/>
+        <ref bean="testSubscriptionService"/>
+        <ref bean="testSourceDao"/>
+        <ref bean="testSubscriptionDao"/>
+        <ref bean="testWayGraphWriteDao"/>
+        <ref bean="testWayGraphReadDao"/>
+        <ref bean="testWayGraphVersionMetadataDao"/>
+        <ref bean="testWayGraphViewDao"/>
+        <ref bean="xInfoTestDao"/>
+        <ref bean="XInfoTestRowMapper"/>
+        <ref bean="testWaySegmentResultSetExtractor"/>
+        <ref bean="TestWkbWriterAndReader"/>
+    </util:list>
+
+    <bean id="wayGraphModelFactory" class="at.srfg.graphium.model.impl.WayGraphModelFactory"/>
+
+    <bean id="testWayGraphViewDaoImpl" class="at.srfg.graphium.postgis.persistence.impl.SubtestWayGraphViewDaoImpl"/>
+
+    <bean id="importConfigurer"
+          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location" value="classpath:import.properties" />
+        <property name="ignoreUnresolvablePlaceholders" value="true" />
+        <property name="ignoreResourceNotFound" value="true" />
+    </bean>
+
+    <bean id="serverConfigurer"
+          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location" value="classpath:server.properties" />
+        <property name="ignoreUnresolvablePlaceholders" value="true" />
+        <property name="ignoreResourceNotFound" value="true" />
+    </bean>
+
+    <bean id="dbConfigurer"
+          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location" value="classpath:db.properties" />
+        <property name="ignoreUnresolvablePlaceholders" value="true" />
+        <property name="ignoreResourceNotFound" value="true" />
+    </bean>
+</beans>

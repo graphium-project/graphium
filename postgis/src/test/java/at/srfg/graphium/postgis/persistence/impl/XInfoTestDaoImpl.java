@@ -23,23 +23,24 @@ package at.srfg.graphium.postgis.persistence.impl;
 
 import java.util.List;
 
+import at.srfg.graphium.ITestGraphiumPostgis;
 import at.srfg.graphium.core.persistence.IXInfoDao;
 import at.srfg.graphium.io.outputformat.ISegmentOutputFormat;
 import at.srfg.graphium.model.IBaseSegment;
 import at.srfg.graphium.postgis.model.IXInfoTest;
-import at.srfg.graphium.postgis.model.impl.XInfoTest;
+import at.srfg.graphium.postgis.model.impl.XInfoTestclass;
 
 /**
  * @author mwimmer
  */
-public class XInfoTestDaoImpl extends AbstractSegmentXInfoTypeAwareDao<IXInfoTest> implements IXInfoDao<IXInfoTest> {
+public class XInfoTestDaoImpl extends AbstractSegmentXInfoTypeAwareDao<IXInfoTest> implements IXInfoDao<IXInfoTest>, ITestGraphiumPostgis{
 
 	private final String TABLENAME = "xinfo_test";
 	private String CREATE_STMT = "CREATE TABLE " + "%SCHEMA%" + TABLENAME + "	( " +
-			  " directed_id bigint ) INHERITS (graphs.xinfo) WITH ( OIDS=FALSE )";
+			  " graph_id bigint, directed_id bigint ) INHERITS (graphs.xinfo) WITH ( OIDS=FALSE )";
 
 	public XInfoTestDaoImpl() {
-		super(new XInfoTest());
+		super(new XInfoTestclass());
 	}
 
 	@Override
@@ -78,8 +79,11 @@ public class XInfoTestDaoImpl extends AbstractSegmentXInfoTypeAwareDao<IXInfoTes
 
 	@Override
 	public void save(String graphName, String version, IXInfoTest xInfo) {
-		getJdbcTemplate().update("INSERT INTO " + schema + TABLENAME + " (segment_id, direction_tow, graph_id, directed_id) VALUES (?,?,?,?)",
-				xInfo.getSegmentId(), xInfo.isDirectionTow(), xInfo.getGraphId(), xInfo.getDirectedId());
+		//getJdbcTemplate().update("INSERT INTO " + schema + TABLENAME + " (segment_id, direction_tow, graph_id, directed_id) VALUES (?,?,?,?)",
+		//		xInfo.getSegmentId(), xInfo.isDirectionTow(), xInfo.getGraphId(), xInfo.getDirectedId());
+		getJdbcTemplate().update("INSERT INTO " + schema + TABLENAME + " (segment_id, direction_tow, directed_id) VALUES (?,?,?)",
+				xInfo.getSegmentId(), xInfo.isDirectionTow(), xInfo.getDirectedId());
+
 	}
 
 	@Override
@@ -110,4 +114,8 @@ public class XInfoTestDaoImpl extends AbstractSegmentXInfoTypeAwareDao<IXInfoTes
 		return TABLENAME;
 	}
 
+	@Override
+	public void run() {
+
+	}
 }

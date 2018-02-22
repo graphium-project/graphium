@@ -13,12 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.srfg.graphium.api.controller;
+
+package at.srfg.graphium.api.model;
+
+import at.srfg.graphium.model.ISegmentXInfo;
 
 /**
- * @author mwimmer
+ * Salzburg Research ForschungsgesmbH (c) 2018
  *
+ * Project: graphium
+ * Created by sschwarz on 08.02.2018.
  */
-public enum RestApiPaths {
+public interface IXInfoTest extends ISegmentXInfo {
 
+    long getDirectedId();
+
+    void setDirectedId(long directedId);
+
+    public long getGraphId();
+
+    public void setGraphId(long graphId);
 }
