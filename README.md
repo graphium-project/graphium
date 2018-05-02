@@ -144,7 +144,7 @@ Example API call to generate a JSON file from GIP data:
    CREATE ROLE graphium LOGIN ENCRYPTED PASSWORD 'md5e85d3e0c9e3a933a0c9103b21ed017df'
       VALID UNTIL 'infinity';
 
-   CREATE DATABASE graphium_central WITH OWNER = graphium;
+   CREATE DATABASE graphium WITH OWNER = graphium;
 
    \i /path/to/graphium-postgis/db/composite/create_graphium_database.sql
    ```
