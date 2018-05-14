@@ -83,6 +83,13 @@ public class CompositeGraphWriteDaoImpl<W extends IWaySegment> implements IWayGr
 	}
 
 	@Override
+	public void saveSegments(List<W> segments, String graphName, String version, List<String> excludedXInfosList) throws GraphStorageException, GraphNotExistsException {
+        for (IWayGraphWriteDao<W> dao : writeDaos) {
+            dao.saveSegments(segments, graphName, version, excludedXInfosList);
+        }
+	}
+
+	@Override
 	public long updateSegmentAttributes(List<W> segments, String graphName, String version) throws GraphStorageException, GraphNotExistsException {
 		Map<String, Long> results = new HashMap<String, Long>();
 		for (IWayGraphWriteDao<W> dao : writeDaos) {
@@ -171,6 +178,13 @@ public class CompositeGraphWriteDaoImpl<W extends IWaySegment> implements IWayGr
 	}
 
 	@Override
+	public void saveConnectionXInfos(List<? extends IBaseSegment> segments, String graphName, String version, List<String> excludedXInfos) throws GraphStorageException, GraphNotExistsException {
+		for (IWayGraphWriteDao<W> dao : writeDaos) {
+			dao.saveConnectionXInfos(segments, graphName, version, excludedXInfos);
+		}
+	}
+
+	@Override
 	public void deleteConnectionXInfos(String graphName, String version, String... types) throws GraphStorageException, GraphNotExistsException {
 		for (IWayGraphWriteDao<W> dao : writeDaos) {
 			dao.deleteConnectionXInfos(graphName, version, types);
@@ -189,6 +203,13 @@ public class CompositeGraphWriteDaoImpl<W extends IWaySegment> implements IWayGr
 		for (IWayGraphWriteDao<W> dao : writeDaos) {
 			dao.saveSegmentXInfos(segments, graphName, version);
 		}
+	}
+
+	@Override
+	public void saveSegmentXInfos(List<? extends IBaseSegment> segments, String graphName, String version, List<String> excludedXInfosList) throws GraphStorageException, GraphNotExistsException {
+        for (IWayGraphWriteDao<W> dao : writeDaos) {
+            dao.saveSegmentXInfos(segments, graphName, version, excludedXInfosList);
+        }
 	}
 
 	@Override

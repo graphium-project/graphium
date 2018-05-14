@@ -17,8 +17,10 @@ package at.srfg.graphium.api.service;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.Set;
 
+import at.srfg.graphium.api.exceptions.ValidationException;
 import org.springframework.web.multipart.MultipartFile;
 
 import at.srfg.graphium.core.exception.GraphAlreadyExistException;
@@ -69,7 +71,22 @@ public interface IGraphService<T extends IBaseWaySegment> {
 	 * @throws GraphAlreadyExistException
 	 * @throws GraphImportException
 	 */
-	IWayGraphVersionMetadata importGraph(String graphName, String version, boolean overrideIfExists, MultipartFile file) throws IOException, GraphAlreadyExistException, GraphImportException;
+	IWayGraphVersionMetadata importGraph(String graphName, String version, boolean overrideIfExists, MultipartFile file) throws IOException, GraphAlreadyExistException, GraphImportException, ValidationException;
+
+	/**
+	 *
+	 * @param graphName
+	 * @param version
+	 * @param overrideIfExists
+	 * @param excludedXInfos
+	 * @param file
+	 * @return
+	 * @throws IOException
+	 * @throws GraphAlreadyExistException
+	 * @throws GraphImportException
+	 */
+	IWayGraphVersionMetadata importGraph(String graphName, String version, boolean overrideIfExists, String excludedXInfos, MultipartFile file) throws IOException, GraphAlreadyExistException, GraphImportException, ValidationException;
+
 
 	/**
 	 * @param outputFormat

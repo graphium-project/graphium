@@ -45,5 +45,4 @@ public class MaintenanceApiController  {
 	public void setServerStatusService(IServerStatusService serverStatusService) {
 		this.serverStatusService = serverStatusService;
 	}
-	
 }

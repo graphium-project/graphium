@@ -15,6 +15,7 @@
  */
 package at.srfg.graphium.api.controller;
 
+import at.srfg.graphium.api.exceptions.ValidationException;
 import at.srfg.graphium.api.service.IBaseSegmentXInfoService;
 import at.srfg.graphium.core.exception.GraphImportException;
 import at.srfg.graphium.core.exception.GraphNotExistsException;
@@ -66,7 +67,7 @@ public class GraphXInfoController {
     public String addXInfoToSegments(@PathVariable String graph,
                                      @PathVariable String version,
 //                                     InputStream stream,
-                                     @RequestParam(value = "file") MultipartFile file) throws IOException, XInfoNotSupportedException, GraphImportException, GraphNotExistsException, GraphStorageException {
+                                     @RequestParam(value = "file") MultipartFile file) throws IOException, XInfoNotSupportedException, GraphImportException, GraphNotExistsException, GraphStorageException, ValidationException {
 //        this.service.streamBaseSegmentXInfos(graph,this.getCurrentVersion(graph,version),stream);
     	if (!file.isEmpty()) {
     		log.info("Parsing file " + file.getName() + " with " + file.getSize() + " Bytes");
@@ -105,12 +106,13 @@ public class GraphXInfoController {
     @PostMapping(value="/connections/graphs/{graph}/versions/{version}/xinfos")
     public String addXInfosToConnections(@PathVariable String graph,
                                          @PathVariable String version,
+                                         @RequestParam(value = "excludedXInfos", required = false) String excludedXInfos,
                                          @RequestParam(value = "file") MultipartFile file) throws XInfoNotSupportedException,
-            GraphImportException, GraphStorageException, GraphNotExistsException, IOException {
+            GraphImportException, GraphStorageException, GraphNotExistsException, IOException, ValidationException {
         if (!file.isEmpty()) {
             log.info("Parsing file " + file.getName() + " with " + file.getSize() + " Bytes");
             InputStream inputStream = file.getInputStream();
-            this.service.streamBaseConnectionXInfos(graph,this.getCurrentVersion(graph,version),inputStream);
+            this.service.streamBaseConnectionXInfos(graph,this.getCurrentVersion(graph,version), excludedXInfos, inputStream);
         }
         return null;
     }

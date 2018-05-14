@@ -28,9 +28,13 @@ public interface IBaseSegmentWriteDao {
 
     void saveConnectionXInfos(List<? extends IBaseSegment> segments, String graphName, String version) throws GraphStorageException, GraphNotExistsException;
 
+    void saveConnectionXInfos(List<? extends IBaseSegment> segments, String graphName, String version, List<String> excludedXInfos) throws GraphStorageException, GraphNotExistsException;
+
     void deleteConnectionXInfos(String graphName, String version, String... types) throws GraphStorageException, GraphNotExistsException;
 
     void saveSegmentXInfos(List<? extends IBaseSegment> segments, String graphName, String version) throws GraphStorageException, GraphNotExistsException;
+
+    void saveSegmentXInfos(List<? extends IBaseSegment> segments, String graphName, String version, List<String> excludedXInfos) throws GraphStorageException, GraphNotExistsException;
 
     void deleteSegmentXInfos(String graphName, String version, String... types) throws GraphStorageException, GraphNotExistsException;
 
