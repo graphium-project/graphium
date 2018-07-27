@@ -310,7 +310,7 @@ public class WayBaseGraphWriteDaoImpl<W extends IBaseWaySegment>
 		segments.stream().filter(segment -> segment != null && segment.getXInfo() != null && !segment.getXInfo().isEmpty())
 				.forEach(segment -> segment.getXInfo()
 						.forEach(xInfo -> {
-							if (excludedXInfoList != null && !excludedXInfoList.contains(xInfo.getXInfoType())) {
+							if (excludedXInfoList == null || !excludedXInfoList.contains(xInfo.getXInfoType())) {
 								//System.out.println("!!!: XInfo-type: " + xInfo.getXInfoType());
 								if (!xInfoMap.containsKey(xInfo.getXInfoType())) {
 									xInfoMap.put(xInfo.getXInfoType(), new ArrayList<>());

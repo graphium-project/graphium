@@ -104,4 +104,8 @@ public interface IImportConfig {
 	Date getValidFrom();
 
 	Date getValidTo();
+	
+	IImportConfig enableFullConnectivity();
+	
+	boolean isEnableFullConnectivity();
 }

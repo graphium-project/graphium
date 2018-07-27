@@ -70,6 +70,7 @@ public class IDF2JSONConverter {
                 .desc("Comma separated List of Access Types, to be considered. If not set, all access types will be considered").build());
         options.addOption(Option.builder("e").longOpt("pixel-cut-enable-short-conn").desc("By default short connections below 3.5 meter with frc 0 are ignored. This is to filter the connections between highways and streets. If this option is set all gip links are considered").build());
         options.addOption(Option.builder("bl").longOpt("extract-buslane-info").desc("By default no bus lane info will be extracted.").build());
+        options.addOption(Option.builder("fc").longOpt("full-connectivity").hasArg().argName("full_connectivity").desc("Create a full connected network ignoring one ways (default = false)").build());
 
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = null;
@@ -162,6 +163,12 @@ public class IDF2JSONConverter {
                 if (cmd.hasOption('M')) {
                     config.maxFrc(Integer.parseInt(cmd.getOptionValue('M')));
                 }
+            }
+            if (cmd.hasOption("fc")) {
+            	boolean fullConnectivity = Boolean.parseBoolean(cmd.getOptionValue("fc"));
+            	if (fullConnectivity) {
+            		config.enableFullConnectivity();
+            	}
             }
 
             log.info("Starte IDF to JSON Converter ...");
