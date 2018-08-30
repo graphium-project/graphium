@@ -113,22 +113,24 @@ Example API call to generate a JSON file from GIP data:
 
 `java idf2graphium_1.0.0.one-jar.jar -i /path/to/gip-at.txt -o /path/to/output -n gip_at_frc_0_8 -v 16_02_161111 --skip-pixel-cut -import-frcs "0,1,2,3,4,5,6,7,8"`
 
-| short option | long option                   | Beschreibung                             |
-| ------------ | ----------------------------- | ---------------------------------------- |
-| -h           | --help                        | display this help page                   |
-| -i           | --input                       | path to IDF or compressed IDF File (ZIP) |
-| -o           | --output                      | path to result directory. (default: user.home) |
-| -n           | --name                        | Name of the graph to be imported         |
-| -v           | --version                     | Version of the graph to be imported      |
+| short option | long option                   | Beschreibung                                                 |
+| ------------ | ----------------------------- | ------------------------------------------------------------ |
+| -h           | --help                        | display this help page                                       |
+| -i           | --input                       | path to IDF or compressed IDF File (ZIP)                     |
+| -o           | --output                      | path to result directory. (default: user.home)               |
+| -n           | --name                        | Name of the graph to be imported                             |
+| -v           | --version                     | Version of the graph to be imported                          |
 | -vf          | --valid-from                  | start timestamp of graph version's validity (format 'yyyy-MM-dd HH:mm') |
 | -vt          | --valid-to                    | end timestamp of graph version's validity (format 'yyyy-MM-dd HH:mm') |
 |              | --skip-gip-import             | skip the import process of the GIP, only pixel cuts will be generated. The options -o and --import-frcs are ignored |
 |              | –skip-pixel-cut               | skip the calculation of the turn offset factors. The options -m and -M are ignored |
-| -m           | --pixel-cut-min-frc           | minimum frc value to be considered for offset calculations |
-| -M           | --pixel-cut-max-frc           | maximum frc value to be considered for offset calculations |
+| -m           | --pixel-cut-min-frc           | minimum frc value to be considered for offset calculations   |
+| -M           | --pixel-cut-max-frc           | maximum frc value to be considered for offset calculations   |
 |              | -import-frcs                  | Comma separated List of FRC values to be included for IDF import. If not set (default) all frc values are considered |
 |              | -access-types                 | Comma separated List of Access Types, to be considered. If not set, all access types will be considered |
 | -e           | --pixel-cut-enable-short-conn | By default short connections below 3.5 meter with frc 0 are ignored. This is to filter the connections between highways and streets. If this option is set all gip links are considered |
+| -fc            | --full-connectivity | Creates a full connected network ignoring one ways (default = false) |
+
 
 ## Quickstart
 
