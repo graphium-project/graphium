@@ -15,9 +15,6 @@
  */
 package at.srfg.graphium.gipimport.service.impl;
 
-import org.junit.Ignore;
-import org.junit.Test;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,6 +22,9 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.junit.Ignore;
+import org.junit.Test;
 
 /**
  * Created by shennebe on 10.08.2015.

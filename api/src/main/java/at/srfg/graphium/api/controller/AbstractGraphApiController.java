@@ -17,15 +17,11 @@ package at.srfg.graphium.api.controller;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.zip.GZIPOutputStream;
 
-import at.srfg.graphium.api.exceptions.ValidationException;
-import at.srfg.graphium.api.service.impl.GraphServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -40,6 +36,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import at.srfg.graphium.api.exceptions.ResourceNotFoundException;
+import at.srfg.graphium.api.exceptions.ValidationException;
 import at.srfg.graphium.api.service.IGraphService;
 import at.srfg.graphium.core.exception.GraphAlreadyExistException;
 import at.srfg.graphium.core.exception.GraphImportException;

@@ -15,7 +15,6 @@
  */
 package at.srfg.graphium.postgis.persistence.impl;
 
-import at.srfg.graphium.ITestGraphiumPostgis;
 import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 
+import at.srfg.graphium.ITestGraphiumPostgis;
 import at.srfg.graphium.core.exception.GraphNotExistsException;
 import at.srfg.graphium.core.persistence.IWayGraphVersionMetadataDao;
 import at.srfg.graphium.core.persistence.IWayGraphViewDao;

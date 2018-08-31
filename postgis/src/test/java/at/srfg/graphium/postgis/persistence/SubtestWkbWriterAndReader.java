@@ -23,19 +23,20 @@ package at.srfg.graphium.postgis.persistence;
 
 import java.util.List;
 
-import at.srfg.graphium.ITestGraphiumPostgis;
 import org.junit.Assert;
 import org.postgis.jts.JtsBinaryParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKBReader;
 import com.vividsolutions.jts.io.WKBWriter;
 import com.vividsolutions.jts.io.WKTReader;
 
+import at.srfg.graphium.ITestGraphiumPostgis;
 import at.srfg.graphium.core.exception.GraphNotExistsException;
 import at.srfg.graphium.core.persistence.IWayGraphReadDao;
 import at.srfg.graphium.model.IWaySegment;

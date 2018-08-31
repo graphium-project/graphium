@@ -17,12 +17,13 @@ package at.srfg.graphium.api.service;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.List;
 import java.util.Set;
 
-import at.srfg.graphium.api.exceptions.ValidationException;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.vividsolutions.jts.geom.Polygon;
+
+import at.srfg.graphium.api.exceptions.ValidationException;
 import at.srfg.graphium.core.exception.GraphAlreadyExistException;
 import at.srfg.graphium.core.exception.GraphImportException;
 import at.srfg.graphium.core.exception.GraphNotExistsException;
@@ -30,8 +31,6 @@ import at.srfg.graphium.io.exception.WaySegmentSerializationException;
 import at.srfg.graphium.io.outputformat.IWayGraphOutputFormat;
 import at.srfg.graphium.model.IBaseWaySegment;
 import at.srfg.graphium.model.IWayGraphVersionMetadata;
-
-import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * @author mwimmer

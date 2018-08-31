@@ -15,10 +15,10 @@
  */
 package at.srfg.graphium.io.adapter.impl;
 
+import java.util.HashMap;
+
 import at.srfg.graphium.io.dto.impl.DefaultSegmentXInfoDTO;
 import at.srfg.graphium.model.impl.DefaultSegmentXInfo;
-
-import java.util.HashMap;
 
 /**
  * Example implementation for the default adapter converting a default XInfo to a DTO and vice versa.

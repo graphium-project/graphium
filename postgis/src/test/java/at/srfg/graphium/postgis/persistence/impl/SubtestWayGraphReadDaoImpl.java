@@ -27,7 +27,6 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
-import at.srfg.graphium.ITestGraphiumPostgis;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.slf4j.Logger;
@@ -40,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.vividsolutions.jts.geom.Point;
 
+import at.srfg.graphium.ITestGraphiumPostgis;
 import at.srfg.graphium.core.exception.GraphNotExistsException;
 import at.srfg.graphium.core.persistence.IWayGraphReadDao;
 import at.srfg.graphium.geomutils.GeometryUtils;

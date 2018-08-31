@@ -15,11 +15,11 @@
  */
 package at.srfg.graphium.gipimport.producer;
 
+import java.util.concurrent.BlockingQueue;
+
 import at.srfg.graphium.gipimport.model.IDFMetadata;
 import at.srfg.graphium.gipimport.model.IImportConfig;
 import at.srfg.graphium.model.IBaseSegment;
-
-import java.util.concurrent.BlockingQueue;
 
 public interface IGipLinkProducer<T extends IBaseSegment> extends Runnable {
 	

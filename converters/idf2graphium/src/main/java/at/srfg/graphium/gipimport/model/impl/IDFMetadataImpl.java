@@ -15,10 +15,10 @@
  */
 package at.srfg.graphium.gipimport.model.impl;
 
-import at.srfg.graphium.gipimport.model.IDFMetadata;
-
 import java.nio.charset.Charset;
 import java.util.Date;
+
+import at.srfg.graphium.gipimport.model.IDFMetadata;
 
 /**
  * Created by shennebe on 11.08.2015.

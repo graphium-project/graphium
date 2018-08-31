@@ -20,13 +20,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 
+import com.vividsolutions.jts.geom.Polygon;
+
 import at.srfg.graphium.core.exception.GraphNotExistsException;
 import at.srfg.graphium.core.service.impl.GraphReadOrder;
 import at.srfg.graphium.io.exception.WaySegmentSerializationException;
 import at.srfg.graphium.io.outputformat.ISegmentOutputFormat;
 import at.srfg.graphium.model.IBaseSegment;
-
-import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * Service for reading graph segments.

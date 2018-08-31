@@ -32,17 +32,11 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import at.srfg.graphium.tutorial.ITestGraphiumModelExtension;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.vividsolutions.jts.geom.LineString;
@@ -69,6 +63,7 @@ import at.srfg.graphium.model.IWaySegment;
 import at.srfg.graphium.model.State;
 import at.srfg.graphium.model.impl.WaySegment;
 import at.srfg.graphium.model.management.impl.Source;
+import at.srfg.graphium.tutorial.ITestGraphiumModelExtension;
 
 /**
  * @author mwimmer

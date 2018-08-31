@@ -23,13 +23,13 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import at.srfg.graphium.ITestGraphiumPostgis;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 
 import com.vividsolutions.jts.geom.Polygon;
 
+import at.srfg.graphium.ITestGraphiumPostgis;
 import at.srfg.graphium.core.exception.GraphAlreadyExistException;
 import at.srfg.graphium.core.exception.GraphImportException;
 import at.srfg.graphium.core.service.IGraphVersionImportService;

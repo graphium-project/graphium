@@ -18,9 +18,9 @@ package at.srfg.graphium.io.adapter.impl;
 import java.util.HashSet;
 import java.util.Set;
 
+import at.srfg.graphium.io.adapter.IAdapter;
 import at.srfg.graphium.io.dto.IGraphVersionMetadataDTO;
 import at.srfg.graphium.io.dto.impl.GraphVersionMetadataDTOImpl;
-import at.srfg.graphium.io.adapter.IAdapter;
 import at.srfg.graphium.model.Access;
 import at.srfg.graphium.model.IWayGraphVersionMetadata;
 import at.srfg.graphium.model.State;

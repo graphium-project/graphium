@@ -15,11 +15,11 @@
  */
 package at.srfg.graphium.core.persistence;
 
+import java.util.List;
+
 import at.srfg.graphium.core.exception.GraphNotExistsException;
 import at.srfg.graphium.core.exception.GraphStorageException;
 import at.srfg.graphium.model.IBaseSegment;
-
-import java.util.List;
 
 /**
  * Created by shennebe on 07.10.2016.

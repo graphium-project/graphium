@@ -15,6 +15,19 @@
  */
 package at.srfg.graphium.api.service.impl;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import at.srfg.graphium.api.exceptions.ValidationException;
 import at.srfg.graphium.api.service.IBaseSegmentXInfoService;
 import at.srfg.graphium.core.exception.GraphImportException;
@@ -32,18 +45,6 @@ import at.srfg.graphium.io.producer.impl.BaseSegmentProducerImpl;
 import at.srfg.graphium.model.IBaseSegment;
 import at.srfg.graphium.model.impl.AbstractXInfoModelTypeAware;
 import at.srfg.graphium.model.management.IServerStatus;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.stream.Collectors;
 
 /**
  * @author anwagner

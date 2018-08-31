@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 
 import at.srfg.graphium.model.IWaySegment;
-import at.srfg.graphium.model.processor.ISegmentProcessor;
 
 /**
  * Interface for a processor working on a segment. In addition to @link ISegmentProcessor parameters are supported

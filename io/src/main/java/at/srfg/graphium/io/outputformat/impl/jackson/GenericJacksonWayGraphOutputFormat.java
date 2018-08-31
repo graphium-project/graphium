@@ -21,6 +21,11 @@ import java.io.OutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonEncoding;
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.MappingJsonFactory;
+
 import at.srfg.graphium.io.adapter.IAdapter;
 import at.srfg.graphium.io.adapter.registry.ISegmentAdapterRegistryAware;
 import at.srfg.graphium.io.dto.IGraphVersionMetadataDTO;
@@ -29,11 +34,6 @@ import at.srfg.graphium.io.outputformat.ISegmentOutputFormat;
 import at.srfg.graphium.io.outputformat.IWayGraphOutputFormat;
 import at.srfg.graphium.model.IBaseWaySegment;
 import at.srfg.graphium.model.IWayGraphVersionMetadata;
-
-import com.fasterxml.jackson.core.JsonEncoding;
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.MappingJsonFactory;
 
 /**
  * @author mwimmer

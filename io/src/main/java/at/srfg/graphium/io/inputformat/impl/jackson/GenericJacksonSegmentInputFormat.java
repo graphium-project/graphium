@@ -15,6 +15,19 @@
  */
 package at.srfg.graphium.io.inputformat.impl.jackson;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.databind.MappingJsonFactory;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+
 import at.srfg.graphium.io.adapter.ISegmentAdapter;
 import at.srfg.graphium.io.adapter.exception.NoSegmentAdapterFoundException;
 import at.srfg.graphium.io.adapter.registry.ISegmentAdapterRegistry;
@@ -24,17 +37,6 @@ import at.srfg.graphium.io.dto.ISegmentXInfoDTO;
 import at.srfg.graphium.io.exception.WaySegmentDeserializationException;
 import at.srfg.graphium.io.inputformat.ISegmentInputFormat;
 import at.srfg.graphium.model.IBaseSegment;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.databind.MappingJsonFactory;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 
 public abstract class GenericJacksonSegmentInputFormat<T extends IBaseSegment>

@@ -17,11 +17,11 @@ package at.srfg.graphium.io.converter.impl;
 
 import java.lang.reflect.Field;
 
-import at.srfg.graphium.model.IXInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.srfg.graphium.io.adapter.IAdapter;
+import at.srfg.graphium.model.IXInfo;
 
 public class ReflectionXInfoToCSVConverterImpl implements IAdapter<String, IXInfo> {
 

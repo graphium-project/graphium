@@ -31,14 +31,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
+import com.vividsolutions.jts.geom.Polygon;
+
 import at.srfg.graphium.core.persistence.IWayGraphVersionMetadataDao;
 import at.srfg.graphium.model.Access;
 import at.srfg.graphium.model.ISource;
 import at.srfg.graphium.model.IWayGraph;
 import at.srfg.graphium.model.IWayGraphVersionMetadata;
 import at.srfg.graphium.model.State;
-
-import com.vividsolutions.jts.geom.Polygon;
 
 public class CompositeGraphMetadataDaoImpl implements IWayGraphVersionMetadataDao {
 
