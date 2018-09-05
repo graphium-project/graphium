@@ -17,10 +17,10 @@ package at.srfg.graphium.io.dto.impl;
 
 import java.util.List;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 import at.srfg.graphium.io.dto.IGraphStatusDTO;
 import at.srfg.graphium.io.dto.IServerStatusDTO;
-
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /**
  * @author mwimmer

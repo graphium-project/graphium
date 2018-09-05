@@ -26,8 +26,8 @@ import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 
-import at.srfg.graphium.io.dto.IGraphVersionMetadataDTO;
 import at.srfg.graphium.io.adapter.IAdapter;
+import at.srfg.graphium.io.dto.IGraphVersionMetadataDTO;
 import at.srfg.graphium.model.Access;
 import at.srfg.graphium.model.IWayGraphVersionMetadata;
 import at.srfg.graphium.model.State;

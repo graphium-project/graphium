@@ -15,6 +15,14 @@
  */
 package at.srfg.graphium.gipimport.parser.impl;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import at.srfg.graphium.gipimport.helper.GeoHelper;
 import at.srfg.graphium.gipimport.helper.GipComparableLinkCoordinate;
 import at.srfg.graphium.gipimport.helper.ParserHelper;
@@ -27,14 +35,6 @@ import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.TLongHashSet;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * Created by shennebe on 18.12.2015.

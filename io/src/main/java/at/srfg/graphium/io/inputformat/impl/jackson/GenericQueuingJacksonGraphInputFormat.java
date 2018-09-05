@@ -19,6 +19,9 @@ import java.io.InputStream;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+
 import at.srfg.graphium.io.adapter.IAdapter;
 import at.srfg.graphium.io.adapter.ISegmentAdapter;
 import at.srfg.graphium.io.adapter.registry.ISegmentAdapterRegistry;
@@ -29,9 +32,6 @@ import at.srfg.graphium.io.exception.WaySegmentDeserializationException;
 import at.srfg.graphium.io.inputformat.IQueuingGraphInputFormat;
 import at.srfg.graphium.model.IBaseWaySegment;
 import at.srfg.graphium.model.IWayGraphVersionMetadata;
-
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
 
 /**
  * @author mwimmer

@@ -15,6 +15,20 @@
  */
 package at.srfg.graphium.api.service.impl;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import at.srfg.graphium.api.exceptions.ValidationException;
 import at.srfg.graphium.api.service.IBaseSegmentXInfoService;
 import at.srfg.graphium.core.exception.GraphImportException;
 import at.srfg.graphium.core.exception.GraphNotExistsException;
@@ -29,16 +43,8 @@ import at.srfg.graphium.io.outputformat.ISegmentOutputFormatFactory;
 import at.srfg.graphium.io.producer.IBaseSegmentProducer;
 import at.srfg.graphium.io.producer.impl.BaseSegmentProducerImpl;
 import at.srfg.graphium.model.IBaseSegment;
+import at.srfg.graphium.model.impl.AbstractXInfoModelTypeAware;
 import at.srfg.graphium.model.management.IServerStatus;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 
 /**
  * @author anwagner
@@ -62,6 +68,9 @@ public class BaseSegmentXInfoService implements IBaseSegmentXInfoService<IBaseSe
 
     private int batchSize;
 
+    @Autowired(required = false)
+    private List<AbstractXInfoModelTypeAware> registeredXInfosList;
+
 
     @Override
 	public void streamBaseSegmentXInfos(String graph, String version, OutputStream outputStream, String... types)
@@ -81,24 +90,64 @@ public class BaseSegmentXInfoService implements IBaseSegmentXInfoService<IBaseSe
 
     @Override
     public void streamBaseSegmentXInfos(String graph, String version, InputStream inputStream)
-            throws XInfoNotSupportedException, GraphImportException, GraphNotExistsException, GraphStorageException {
-        this.streamBaseXInfos(graph,version,inputStream,true);
+            throws XInfoNotSupportedException, GraphImportException, GraphNotExistsException, GraphStorageException, ValidationException {
+        this.streamBaseXInfos(graph,version,null,inputStream,true);
+    }
+
+    @Override
+    public void streamBaseSegmentXInfos(String graph, String version, String excludedXInfos, InputStream inputStream)
+            throws XInfoNotSupportedException, GraphImportException, GraphNotExistsException, GraphStorageException, ValidationException {
+        this.streamBaseXInfos(graph,version,excludedXInfos,inputStream,true);
     }
 
     @Override
     public void streamBaseConnectionXInfos(String graph, String version, InputStream inputStream)
-            throws XInfoNotSupportedException, GraphImportException, GraphStorageException, GraphNotExistsException {
-        this.streamBaseXInfos(graph,version,inputStream,false);
+            throws XInfoNotSupportedException, GraphImportException, GraphStorageException, GraphNotExistsException, ValidationException {
+        this.streamBaseXInfos(graph,version,null,inputStream,false);
     }
 
-    private void streamBaseXInfos(String graph, String version, InputStream inputStream, boolean isSegmentXInfo)
-            throws XInfoNotSupportedException, GraphImportException, GraphStorageException, GraphNotExistsException {
+    @Override
+    public void streamBaseConnectionXInfos(String graph, String version, String excludedXInfos, InputStream inputStream)
+            throws XInfoNotSupportedException, GraphImportException, GraphStorageException, GraphNotExistsException, ValidationException {
+        this.streamBaseXInfos(graph,version,excludedXInfos,inputStream,false);
+    }
+
+    private void streamBaseXInfos(String graph, String version, String excludedXInfos, InputStream inputStream, boolean isSegmentXInfo)
+            throws XInfoNotSupportedException, GraphImportException, GraphStorageException, GraphNotExistsException, ValidationException {
         //First checkk if already another import is running. The singleton serverStatus has to be injected therefore
         if (!serverStatus.registerImport()) {
             throw new GraphImportException("Sorry, system is busy, a graph import is currently executed");
         }
         IBaseSegmentProducer<IBaseSegment> producer = null;
         try {
+            //TODO create list for excludedXInfos
+            List<String> excludedXInfosList;
+            if (excludedXInfos != null) {
+                excludedXInfosList = Arrays.asList(excludedXInfos.split(","));
+            }else{
+                excludedXInfosList = new ArrayList<String>();
+            }
+            //verify xinfos
+            List<String> types;
+            if (registeredXInfosList == null) {
+                types = new ArrayList<>();
+                log.warn("registeredXInfosList: null");
+            }else{
+                types = registeredXInfosList.stream().map(AbstractXInfoModelTypeAware::getResponsibleType).distinct().collect(Collectors.toList());
+                //System.out.println("registeredXInfosList: " + String.join(", ", types));
+            }
+            for (String xinfo : excludedXInfosList) {
+                boolean found = false;
+                for (String  registeredXInfoType : types) {
+                    if (registeredXInfoType.equals(xinfo)){
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    throw new ValidationException("XInfo-type: " +  xinfo + " is not registered!");
+                }
+            }
 
             BlockingQueue<IBaseSegment> segmentsQueue;
 
@@ -115,11 +164,11 @@ public class BaseSegmentXInfoService implements IBaseSegmentXInfoService<IBaseSe
                     segments.add(segmentsQueue.poll());
                 }
                 if (segments.size() >= this.batchSize) {
-                    this.writeSegments(segments,graph,version,isSegmentXInfo);
+                    this.writeSegments(segments,graph,version, excludedXInfosList, isSegmentXInfo);
                     segments.clear();
                 }
             }
-            this.writeSegments(segments,graph,version,isSegmentXInfo);
+            this.writeSegments(segments,graph,version, excludedXInfosList, isSegmentXInfo);
         } finally {
             serverStatus.unregisterImport();
             if (producer != null && producer.getException() != null) {
@@ -128,11 +177,11 @@ public class BaseSegmentXInfoService implements IBaseSegmentXInfoService<IBaseSe
         }
     }
 
-    private void writeSegments(List<IBaseSegment> segments, String graph, String version, boolean isSegmentXInfo) throws GraphStorageException, GraphNotExistsException {
+    private void writeSegments(List<IBaseSegment> segments, String graph, String version, List<String> excludedXInfosList,  boolean isSegmentXInfo) throws GraphStorageException, GraphNotExistsException {
         if (isSegmentXInfo) {
-            writeDao.saveSegmentXInfos(segments, graph, version);
+            writeDao.saveSegmentXInfos(segments, graph, version, excludedXInfosList);
         }
-        else writeDao.saveConnectionXInfos(segments, graph, version);
+        else writeDao.saveConnectionXInfos(segments, graph, version, excludedXInfosList);
     }
 
     @Override

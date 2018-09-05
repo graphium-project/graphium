@@ -10,20 +10,29 @@ package at.srfg.graphium.core.helper;
  */
 
 import static org.junit.Assert.assertEquals;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import at.srfg.graphium.core.persistence.IWayGraphVersionMetadataDao;
-import at.srfg.graphium.core.springconfig.MockBeansConfig;
-import at.srfg.graphium.model.*;
-import at.srfg.graphium.model.impl.WayGraph;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import at.srfg.graphium.core.persistence.IWayGraphVersionMetadataDao;
+import at.srfg.graphium.core.springconfig.MockBeansConfig;
+import at.srfg.graphium.model.Access;
+import at.srfg.graphium.model.ISource;
+import at.srfg.graphium.model.IWayGraph;
+import at.srfg.graphium.model.IWayGraphVersionMetadata;
+import at.srfg.graphium.model.State;
+import at.srfg.graphium.model.impl.WayGraph;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:application-context-graphium-core-test.xml"})

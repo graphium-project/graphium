@@ -21,6 +21,9 @@ import java.util.Set;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.vividsolutions.jts.geom.Polygon;
+
+import at.srfg.graphium.api.exceptions.ValidationException;
 import at.srfg.graphium.core.exception.GraphAlreadyExistException;
 import at.srfg.graphium.core.exception.GraphImportException;
 import at.srfg.graphium.core.exception.GraphNotExistsException;
@@ -28,8 +31,6 @@ import at.srfg.graphium.io.exception.WaySegmentSerializationException;
 import at.srfg.graphium.io.outputformat.IWayGraphOutputFormat;
 import at.srfg.graphium.model.IBaseWaySegment;
 import at.srfg.graphium.model.IWayGraphVersionMetadata;
-
-import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * @author mwimmer
@@ -69,7 +70,22 @@ public interface IGraphService<T extends IBaseWaySegment> {
 	 * @throws GraphAlreadyExistException
 	 * @throws GraphImportException
 	 */
-	IWayGraphVersionMetadata importGraph(String graphName, String version, boolean overrideIfExists, MultipartFile file) throws IOException, GraphAlreadyExistException, GraphImportException;
+	IWayGraphVersionMetadata importGraph(String graphName, String version, boolean overrideIfExists, MultipartFile file) throws IOException, GraphAlreadyExistException, GraphImportException, ValidationException;
+
+	/**
+	 *
+	 * @param graphName
+	 * @param version
+	 * @param overrideIfExists
+	 * @param excludedXInfos
+	 * @param file
+	 * @return
+	 * @throws IOException
+	 * @throws GraphAlreadyExistException
+	 * @throws GraphImportException
+	 */
+	IWayGraphVersionMetadata importGraph(String graphName, String version, boolean overrideIfExists, String excludedXInfos, MultipartFile file) throws IOException, GraphAlreadyExistException, GraphImportException, ValidationException;
+
 
 	/**
 	 * @param outputFormat

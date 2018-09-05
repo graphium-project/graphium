@@ -32,7 +32,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.vividsolutions.jts.geom.Polygon;
@@ -485,14 +484,14 @@ public class WayGraphVersionMetadataDaoImpl extends AbstractWayGraphDaoImpl impl
 		if (version == null) {
 			query = "WITH views AS (SELECT * FROM " + schema + VIEW_TABLE_NAME + " WHERE viewname = :viewName) " +
 					"SELECT md.version FROM " + schema + METADATA_TABLE_NAME + " AS md, views AS vw " +
-					"WHERE md.graph_id = vw.graph_id AND state IN (:states)";
+					"WHERE md.graph_id = vw.graph_id AND state IN (:states) ORDER BY valid_from DESC LIMIT 1";
 		} else {
 			query = "WITH views AS (SELECT * FROM " + schema + VIEW_TABLE_NAME + " WHERE viewname = :viewName) " +
 					"SELECT md.version FROM " + schema + METADATA_TABLE_NAME + " AS md, views AS vw " +
 					"WHERE md.graph_id = vw.graph_id AND valid_from > (" +
 							"SELECT valid_from FROM " + schema + METADATA_TABLE_NAME + " AS md2, views AS vw2 " +
 							"WHERE md2.graph_id = vw2.graph_id AND version = :version) " +
-					"AND state IN (:states)";
+					"AND state IN (:states) ORDER BY valid_from DESC LIMIT 1";
 			paramMap.put("version", version);
 		}
 

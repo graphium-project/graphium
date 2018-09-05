@@ -18,6 +18,7 @@ package at.srfg.graphium.api.service;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import at.srfg.graphium.api.exceptions.ValidationException;
 import at.srfg.graphium.core.exception.GraphImportException;
 import at.srfg.graphium.core.exception.GraphNotExistsException;
 import at.srfg.graphium.core.exception.GraphStorageException;
@@ -36,9 +37,15 @@ public interface IBaseSegmentXInfoService<T extends IBaseSegment> {
 
     void streamBaseConnectionXInfos(String graph, String version, OutputStream outputStream,  String... types) throws XInfoNotSupportedException, GraphNotExistsException, WaySegmentSerializationException;
 
-    void streamBaseSegmentXInfos(String graph, String version, InputStream inputStream) throws XInfoNotSupportedException, GraphImportException, GraphNotExistsException, GraphStorageException;
+    void streamBaseSegmentXInfos(String graph, String version, InputStream inputStream) throws XInfoNotSupportedException, GraphImportException, GraphNotExistsException, GraphStorageException, ValidationException;
 
-    void streamBaseConnectionXInfos(String graph, String version,InputStream inputStream) throws XInfoNotSupportedException, GraphImportException, GraphStorageException, GraphNotExistsException;
+    void streamBaseSegmentXInfos(String graph, String version, String excludedXInfos, InputStream inputStream)
+            throws XInfoNotSupportedException, GraphImportException, GraphNotExistsException, GraphStorageException, ValidationException;
+
+    void streamBaseConnectionXInfos(String graph, String version, InputStream inputStream) throws XInfoNotSupportedException, GraphImportException, GraphStorageException, GraphNotExistsException, ValidationException;
+
+    void streamBaseConnectionXInfos(String graph, String version, String excludedXInfos, InputStream inputStream)
+            throws XInfoNotSupportedException, GraphImportException, GraphStorageException, GraphNotExistsException, ValidationException;
 
     void deleteBaseSegmentXInfos(String graph, String version, String... types) throws XInfoNotSupportedException, GraphNotExistsException, GraphStorageException;
 

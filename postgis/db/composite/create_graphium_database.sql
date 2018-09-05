@@ -193,6 +193,18 @@ WITH (
 );
 ALTER TABLE graphs.xinfo OWNER TO graphium;
 
+CREATE TABLE graphs.default_xinfo
+(
+  segment_id bigint NOT NULL,
+  direction_tow boolean,
+  graphversion_id bigint,
+  tags hstore
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE graphs.default_xinfo OWNER TO graphium;
+
 INSERT INTO graphs.accesses ("type", id) VALUES ('PEDESTRIAN', 1);
 INSERT INTO graphs.accesses ("type", id) VALUES ('BIKE', 2);
 INSERT INTO graphs.accesses ("type", id) VALUES ('PRIVATE_CAR', 3);

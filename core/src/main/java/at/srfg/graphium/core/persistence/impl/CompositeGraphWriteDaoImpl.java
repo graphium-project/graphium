@@ -22,6 +22,14 @@
  **/
 package at.srfg.graphium.core.persistence.impl;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import at.srfg.graphium.core.exception.GraphAlreadyExistException;
 import at.srfg.graphium.core.exception.GraphNotExistsException;
 import at.srfg.graphium.core.exception.GraphStorageException;
@@ -31,14 +39,6 @@ import at.srfg.graphium.model.IBaseSegment;
 import at.srfg.graphium.model.IWayGraphVersionMetadata;
 import at.srfg.graphium.model.IWaySegment;
 import at.srfg.graphium.model.IWaySegmentConnection;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 public class CompositeGraphWriteDaoImpl<W extends IWaySegment> implements IWayGraphWriteDao<W>, ICompositeWayGraphWriteDao<W>{
 
@@ -80,6 +80,13 @@ public class CompositeGraphWriteDaoImpl<W extends IWaySegment> implements IWayGr
 		for (IWayGraphWriteDao<W> dao : writeDaos) {
 			dao.saveSegments(segments, graphName, version);
 		}
+	}
+
+	@Override
+	public void saveSegments(List<W> segments, String graphName, String version, List<String> excludedXInfosList) throws GraphStorageException, GraphNotExistsException {
+        for (IWayGraphWriteDao<W> dao : writeDaos) {
+            dao.saveSegments(segments, graphName, version, excludedXInfosList);
+        }
 	}
 
 	@Override
@@ -171,6 +178,13 @@ public class CompositeGraphWriteDaoImpl<W extends IWaySegment> implements IWayGr
 	}
 
 	@Override
+	public void saveConnectionXInfos(List<? extends IBaseSegment> segments, String graphName, String version, List<String> excludedXInfos) throws GraphStorageException, GraphNotExistsException {
+		for (IWayGraphWriteDao<W> dao : writeDaos) {
+			dao.saveConnectionXInfos(segments, graphName, version, excludedXInfos);
+		}
+	}
+
+	@Override
 	public void deleteConnectionXInfos(String graphName, String version, String... types) throws GraphStorageException, GraphNotExistsException {
 		for (IWayGraphWriteDao<W> dao : writeDaos) {
 			dao.deleteConnectionXInfos(graphName, version, types);
@@ -189,6 +203,13 @@ public class CompositeGraphWriteDaoImpl<W extends IWaySegment> implements IWayGr
 		for (IWayGraphWriteDao<W> dao : writeDaos) {
 			dao.saveSegmentXInfos(segments, graphName, version);
 		}
+	}
+
+	@Override
+	public void saveSegmentXInfos(List<? extends IBaseSegment> segments, String graphName, String version, List<String> excludedXInfosList) throws GraphStorageException, GraphNotExistsException {
+        for (IWayGraphWriteDao<W> dao : writeDaos) {
+            dao.saveSegmentXInfos(segments, graphName, version, excludedXInfosList);
+        }
 	}
 
 	@Override

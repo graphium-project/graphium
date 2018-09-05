@@ -19,12 +19,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import at.srfg.graphium.api.service.IServerStatusService;
+import at.srfg.graphium.core.persistence.IWayGraphVersionMetadataDao;
 import at.srfg.graphium.io.dto.IGraphStatusDTO;
 import at.srfg.graphium.io.dto.IServerStatusDTO;
 import at.srfg.graphium.io.dto.impl.GraphStatusDTOImpl;
 import at.srfg.graphium.io.dto.impl.ServerStatusDTOImpl;
-import at.srfg.graphium.api.service.IServerStatusService;
-import at.srfg.graphium.core.persistence.IWayGraphVersionMetadataDao;
 import at.srfg.graphium.model.IWayGraphVersionMetadata;
 import at.srfg.graphium.model.State;
 import at.srfg.graphium.model.management.IServerStatus;

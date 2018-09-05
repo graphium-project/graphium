@@ -19,14 +19,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import javax.annotation.Resource;
 
-import at.srfg.graphium.api.springconfig.MockBeansConfig;
-import at.srfg.graphium.io.dto.impl.GraphVersionMetadataDTOImpl;
-import at.srfg.graphium.model.State;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,8 +41,15 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import at.srfg.graphium.api.springconfig.MockBeansConfig;
 import at.srfg.graphium.core.service.impl.GraphVersionMetadataServiceImpl;
+import at.srfg.graphium.io.dto.impl.GraphVersionMetadataDTOImpl;
 import at.srfg.graphium.model.IWayGraphVersionMetadata;
+import at.srfg.graphium.model.State;
 
 /**
  * @author mwimmer

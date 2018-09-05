@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.zip.GZIPOutputStream;
 
-import at.srfg.graphium.api.service.impl.GraphServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -37,6 +36,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import at.srfg.graphium.api.exceptions.ResourceNotFoundException;
+import at.srfg.graphium.api.exceptions.ValidationException;
 import at.srfg.graphium.api.service.IGraphService;
 import at.srfg.graphium.core.exception.GraphAlreadyExistException;
 import at.srfg.graphium.core.exception.GraphImportException;
@@ -73,16 +73,19 @@ public abstract class AbstractGraphApiController<T extends IBaseWaySegment> {
     		@PathVariable(value = "graph") String graphName,
     		@PathVariable(value = "version") String version,
     		@RequestParam(value = "overrideIfExists", required = false, defaultValue = "false") boolean overrideIfExists,
+            @RequestParam(value = "excludedXInfos", required = false) String excludedXInfos,
             @RequestParam(value = "file") MultipartFile file)
-			throws GraphAlreadyExistException, GraphImportException, IOException {
+			throws GraphAlreadyExistException, GraphImportException, IOException, ValidationException {
     	
-		return this.importGraph(graphName,version,overrideIfExists,file);
+		//return this.importGraph(graphName,version,overrideIfExists,file);
+		return this.importGraph(graphName,version,overrideIfExists,excludedXInfos, file);
     }
 
-    private IGraphVersionMetadataDTO importGraph(String graphName, String version,
-												 boolean overrideIfExists, MultipartFile file)
-			throws GraphAlreadyExistException, GraphImportException, IOException {
-		IWayGraphVersionMetadata metadata = this.graphApiService.importGraph(graphName, version, overrideIfExists, file);
+    //private IGraphVersionMetadataDTO importGraph(String graphName, String version, boolean overrideIfExists, MultipartFile file)
+    private IGraphVersionMetadataDTO importGraph(String graphName, String version, boolean overrideIfExists, String excludedXInfos, MultipartFile file)
+			throws GraphAlreadyExistException, GraphImportException, IOException, ValidationException {
+		//IWayGraphVersionMetadata metadata = this.graphApiService.importGraph(graphName, version, overrideIfExists, file);
+		IWayGraphVersionMetadata metadata = this.graphApiService.importGraph(graphName, version, overrideIfExists, excludedXInfos, file);
 
 		log.info("Import finished");
 		return this.adapter.adapt(metadata);

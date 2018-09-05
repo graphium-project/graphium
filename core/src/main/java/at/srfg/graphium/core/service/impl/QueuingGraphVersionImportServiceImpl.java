@@ -65,7 +65,7 @@ import at.srfg.graphium.model.management.IServerStatus;
 public class QueuingGraphVersionImportServiceImpl<T extends IBaseWaySegment> implements IGraphVersionImportService<T> {
 
 	private static Logger log = LoggerFactory.getLogger(QueuingGraphVersionImportServiceImpl.class);
-	
+
 	protected IWayGraphVersionMetadataDao metadataDao;
 	protected ISourceDao sourceDao;
 	protected IWayGraphWriteDao<T> writeDao;
@@ -78,212 +78,209 @@ public class QueuingGraphVersionImportServiceImpl<T extends IBaseWaySegment> imp
 	protected int SRID = 4326;
 	protected int queueSize;
 	protected int batchSize;
-	
+
 	@Override
-	@Transactional(readOnly=false, rollbackFor={GraphImportException.class,GraphAlreadyExistException.class})
+	@Transactional(readOnly = false, rollbackFor = {GraphImportException.class, GraphAlreadyExistException.class})
 	public void importGraphVersion(String graphName, String version,
-			InputStream stream, boolean overrideIfExists) 
+								   InputStream stream, boolean overrideIfExists)
 			throws GraphImportException, GraphAlreadyExistException {
-		
-		BlockingQueue<T> segmentsQueue;
-		BlockingQueue<IWayGraphVersionMetadata> metadataQueue;
-		
-		log.info("Starting import of graph " + graphName + " in version " + version + " (override existing graph = " + overrideIfExists + ")");
-		
-		try {
-		
-			int segmentsCount = 0;
-			int connectionsCount = 0;
-			
-			if (!serverStatus.registerImport()) {
-				throw new GraphImportException("Sorry, system is busy, a graph import is currently executed");
-			}
-				
-			// deserialize
-			segmentsQueue = new ArrayBlockingQueue<T>(queueSize);
-			metadataQueue = new ArrayBlockingQueue<IWayGraphVersionMetadata>(1);
-			
-			IBaseWaySegmentProducer<T> producer = new BaseWaySegmentProducerImpl<T>(inputFormat, stream, segmentsQueue, metadataQueue);
-						
-			Thread producerThread = new Thread(producer, "waysegment-parser-thread");
-			producerThread.start();
-						
-			IWayGraphVersionMetadata metadata = null;
-			while ((producerThread.isAlive() 
-					|| !metadataQueue.isEmpty())
-					&& metadata == null) {
-				try {
-					metadata = metadataQueue.poll(500, TimeUnit.MILLISECONDS);
-				} catch (InterruptedException e) {
-					log.error("error during thread sleep", e);
-				}
-			}
-			
-			if (metadata == null) {
-				throw new GraphImportException("Could not parse graph's input format - metadata is null!");
-			}
 
-			IWayGraph wayGraph = getOrCreateWayGraph(graphName);
-			
-			if (version == null) {
-				version = metadata.getVersion();
-			}
-			
-			preImport(graphName, version);
-
-			writeDao.createGraphVersion(graphName, version, overrideIfExists, false);
-			
-			metadata.setGraphId(wayGraph.getId());
-			int originalSegmentsCount = metadata.getSegmentsCount();
-			int originalConnectionsCount = metadata.getConnectionsCount();
-			
-			setOrCreateSource(metadata);
-
-			// if no graphName and/or version explicitly defined take them from JSON's metadata
-			if (graphName == null) {
-				graphName = metadata.getGraphName();
-			}
-			if (graphName == null) {
-				throw new GraphImportException("graph name is null");
-			}
-
-			if (version == null) {
-				version = metadata.getVersion();
-			}
-			if (version == null) {
-				throw new GraphImportException("version is null");
-			}
-			
-			Polygon coveredArea = metadata.getCoveredArea();
-			
-			setDefaultValues(metadata);
-			
-			IWayGraphVersionMetadata savedMetadata = null;
-			savedMetadata = metadataDao.getWayGraphVersionMetadata(graphName, version);
-			boolean graphVersionAlreadyExisted = savedMetadata != null;
-
-			// save first shot of metadata
-			// has to be done so further segment and xInfo DAOs could access a valid ID of the graph version's metadata
-			savedMetadata = saveInitialMetadata(graphName, version, metadata, savedMetadata);
-			
-			// validate validity period
-			List<String> errorMessages = validityPeriodValidator.validateValidityPeriod(savedMetadata);
-			if (errorMessages != null) {
-				String msg = StringUtils.join(errorMessages, "; ");
-				log.error(msg);			
-				throw new ValidationException(msg);
-			}
-			
-			if (!graphVersionAlreadyExisted) {
-				insertDefaultView(wayGraph);
-			}
-
-			// save segments via view
-			List<T> segmentsToSave = new ArrayList<T>(queueSize);
-			Map<Long, List<IWaySegmentConnection>> connectionIntegrityMap = new HashMap<Long, List<IWaySegmentConnection>>();
-			List<IWaySegmentConnection> connectionsToSave = new ArrayList<IWaySegmentConnection>();
-			List<Long> segmentIds = new ArrayList<Long>();
-			String segmentType = null;
-			while (producerThread.isAlive() || !segmentsQueue.isEmpty()) {
-				T segment;
-				try {
-					segment = segmentsQueue.poll(500, TimeUnit.MILLISECONDS);
-											
-					if (segment != null) {
-						// check which segment type is contained as model
-						if(segmentType == null) {
-							segmentType = segmentAdpaterRegistry.getSegmentDtoType((Class<T>) segment.getClass());
-						}
-												
-						// calculate metadata
-					/*	if (segment.getAccessTow() != null) {
-							for (Access access : segment.getAccessTow()) {
-								accessTypes.add(access);
-							}
-						}
-						if (segment.getAccessBkw() != null) {
-							for (Access access : segment.getAccessBkw()) {
-								accessTypes.add(access);
-							}
-						}*/
-						segmentsCount++;
-						if(segment.getCons() != null) {
-							connectionsCount += segment.getCons().size();
-						}
-						
-						if (metadata.getCoveredArea() == null) {
-							coveredArea = expandEnvelope(coveredArea, segment);
-						}
-						
-						segmentsToSave.add(segment);
-						segmentIds.add(segment.getId());
-						addConnectionsToIntegrityList(segment, connectionIntegrityMap);
-						
-						if (segmentsToSave.size() == batchSize) {
-							connectionsToSave = getValidConnections(connectionIntegrityMap, segmentIds);
-							saveBatch(segmentsToSave, connectionsToSave, graphName, version);
-							segmentsToSave.clear();
-							connectionsToSave.clear();
-						}
-					}
-
-				} catch (InterruptedException e) {
-					log.error("error during thread sleep", e);
-				}
-			}
-			
-			// check if background worker terminated with errors
-			if(producer.getException() != null) {
-				throw new GraphImportException("Could not parse graph's input format - error in background producer!", 
-						producer.getException());
-			}
-			
-			if (!segmentsToSave.isEmpty()) {
-				connectionsToSave = getValidConnections(connectionIntegrityMap, segmentIds);
-				saveBatch(segmentsToSave, connectionsToSave, graphName, version);
-				segmentsToSave.clear();
-				connectionsToSave.clear();
-			}
-			
-			if (!connectionIntegrityMap.isEmpty()) {
-				int waitingConnectionsSize = 0;
-				for (List<IWaySegmentConnection> conns : connectionIntegrityMap.values()) {
-					waitingConnectionsSize += conns.size();
-				}
-				log.warn(waitingConnectionsSize + " connections are left because their toSegmentIds are not valid");			
-			}
-			
-			// check if counts of original graph's metadata are equal to saved ones
-			if ((originalSegmentsCount > 0 && originalSegmentsCount != segmentsCount) ||
-				(originalConnectionsCount > 0 && originalConnectionsCount != connectionsCount)) {
-				throw new GraphImportException("Import failed because of invalid import counts "
-						+ "(segmentCount is " + segmentsCount +	" - should be " + originalSegmentsCount 
-						+ ", connectionsCount is " + connectionsCount + ", should be " + originalConnectionsCount + "!");
-			}
-	
-			log.info("data saved, updating metadata..");
-			updateCompletedMetadata(savedMetadata, connectionsCount, coveredArea, segmentsCount, segmentType);
-			log.info("metadata updated.");
-			
-			// TODO: Wie wird die grapharea berechnet??? Derzeit nur als Envelope. Polygon benötigt?
-			// für die Postgres Version wäre vermutlich das vernünftigste in postImport ein Query zu machen das
-			// in den Metadaten das Polygon mit der Concave Hull der Geometry Collection die mit collect aus allen 
-			// segmenten das Graphen zusammengesammelt wurden ersetzt
-			log.info("starting post processing ...");
-			postImport(wayGraph, version, graphVersionAlreadyExisted);
-			log.info("post processing finished.");
-			
-			log.info("importer finished, commiting transaction");
-		} catch (Exception e) {
-			handleImportError(graphName, version, e);
-		
-		} finally {
-//			serverStatus.setCurrentImport(false);
-			serverStatus.unregisterImport();
-			log.info("Graph import finished");
-		}
-		
+		importGraphVersion(graphName, version, stream, null, overrideIfExists);
 	}
+
+    @Override
+    @Transactional(readOnly = false, rollbackFor = {GraphImportException.class, GraphAlreadyExistException.class})
+    public void importGraphVersion(String graphName, String version,
+                                   InputStream stream, List<String> excludedXInfosList, boolean overrideIfExists)
+            throws GraphImportException, GraphAlreadyExistException {
+
+        BlockingQueue<T> segmentsQueue;
+        BlockingQueue<IWayGraphVersionMetadata> metadataQueue;
+
+        log.info("Starting import of graph " + graphName + " in version " + version + " (override existing graph = " + overrideIfExists + ")");
+
+        try {
+
+            int segmentsCount = 0;
+            int connectionsCount = 0;
+
+            if (!serverStatus.registerImport()) {
+                throw new GraphImportException("Sorry, system is busy, a graph import is currently executed");
+            }
+
+            // deserialize
+            segmentsQueue = new ArrayBlockingQueue<T>(queueSize);
+            metadataQueue = new ArrayBlockingQueue<IWayGraphVersionMetadata>(1);
+
+            IBaseWaySegmentProducer<T> producer = new BaseWaySegmentProducerImpl<T>(inputFormat, stream, segmentsQueue, metadataQueue);
+
+            Thread producerThread = new Thread(producer, "waysegment-parser-thread");
+            producerThread.start();
+
+            IWayGraphVersionMetadata metadata = null;
+            while ((producerThread.isAlive()
+                    || !metadataQueue.isEmpty())
+                    && metadata == null) {
+                try {
+                    metadata = metadataQueue.poll(500, TimeUnit.MILLISECONDS);
+                } catch (InterruptedException e) {
+                    log.error("error during thread sleep", e);
+                }
+            }
+
+            if (metadata == null) {
+                throw new GraphImportException("Could not parse graph's input format - metadata is null!");
+            }
+
+            IWayGraph wayGraph = getOrCreateWayGraph(graphName);
+
+            if (version == null) {
+                version = metadata.getVersion();
+            }
+
+            preImport(graphName, version);
+
+            writeDao.createGraphVersion(graphName, version, overrideIfExists, false);
+
+            metadata.setGraphId(wayGraph.getId());
+            int originalSegmentsCount = metadata.getSegmentsCount();
+            int originalConnectionsCount = metadata.getConnectionsCount();
+
+            setOrCreateSource(metadata);
+
+            // if no graphName and/or version explicitly defined take them from JSON's metadata
+            if (graphName == null) {
+                graphName = metadata.getGraphName();
+            }
+            if (graphName == null) {
+                throw new GraphImportException("graph name is null");
+            }
+
+            if (version == null) {
+                version = metadata.getVersion();
+            }
+            if (version == null) {
+                throw new GraphImportException("version is null");
+            }
+
+            Polygon coveredArea = metadata.getCoveredArea();
+
+            setDefaultValues(metadata);
+
+            IWayGraphVersionMetadata savedMetadata = null;
+            savedMetadata = metadataDao.getWayGraphVersionMetadata(graphName, version);
+            boolean graphVersionAlreadyExisted = savedMetadata != null;
+
+            // save first shot of metadata
+            // has to be done so further segment and xInfo DAOs could access a valid ID of the graph version's metadata
+            savedMetadata = saveInitialMetadata(graphName, version, metadata, savedMetadata);
+
+            // validate validity period
+            List<String> errorMessages = validityPeriodValidator.validateValidityPeriod(savedMetadata);
+            if (errorMessages != null) {
+                String msg = StringUtils.join(errorMessages, "; ");
+                log.error(msg);
+                throw new ValidationException(msg);
+            }
+
+            if (!graphVersionAlreadyExisted) {
+                insertDefaultView(wayGraph);
+            }
+
+            // save segments via view
+            List<T> segmentsToSave = new ArrayList<T>(queueSize);
+            Map<Long, List<IWaySegmentConnection>> connectionIntegrityMap = new HashMap<Long, List<IWaySegmentConnection>>();
+            List<IWaySegmentConnection> connectionsToSave = new ArrayList<IWaySegmentConnection>();
+            List<Long> segmentIds = new ArrayList<Long>();
+            String segmentType = null;
+            while (producerThread.isAlive() || !segmentsQueue.isEmpty()) {
+                T segment;
+                try {
+                    segment = segmentsQueue.poll(500, TimeUnit.MILLISECONDS);
+
+                    if (segment != null) {
+                        // check which segment type is contained as model
+                        if (segmentType == null) {
+                            segmentType = segmentAdpaterRegistry.getSegmentDtoType((Class<T>) segment.getClass());
+                        }
+
+                        segmentsCount++;
+                        if (segment.getCons() != null) {
+                            connectionsCount += segment.getCons().size();
+                        }
+
+                        if (metadata.getCoveredArea() == null) {
+                            coveredArea = expandEnvelope(coveredArea, segment);
+                        }
+
+                        segmentsToSave.add(segment);
+                        segmentIds.add(segment.getId());
+                        addConnectionsToIntegrityList(segment, connectionIntegrityMap);
+
+                        if (segmentsToSave.size() == batchSize) {
+                            connectionsToSave = getValidConnections(connectionIntegrityMap, segmentIds);
+                            saveBatch(segmentsToSave, connectionsToSave, graphName, version, excludedXInfosList);
+                            segmentsToSave.clear();
+                            connectionsToSave.clear();
+                        }
+                    }
+
+                } catch (InterruptedException e) {
+                    log.error("error during thread sleep", e);
+                }
+            }
+
+            // check if background worker terminated with errors
+            if (producer.getException() != null) {
+                throw new GraphImportException("Could not parse graph's input format - error in background producer!",
+                        producer.getException());
+            }
+
+            if (!segmentsToSave.isEmpty()) {
+                connectionsToSave = getValidConnections(connectionIntegrityMap, segmentIds);
+                saveBatch(segmentsToSave, connectionsToSave, graphName, version, excludedXInfosList);
+                segmentsToSave.clear();
+                connectionsToSave.clear();
+            }
+
+            if (!connectionIntegrityMap.isEmpty()) {
+                int waitingConnectionsSize = 0;
+                for (List<IWaySegmentConnection> conns : connectionIntegrityMap.values()) {
+                    waitingConnectionsSize += conns.size();
+                }
+                log.warn(waitingConnectionsSize + " connections are left because their toSegmentIds are not valid");
+            }
+
+            // check if counts of original graph's metadata are equal to saved ones
+            if ((originalSegmentsCount > 0 && originalSegmentsCount != segmentsCount) ||
+                    (originalConnectionsCount > 0 && originalConnectionsCount != connectionsCount)) {
+                throw new GraphImportException("Import failed because of invalid import counts "
+                        + "(segmentCount is " + segmentsCount + " - should be " + originalSegmentsCount
+                        + ", connectionsCount is " + connectionsCount + ", should be " + originalConnectionsCount + "!");
+            }
+
+            log.info("data saved, updating metadata..");
+            updateCompletedMetadata(savedMetadata, connectionsCount, coveredArea, segmentsCount, segmentType);
+            log.info("metadata updated.");
+
+            // TODO: Wie wird die grapharea berechnet??? Derzeit nur als Envelope. Polygon benötigt?
+            // für die Postgres Version wäre vermutlich das vernünftigste in postImport ein Query zu machen das
+            // in den Metadaten das Polygon mit der Concave Hull der Geometry Collection die mit collect aus allen
+            // segmenten das Graphen zusammengesammelt wurden ersetzt
+            log.info("starting post processing ...");
+            postImport(wayGraph, version, graphVersionAlreadyExisted);
+            log.info("post processing finished.");
+
+            log.info("importer finished, commiting transaction");
+        } catch (Exception e) {
+            handleImportError(graphName, version, e);
+
+        } finally {
+            serverStatus.unregisterImport();
+            log.info("Graph import finished");
+        }
+
+    }
 	
 	protected IWayGraphVersionMetadata saveInitialMetadata(String graphName, String version, IWayGraphVersionMetadata metadata, IWayGraphVersionMetadata savedMetadata) {
 		Date now = new Date();
@@ -365,9 +362,14 @@ public class QueuingGraphVersionImportServiceImpl<T extends IBaseWaySegment> imp
 
 	protected void saveBatch(List<T> segmentsToSave, List<IWaySegmentConnection> connectionsToSave,
 			String graphName, String version) throws GraphImportException, GraphNotExistsException {
+		saveBatch(segmentsToSave, connectionsToSave, graphName, version, null);
+	}
+
+	protected void saveBatch(List<T> segmentsToSave, List<IWaySegmentConnection> connectionsToSave,
+							 String graphName, String version, List<String> excludedXInfosList) throws GraphImportException, GraphNotExistsException {
 		log.info("saving " + segmentsToSave.size() + " segments...");
 		try {
-			writeDao.saveSegments(segmentsToSave, graphName, version);
+			writeDao.saveSegments(segmentsToSave, graphName, version, excludedXInfosList);
 		} catch (GraphStorageException e) {
 			String msg = "error saving segments: " + e.getMessage();
 			log.error(msg);

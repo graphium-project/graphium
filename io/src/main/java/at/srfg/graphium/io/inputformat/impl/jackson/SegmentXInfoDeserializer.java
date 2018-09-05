@@ -15,19 +15,17 @@
  */
 package at.srfg.graphium.io.inputformat.impl.jackson;
 
+import java.io.IOException;
+
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+
 import at.srfg.graphium.io.adapter.ISegmentAdapter;
 import at.srfg.graphium.io.adapter.exception.XInfoNotSupportedException;
 import at.srfg.graphium.io.adapter.impl.AbstractSegmentDTOAdapter;
 import at.srfg.graphium.io.dto.ISegmentXInfoDTO;
 import at.srfg.graphium.io.exception.XInfoDeserializationException;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.deser.SettableBeanProperty;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *

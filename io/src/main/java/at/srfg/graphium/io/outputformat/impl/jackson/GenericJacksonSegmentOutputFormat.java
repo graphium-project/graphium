@@ -22,6 +22,10 @@ import java.io.OutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonEncoding;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.MappingJsonFactory;
+
 import at.srfg.graphium.io.adapter.ISegmentAdapter;
 import at.srfg.graphium.io.adapter.exception.NoSegmentAdapterFoundException;
 import at.srfg.graphium.io.adapter.registry.ISegmentAdapterRegistry;
@@ -30,10 +34,6 @@ import at.srfg.graphium.io.dto.IBaseSegmentDTO;
 import at.srfg.graphium.io.exception.WaySegmentSerializationException;
 import at.srfg.graphium.io.outputformat.ISegmentOutputFormat;
 import at.srfg.graphium.model.IBaseSegment;
-
-import com.fasterxml.jackson.core.JsonEncoding;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.MappingJsonFactory;
 
 public class GenericJacksonSegmentOutputFormat<T extends IBaseSegment>
 	implements ISegmentOutputFormat<T>, ISegmentAdapterRegistryAware<T> {

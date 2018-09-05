@@ -19,8 +19,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import at.srfg.graphium.ITestGraphiumPostgis;
-import at.srfg.graphium.core.exception.GraphNotExistsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 
+import at.srfg.graphium.ITestGraphiumPostgis;
+import at.srfg.graphium.core.exception.GraphNotExistsException;
 import at.srfg.graphium.core.exception.GraphStorageException;
 import at.srfg.graphium.core.persistence.IWayGraphWriteDao;
 import at.srfg.graphium.geomutils.GeometryUtils;

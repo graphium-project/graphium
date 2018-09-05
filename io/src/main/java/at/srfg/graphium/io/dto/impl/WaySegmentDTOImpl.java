@@ -19,14 +19,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.vividsolutions.jts.geom.LineString;
+
 import at.srfg.graphium.io.dto.IBaseSegmentConnectionDTO;
 import at.srfg.graphium.io.dto.ISegmentXInfoDTO;
 import at.srfg.graphium.io.dto.IWaySegmentDTO;
 import at.srfg.graphium.model.Access;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.vividsolutions.jts.geom.LineString;
 
 /**
  * @author mwimmer

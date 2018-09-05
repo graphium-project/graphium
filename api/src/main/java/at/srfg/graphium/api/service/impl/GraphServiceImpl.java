@@ -24,7 +24,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.FileAlreadyExistsException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -33,11 +37,13 @@ import org.apache.commons.io.input.TeeInputStream;
 import org.apache.commons.io.output.TeeOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.vividsolutions.jts.geom.Polygon;
 
+import at.srfg.graphium.api.exceptions.ValidationException;
 import at.srfg.graphium.api.service.IGraphService;
 import at.srfg.graphium.core.exception.GraphAlreadyExistException;
 import at.srfg.graphium.core.exception.GraphImportException;
@@ -55,6 +61,7 @@ import at.srfg.graphium.model.IBaseWaySegment;
 import at.srfg.graphium.model.IConnectionXInfo;
 import at.srfg.graphium.model.ISegmentXInfo;
 import at.srfg.graphium.model.IWayGraphVersionMetadata;
+import at.srfg.graphium.model.impl.AbstractXInfoModelTypeAware;
 
 /**
  * @author mwimmer
@@ -72,6 +79,9 @@ public class GraphServiceImpl<T extends IBaseWaySegment> implements IGraphServic
 	private IXInfoDaoRegistry<ISegmentXInfo, IConnectionXInfo> xInfoDaoRegistry;
 	
 	private boolean cacheGraphFiles = false;
+
+	@Autowired(required = false)
+	private List<AbstractXInfoModelTypeAware> registeredXInfosList;
 	
 	private String graphFileUploadDirectory;
 
@@ -234,42 +244,69 @@ public class GraphServiceImpl<T extends IBaseWaySegment> implements IGraphServic
 	@Override
 	@Transactional
 	public IWayGraphVersionMetadata importGraph(String graphName, String version, boolean overrideIfExists, MultipartFile file)
-			throws IOException, GraphAlreadyExistException, GraphImportException {
+			throws IOException, GraphAlreadyExistException, GraphImportException, ValidationException {
+		return importGraph(graphName, version, overrideIfExists, null, file);
+	}
+
+
+	@Override
+	@Transactional
+	public IWayGraphVersionMetadata importGraph(String graphName, String version, boolean overrideIfExists, String excludedXInfos, MultipartFile file)
+			throws IOException, GraphAlreadyExistException, GraphImportException, ValidationException {
 
 		String fileName = createFileName(graphName, version);
 
 		log.info("Import of graph version " + fileName + " from file " + file.getOriginalFilename() + " started...");
 
 		if (!file.isEmpty()) {
-			
-			//Compressed inputStream
-			InputStream fileIn;
-			if (file.getOriginalFilename().endsWith(".zip")) {
-				ZipInputStream zip = new ZipInputStream(file.getInputStream());
-				ZipEntry entry = zip.getNextEntry();
-				fileIn = zip;
-			} else {
-				fileIn = file.getInputStream();
+			InputStream fileIn = getInputStream(file);
+
+			List<String> excludedXInfosList;
+			if (excludedXInfos != null) {
+				excludedXInfosList = Arrays.asList(excludedXInfos.split(","));
+			}else{
+				excludedXInfosList = new ArrayList<String>();
+			}
+			//verify xinfos
+			List<String> types;
+			if (registeredXInfosList == null) {
+				types = new ArrayList<>();
+				log.warn("registeredXInfosList: null");
+			}else{
+				types = registeredXInfosList.stream().map(AbstractXInfoModelTypeAware::getResponsibleType).distinct().collect(Collectors.toList());
+				//System.out.println("registeredXInfosList: " + String.join(", ", types));
+			}
+			for (String xinfo : excludedXInfosList) {
+				boolean found = false;
+				for (String  registeredXInfoType : types) {
+					if (registeredXInfoType.equals(xinfo)){
+						found = true;
+						break;
+					}
+				}
+				if (!found) {
+					throw new ValidationException("XInfo-type: " +  xinfo + " is not registered!");
+				}
 			}
 
 			if (saveFile()) {
 				TeeInputStream teeInputStream = null;
 				BufferedOutputStream fileOutputStream = null;
 				try {
-	
+
 					// check if file in directory already exists and delete it or throw exception
 					File graphVersionFile = new File(graphFileUploadDirectory + fileName);
-	
+
 					if (!overrideIfExists && graphVersionFile.exists()) {
 						throw new FileAlreadyExistsException("Import failed - file '" + fileName + "' already exists, but overrideIfExists has been true!");
 					}
-	
+
 					// save file in graph version upload folder
 					fileOutputStream =
 							new BufferedOutputStream(new FileOutputStream(graphVersionFile));
 					teeInputStream = new TeeInputStream(fileIn, fileOutputStream);
-	
-					importService.importGraphVersion(graphName, version, teeInputStream, overrideIfExists);
+
+					importService.importGraphVersion(graphName, version, teeInputStream, excludedXInfosList, overrideIfExists);
 				} finally {
 					if (teeInputStream != null) {
 						teeInputStream.close();
@@ -280,7 +317,7 @@ public class GraphServiceImpl<T extends IBaseWaySegment> implements IGraphServic
 				}
 			} else {
 				try {
-					importService.importGraphVersion(graphName, version, fileIn, overrideIfExists);
+					importService.importGraphVersion(graphName, version, fileIn, excludedXInfosList, overrideIfExists);
 				} finally {
 					if (fileIn != null) {
 						fileIn.close();
@@ -291,7 +328,19 @@ public class GraphServiceImpl<T extends IBaseWaySegment> implements IGraphServic
 			throw new IllegalArgumentException("Import failed - file " + file.getOriginalFilename() + " was empty");
 		}
 		return metadataService.getWayGraphVersionMetadata(graphName,version);
+
 	}
+
+    private InputStream getInputStream(MultipartFile file) throws IOException{
+        //Compressed inputStream
+	    if (file.getOriginalFilename().endsWith(".zip")) {
+            ZipInputStream zip = new ZipInputStream(file.getInputStream());
+            ZipEntry entry = zip.getNextEntry();
+            return zip;
+        } else {
+            return file.getInputStream();
+        }
+    }
 
 	private boolean saveFile() {
 		// File can be saved only if caching is explicitly enabled and there are no XInfo DAOs registered. This is because only graph files without XInfo should be cached and

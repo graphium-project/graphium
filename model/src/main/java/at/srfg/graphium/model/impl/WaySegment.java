@@ -27,9 +27,9 @@ import com.vividsolutions.jts.geom.LineString;
 import at.srfg.graphium.model.Access;
 import at.srfg.graphium.model.FormOfWay;
 import at.srfg.graphium.model.FuncRoadClass;
+import at.srfg.graphium.model.ISegmentXInfo;
 import at.srfg.graphium.model.IWaySegment;
 import at.srfg.graphium.model.IWaySegmentConnection;
-import at.srfg.graphium.model.ISegmentXInfo;
 import at.srfg.graphium.model.OneWay;
 
 public class WaySegment extends BaseWaySegment implements IWaySegment, Serializable {

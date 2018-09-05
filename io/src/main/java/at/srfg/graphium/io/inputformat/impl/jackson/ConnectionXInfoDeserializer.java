@@ -15,16 +15,17 @@
  */
 package at.srfg.graphium.io.inputformat.impl.jackson;
 
+import java.io.IOException;
+
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+
 import at.srfg.graphium.io.adapter.ISegmentAdapter;
 import at.srfg.graphium.io.adapter.exception.XInfoNotSupportedException;
 import at.srfg.graphium.io.adapter.impl.AbstractSegmentDTOAdapter;
 import at.srfg.graphium.io.dto.IConnectionXInfoDTO;
 import at.srfg.graphium.io.exception.XInfoDeserializationException;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-
-import java.io.IOException;
 
 /**
  * Deserializer for connection XInfos cannot be used with anntoations but has to be set in an module and registered

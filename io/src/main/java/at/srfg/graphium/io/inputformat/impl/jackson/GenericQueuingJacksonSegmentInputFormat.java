@@ -19,15 +19,15 @@ import java.io.InputStream;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+
 import at.srfg.graphium.io.adapter.ISegmentAdapter;
 import at.srfg.graphium.io.adapter.registry.ISegmentAdapterRegistry;
 import at.srfg.graphium.io.dto.IBaseSegmentDTO;
 import at.srfg.graphium.io.exception.WaySegmentDeserializationException;
 import at.srfg.graphium.io.inputformat.IQueuingSegmentInputFormat;
 import at.srfg.graphium.model.IBaseSegment;
-
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
 
 
 public class GenericQueuingJacksonSegmentInputFormat<T extends IBaseSegment> 
