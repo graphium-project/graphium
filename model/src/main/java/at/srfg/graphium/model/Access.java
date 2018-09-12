@@ -41,8 +41,8 @@ public enum Access {
 	CAMPER (19),
 	COMBUSTIBLES (20),
 	HAZARDOUS_TO_WATER (21),
-	GARBAGE_COLLECTION_VEHICLE (22);
-	
+	GARBAGE_COLLECTION_VEHICLE (22),
+	NONE (-1);
 	
 	private int id;
 	
@@ -62,6 +62,8 @@ public enum Access {
 		for (int i=0; i<accesses.length; i++) { // begin at 1 => first valid ID
 			if (accesses[i] > 0) {
 				accessTypes.add(types[accesses[i]-1]);
+			} else if (accesses[i] == -1) {
+				accessTypes.add(NONE);
 			}
 		}
 		

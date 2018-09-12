@@ -1,9 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>at.srfg.graphium</groupId>
 	<artifactId>graphium-parent</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 	<packaging>pom</packaging>
 
 	<name>graphium-builder</name>
@@ -75,17 +74,17 @@
 			</plugin>
 			
 			
-			<!-- License Header Plugin -->
 			
-			<!-- goal: license:format -->
+			
+			
 			
 			<plugin>
 				<groupId>com.mycila</groupId>
 				<artifactId>license-maven-plugin</artifactId>
 				<version>3.0</version>
 				<configuration>
-					<!-- Those properties have to be defined. If not favored a custom template has to be created. -->
-					<!-- <header>com/mycila/maven/plugin/license/templates/GPL-3.txt</header> -->
+					
+					
 					<header>com/mycila/maven/plugin/license/templates/APACHE-2.txt</header>
 			   		<properties>
 						<owner>Salzburg Research Forschungsgesellschaft</owner>
@@ -93,8 +92,8 @@
 						<project.inceptionYear>2017</project.inceptionYear>
 					</properties>
 					
-					<!-- Custom template -->
-					<!-- <header>src/license/custom_GPL_3_for_mycila.txt</header> -->
+					
+					
 					
 					<includes>
 						<include>**/*.java</include>
@@ -118,7 +117,7 @@
 	</build>
 
 	<properties>
-		<graphium.version>1.0.0</graphium.version>
+		<graphium.version>1.0.1</graphium.version>
 		
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<slf4j-log4j12.version>1.7.21</slf4j-log4j12.version>
@@ -143,7 +142,7 @@
 				<scope>import</scope>
 			</dependency>
 			
-			<!-- fix exclusion of commons logging, we always use slf4j and bridges -->
+			
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-core</artifactId>

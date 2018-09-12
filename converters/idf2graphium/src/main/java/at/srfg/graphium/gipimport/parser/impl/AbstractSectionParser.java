@@ -15,12 +15,13 @@
  */
 package at.srfg.graphium.gipimport.parser.impl;
 
-import at.srfg.graphium.gipimport.parser.IGipSectionParser;
-import at.srfg.graphium.gipimport.parser.IGipParser;
+import java.io.BufferedReader;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
+import at.srfg.graphium.gipimport.parser.IGipParser;
+import at.srfg.graphium.gipimport.parser.IGipSectionParser;
 
 /**
  * Created by shennebe on 18.12.2015.

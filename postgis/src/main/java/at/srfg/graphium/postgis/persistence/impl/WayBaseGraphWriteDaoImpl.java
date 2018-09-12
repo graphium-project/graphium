@@ -61,7 +61,7 @@ public class WayBaseGraphWriteDaoImpl<W extends IBaseWaySegment>
 	extends AbstractWayGraphDaoImpl implements IWayGraphWriteDao<W>, ISegmentToSqlParameterSetConverter<W> {
 
 	private static Logger log = LoggerFactory.getLogger(WayBaseGraphWriteDaoImpl.class);
-	
+
 	protected WKTWriter wktWriter;
 	protected IXInfoDaoRegistry<ISegmentXInfo,IConnectionXInfo> xInfoDaoRegistry;
 	protected IWayGraphVersionMetadataDao metadataDao;
@@ -156,7 +156,24 @@ public class WayBaseGraphWriteDaoImpl<W extends IBaseWaySegment>
 	@Override
 	@Transactional(propagation=Propagation.MANDATORY)
 	public void saveSegments(final List<W> segments, String graphName, String version) throws GraphStorageException, GraphNotExistsException {
-			
+		doBatchUpdate(segments, graphName, version);
+	
+		// save XInfos
+		saveSegmentXInfos(segments, graphName, version);
+		
+	}
+
+	@Override
+	@Transactional(propagation=Propagation.MANDATORY)
+	public void saveSegments(final List<W> segments, String graphName, String version, List<String> excludedXInfosList) throws GraphStorageException, GraphNotExistsException {
+		doBatchUpdate(segments, graphName, version);
+
+		// save XInfos
+		saveSegmentXInfos(segments, graphName, version, excludedXInfosList);
+
+	}
+
+	private void doBatchUpdate(final List<W> segments, String graphName, String version) throws  GraphStorageException{
 		String graphVersionName = GraphVersionHelper.createGraphVersionName(graphName, version);
 		IWayGraphVersionMetadata metadata = metadataDao.getWayGraphVersionMetadata(graphName, version);
 		int graphVersionId = (int) metadata.getId();
@@ -165,12 +182,9 @@ public class WayBaseGraphWriteDaoImpl<W extends IBaseWaySegment>
 		} catch (SQLException e) {
 			throw new GraphStorageException("error inserting segments", e);
 		}
-	
-		// save XInfos
-		saveSegmentXInfos(segments, graphName, version);
-		
 	}
-	
+
+
 	@Override
 	public SqlParameterSource[] getParamSource(List<W> segments, Integer graphVersionId) throws SQLException { 
 		final Timestamp now = new Timestamp(Calendar.getInstance().getTimeInMillis());
@@ -222,7 +236,7 @@ public class WayBaseGraphWriteDaoImpl<W extends IBaseWaySegment>
 
 	@Override
 	public void updateConnectionXInfos(List<? extends IBaseSegment> segments, String graphName, String version) throws GraphStorageException, GraphNotExistsException {
-		this.saveConnectionXInfos(segments,graphName,version,false);
+		this.saveConnectionXInfos(segments,graphName,version, null,false);
 	}
 
 	@Override
@@ -232,8 +246,13 @@ public class WayBaseGraphWriteDaoImpl<W extends IBaseWaySegment>
 
 	@Override
 	public void saveConnectionXInfos(List<? extends IBaseSegment> segments, String graphName, String version) throws GraphStorageException, GraphNotExistsException {
-		this.saveConnectionXInfos(segments,graphName,version,true);
+		this.saveConnectionXInfos(segments,graphName,version, null, true);
 	}
+
+    @Override
+    public void saveConnectionXInfos(List<? extends IBaseSegment> segments, String graphName, String version, List<String> excludedXInfosList) throws GraphStorageException, GraphNotExistsException {
+        this.saveConnectionXInfos(segments,graphName,version, excludedXInfosList, true);
+    }
 
 	@Override
 	public void deleteConnectionXInfos(String graphName, String version, String... types) throws GraphStorageException, GraphNotExistsException {
@@ -249,16 +268,19 @@ public class WayBaseGraphWriteDaoImpl<W extends IBaseWaySegment>
 		}
 	}
 
-	private void saveConnectionXInfos(List<? extends IBaseSegment> segments, String graphName, String version, boolean insert) throws GraphStorageException, GraphNotExistsException {
+	private void saveConnectionXInfos(List<? extends IBaseSegment> segments, String graphName, String version, List<String> excludedXInfoList,  boolean insert) throws GraphStorageException, GraphNotExistsException {
 		final Map<String, List<IConnectionXInfo>> xInfoMap = new HashMap<>();
 		segments.stream().filter(w -> w.getCons() != null && w.getCons().isEmpty())
 				.forEach(segment -> segment.getCons().stream().filter(con -> con.getXInfo() != null && !con.getXInfo().isEmpty())
 						.forEach(con -> {
 							con.getXInfo().forEach(xInfo -> {
-								if (!xInfoMap.containsKey(xInfo.getXInfoType())) {
-									xInfoMap.put(xInfo.getXInfoType(), new ArrayList<>());
+								if (excludedXInfoList != null && !excludedXInfoList.contains(xInfo.getXInfoType())) {
+									//System.out.println("!!!: XInfo-type: " + xInfo.getXInfoType());
+									if (!xInfoMap.containsKey(xInfo.getXInfoType())) {
+										xInfoMap.put(xInfo.getXInfoType(), new ArrayList<>());
+									}
+									xInfoMap.get(xInfo.getXInfoType()).add(xInfo);
 								}
-								xInfoMap.get(xInfo.getXInfoType()).add(xInfo);
 							});
 						}));
 
@@ -284,19 +306,33 @@ public class WayBaseGraphWriteDaoImpl<W extends IBaseWaySegment>
 		this.saveSegmentXInfos(segments,graphName,version,true);
 	}
 
+	@Override
+	public void saveSegmentXInfos(List<? extends IBaseSegment> segments, String graphName, String version, List<String> excludedXInfosList) throws GraphStorageException, GraphNotExistsException {
+		this.saveSegmentXInfos(segments,graphName,version, excludedXInfosList, true);
+	}
+
     private void saveSegmentXInfos(List<? extends IBaseSegment> segments, String graphName, String version, boolean insert) throws GraphNotExistsException {
+      saveSegmentXInfos(segments, graphName, version, null, insert);
+	}
 
-        final Map<String, List<ISegmentXInfo>> xInfoMap = new HashMap<>();
-        segments.stream().filter(segment -> segment != null && segment.getXInfo() != null && !segment.getXInfo().isEmpty())
-                .forEach(segment -> segment.getXInfo()
-                        .forEach(xInfo -> {
-                            if (!xInfoMap.containsKey(xInfo.getXInfoType())) {
-                                xInfoMap.put(xInfo.getXInfoType(), new ArrayList<>());
-                            }
-                            xInfoMap.get(xInfo.getXInfoType()).add(xInfo);
-                        }));
+	private void saveSegmentXInfos(List<? extends IBaseSegment> segments, String graphName, String version, List<String> excludedXInfoList, boolean insert) throws GraphNotExistsException {
+		final Map<String, List<ISegmentXInfo>> xInfoMap = new HashMap<>();
+		segments.stream().filter(segment -> segment != null && segment.getXInfo() != null && !segment.getXInfo().isEmpty())
+				.forEach(segment -> segment.getXInfo()
+						.forEach(xInfo -> {
+							if (excludedXInfoList == null || !excludedXInfoList.contains(xInfo.getXInfoType())) {
+								//System.out.println("!!!: XInfo-type: " + xInfo.getXInfoType());
+								if (!xInfoMap.containsKey(xInfo.getXInfoType())) {
+									xInfoMap.put(xInfo.getXInfoType(), new ArrayList<>());
+								}
+								xInfoMap.get(xInfo.getXInfoType()).add(xInfo);
+							}
+						}));
+		saveXInfos(graphName, version, insert, xInfoMap);
+	}
 
 
+	private void saveXInfos(String graphName, String version, boolean insert, Map<String, List<ISegmentXInfo>> xInfoMap){
 		for (String type : xInfoMap.keySet()) {
 			// get DAO per XInfo type
 			IXInfoDao<ISegmentXInfo>  xInfoDao = xInfoDaoRegistry.getSegmentXInfoDao(type);

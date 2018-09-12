@@ -15,6 +15,11 @@
  */
 package at.srfg.graphium.io.adapter.impl;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import at.srfg.graphium.io.adapter.ISegmentAdapter;
 import at.srfg.graphium.io.adapter.exception.XInfoNotSupportedException;
 import at.srfg.graphium.io.adapter.registry.IXinfoAdapterRegistry;
@@ -26,8 +31,6 @@ import at.srfg.graphium.model.IBaseSegment;
 import at.srfg.graphium.model.IConnectionXInfo;
 import at.srfg.graphium.model.ISegmentXInfo;
 import at.srfg.graphium.model.IWaySegmentConnection;
-
-import java.util.*;
 
 /**
  * Created by shennebe on 27.09.2016.

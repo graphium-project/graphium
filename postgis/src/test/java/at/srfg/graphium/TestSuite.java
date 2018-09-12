@@ -15,13 +15,17 @@
  */
 package at.srfg.graphium;
 
-import at.srfg.graphium.core.exception.GraphAlreadyExistException;
-import at.srfg.graphium.core.exception.GraphImportException;
-import at.srfg.graphium.core.persistence.IWayGraphVersionMetadataDao;
-import at.srfg.graphium.core.service.IGraphVersionImportService;
-import at.srfg.graphium.core.service.IGraphVersionMetadataService;
-import at.srfg.graphium.model.State;
-import org.junit.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.List;
+import java.util.zip.ZipInputStream;
+
+import javax.annotation.Resource;
+
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,10 +33,12 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
-import java.io.*;
-import java.util.List;
-import java.util.zip.ZipInputStream;
+import at.srfg.graphium.core.exception.GraphAlreadyExistException;
+import at.srfg.graphium.core.exception.GraphImportException;
+import at.srfg.graphium.core.persistence.IWayGraphVersionMetadataDao;
+import at.srfg.graphium.core.service.IGraphVersionImportService;
+import at.srfg.graphium.core.service.IGraphVersionMetadataService;
+import at.srfg.graphium.model.State;
 
 /**
  * Salzburg Research ForschungsgesmbH (c) 2018

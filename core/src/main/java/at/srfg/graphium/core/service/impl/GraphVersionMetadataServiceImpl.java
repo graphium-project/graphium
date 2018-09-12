@@ -32,7 +32,6 @@ import at.srfg.graphium.model.ISource;
 import at.srfg.graphium.model.IWayGraphVersionMetadata;
 import at.srfg.graphium.model.State;
 import at.srfg.graphium.model.view.IWayGraphView;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author mwimmer

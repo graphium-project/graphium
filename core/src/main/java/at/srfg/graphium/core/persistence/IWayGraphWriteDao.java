@@ -20,6 +20,7 @@ import java.util.List;
 import at.srfg.graphium.core.exception.GraphAlreadyExistException;
 import at.srfg.graphium.core.exception.GraphNotExistsException;
 import at.srfg.graphium.core.exception.GraphStorageException;
+import at.srfg.graphium.model.IBaseSegment;
 import at.srfg.graphium.model.IBaseWaySegment;
 import at.srfg.graphium.model.IWayGraphVersionMetadata;
 import at.srfg.graphium.model.IWaySegmentConnection;
@@ -65,7 +66,20 @@ public interface IWayGraphWriteDao<T extends IBaseWaySegment> extends IBaseSegme
 	 * @throws GraphStorageException if problems during persisting graph occurred
 	 */
 	void saveSegments(List<T> segments, String graphName, String version) throws GraphStorageException, GraphNotExistsException;
-	
+
+	/**
+	 * save segments to the graph with the given name
+	 *
+	 * @param segments segments to save
+	 * @param graphName name of the graph
+	 * @param version name of the graph's version
+	 * @param excludedXInfosList comma-separated list of XInfo-types which should not be considered
+	 * @throws GraphStorageException if problems during persisting graph occurred
+	 */
+	void saveSegments(List<T> segments, String graphName, String version, List<String> excludedXInfosList) throws GraphStorageException, GraphNotExistsException;
+
+	void saveSegmentXInfos(List<? extends IBaseSegment> segments, String graphName, String version, List<String> excludedXInfosList) throws GraphStorageException, GraphNotExistsException;
+
 	/**
  	 * update all attributes (not connections or geometries) of the segments in the graph with the given name
 	 * 

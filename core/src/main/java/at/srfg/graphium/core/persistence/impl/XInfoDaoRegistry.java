@@ -15,15 +15,18 @@
  */
 package at.srfg.graphium.core.persistence.impl;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
-import at.srfg.graphium.model.IConnectionXInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import at.srfg.graphium.core.persistence.IXInfoDao;
 import at.srfg.graphium.core.persistence.IXInfoDaoRegistry;
+import at.srfg.graphium.model.IConnectionXInfo;
 import at.srfg.graphium.model.ISegmentXInfo;
 
 /**

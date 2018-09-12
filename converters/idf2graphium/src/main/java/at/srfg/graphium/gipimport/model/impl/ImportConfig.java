@@ -37,7 +37,7 @@ public class ImportConfig implements IImportConfig {
     private Set<Integer> frcList = null;
     private Set<Access> accessTypes = null;
     private Integer minFrc = null;
-    private Integer maxFrc = 5;
+    private Integer maxFrc = null;
     private Polygon bounds = null;
     private TIntSet includedGipIds = null;
     private TIntSet excludedGipIds = null;
@@ -53,6 +53,7 @@ public class ImportConfig implements IImportConfig {
     private boolean importGip = true;
     private boolean calculatePixelCut = true;
     private boolean extractBusLaneInfo = false;
+    private boolean enableFullConnectivity = false;
 
     public static IImportConfig getConfig(String graphName, String version,
                                          String inputIDFFile) {
@@ -295,6 +296,17 @@ public class ImportConfig implements IImportConfig {
 	}
 
 	@Override
+	public IImportConfig enableFullConnectivity() {
+		this.enableFullConnectivity = true;
+		return this;
+	}
+
+	@Override
+	public boolean isEnableFullConnectivity() {
+		return enableFullConnectivity;
+	}
+
+	@Override
     public String toString() {
         return "ImportConfig{" +
                 "queueSize=" + queueSize +
@@ -318,6 +330,8 @@ public class ImportConfig implements IImportConfig {
                 ", importGip=" + importGip +
                 ", calculatePixelCut=" + calculatePixelCut +
                 ", extractBusLaneInfo=" + extractBusLaneInfo +
+                ", enableFullConnectivity=" + enableFullConnectivity +
                 '}';
     }
+
 }

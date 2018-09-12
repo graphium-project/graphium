@@ -20,9 +20,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 
-import at.srfg.graphium.io.outputformat.impl.jackson.GenericJacksonSegmentOutputFormat;
-import at.srfg.graphium.model.*;
-
 import com.vividsolutions.jts.geom.Polygon;
 
 import at.srfg.graphium.core.exception.GraphNotExistsException;
@@ -30,6 +27,7 @@ import at.srfg.graphium.core.persistence.IWayGraphReadDao;
 import at.srfg.graphium.core.service.IGraphReadService;
 import at.srfg.graphium.io.exception.WaySegmentSerializationException;
 import at.srfg.graphium.io.outputformat.ISegmentOutputFormat;
+import at.srfg.graphium.model.IBaseWaySegment;
 
 public class GraphReadServiceImpl<T extends IBaseWaySegment> implements IGraphReadService<T> {
 		

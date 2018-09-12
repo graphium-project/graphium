@@ -15,11 +15,11 @@
  */
 package at.srfg.graphium.core.persistence;
 
+import java.util.List;
+
 import at.srfg.graphium.core.exception.GraphNotExistsException;
 import at.srfg.graphium.core.exception.GraphStorageException;
 import at.srfg.graphium.model.IBaseSegment;
-
-import java.util.List;
 
 /**
  * Created by shennebe on 07.10.2016.
@@ -28,9 +28,13 @@ public interface IBaseSegmentWriteDao {
 
     void saveConnectionXInfos(List<? extends IBaseSegment> segments, String graphName, String version) throws GraphStorageException, GraphNotExistsException;
 
+    void saveConnectionXInfos(List<? extends IBaseSegment> segments, String graphName, String version, List<String> excludedXInfos) throws GraphStorageException, GraphNotExistsException;
+
     void deleteConnectionXInfos(String graphName, String version, String... types) throws GraphStorageException, GraphNotExistsException;
 
     void saveSegmentXInfos(List<? extends IBaseSegment> segments, String graphName, String version) throws GraphStorageException, GraphNotExistsException;
+
+    void saveSegmentXInfos(List<? extends IBaseSegment> segments, String graphName, String version, List<String> excludedXInfos) throws GraphStorageException, GraphNotExistsException;
 
     void deleteSegmentXInfos(String graphName, String version, String... types) throws GraphStorageException, GraphNotExistsException;
 

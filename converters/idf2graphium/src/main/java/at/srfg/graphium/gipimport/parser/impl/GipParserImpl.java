@@ -15,13 +15,6 @@
  */
 package at.srfg.graphium.gipimport.parser.impl;
 
-import gnu.trove.impl.sync.TSynchronizedLongObjectMap;
-import gnu.trove.list.array.TLongArrayList;
-import gnu.trove.map.TLongObjectMap;
-import gnu.trove.map.hash.TLongObjectHashMap;
-import gnu.trove.procedure.TLongObjectProcedure;
-import gnu.trove.set.TLongSet;
-
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -42,6 +35,9 @@ import java.util.zip.ZipInputStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.LineString;
 
 import at.srfg.graphium.gipimport.helper.GeoHelper;
 import at.srfg.graphium.gipimport.helper.GipLinkFilter;
@@ -71,9 +67,14 @@ import at.srfg.graphium.pixelcuts.model.ISegment;
 import at.srfg.graphium.pixelcuts.model.impl.SegmentImpl;
 import at.srfg.graphium.pixelcuts.service.IRenderingCalculator;
 import at.srfg.graphium.pixelcuts.service.impl.RenderingCalculatorImpl;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineString;
+import gnu.trove.impl.sync.TSynchronizedLongObjectMap;
+import gnu.trove.iterator.TLongIterator;
+import gnu.trove.list.TLongList;
+import gnu.trove.list.array.TLongArrayList;
+import gnu.trove.map.TLongObjectMap;
+import gnu.trove.map.hash.TLongObjectHashMap;
+import gnu.trove.procedure.TLongObjectProcedure;
+import gnu.trove.set.TLongSet;
 
 public class GipParserImpl<T extends IBaseSegment> implements IGipParser<T> {
 
@@ -274,8 +275,25 @@ public class GipParserImpl<T extends IBaseSegment> implements IGipParser<T> {
 			log.info("Rendering Table" + rendering.size());
 		}
 		
-		
-		if(config.isImportGip()) {
+		if (config.isImportGip()) {
+			TLongObjectMap<TLongList> fullNodeConnections = null;
+			
+			if (config.isEnableFullConnectivity()) {
+				fullNodeConnections = new TLongObjectHashMap<>();
+				for (long linkId : linksToEnqueue.toArray()) {
+					IGipLink link = links.get(linkId);
+					if (!fullNodeConnections.containsKey(link.getFromNodeId())) {
+						fullNodeConnections.put(link.getFromNodeId(), new TLongArrayList());
+					}
+					fullNodeConnections.get(link.getFromNodeId()).add(linkId);
+					
+					if (!fullNodeConnections.containsKey(link.getToNodeId())) {
+						fullNodeConnections.put(link.getToNodeId(), new TLongArrayList());
+					}
+					fullNodeConnections.get(link.getToNodeId()).add(linkId);
+				}
+			}
+			
 			for (long linkId : linksToEnqueue.toArray()) {
 				IGipLink link = links.get(linkId);
 				Coordinate[] coordinates = new Coordinate[link.getCoordinatesX().length];
@@ -343,6 +361,10 @@ public class GipParserImpl<T extends IBaseSegment> implements IGipParser<T> {
 				
 				doUpdateConnections(waySeg, turnEdges);
 				
+				if (config.isEnableFullConnectivity()) {
+					doUpdateFullConnections(waySeg, fullNodeConnections);
+				}
+				
 				try {
 					queue.put(segment);
 				} catch (InterruptedException e) {
@@ -352,7 +374,7 @@ public class GipParserImpl<T extends IBaseSegment> implements IGipParser<T> {
 			}
 		}
 		// only if rendering is present and no gip import done
-		else if(rendering != null) {
+		else if (rendering != null) {
 			
 			rendering.forEachEntry( new TLongObjectProcedure<IPixelCut>() {
 
@@ -374,6 +396,47 @@ public class GipParserImpl<T extends IBaseSegment> implements IGipParser<T> {
 		}
 	}
 	
+	private void doUpdateFullConnections(IWaySegment waySeg, TLongObjectMap<TLongList> fullNodeConnections) {
+		Set<Access> accesses = new HashSet<>();
+		accesses.add(Access.NONE);
+		Set<IWaySegmentConnection> cons = new HashSet<>();
+		TLongList startNodeSegments = fullNodeConnections.get(waySeg.getStartNodeId());
+		TLongIterator it = startNodeSegments.iterator();
+		while (it.hasNext()) {
+			Long connectedSegId = it.next();
+			if (waySeg.getId() != connectedSegId &&
+				!hasConnection(waySeg.getStartNodeCons(), connectedSegId)) {
+				cons.add(new WaySegmentConnection(waySeg.getStartNodeId(), waySeg.getId(),
+						connectedSegId, accesses));
+			}
+		}
+		
+		TLongList endNodeSegments = fullNodeConnections.get(waySeg.getEndNodeId());
+		it = endNodeSegments.iterator();
+		while (it.hasNext()) {
+			Long connectedSegId = it.next();
+			if (waySeg.getId() != connectedSegId &&
+				!hasConnection(waySeg.getEndNodeCons(), connectedSegId)) {
+				cons.add(new WaySegmentConnection(waySeg.getEndNodeId(), waySeg.getId(),
+						connectedSegId, accesses));
+			}
+		}
+
+		if (!cons.isEmpty()) {
+			waySeg.addCons(new ArrayList<>(cons));
+		}
+		
+	}
+
+	private boolean hasConnection(List<IWaySegmentConnection> cons, Long segId) {
+		for (IWaySegmentConnection con : cons) {
+			if (con.getToSegmentId() == segId) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	protected void doUpdateConnections(IWaySegment current,
 									   TLongObjectMap<List<IGipTurnEdge>> turnEdges) {
 		Set<IWaySegmentConnection> startNodeCons = new HashSet<>();

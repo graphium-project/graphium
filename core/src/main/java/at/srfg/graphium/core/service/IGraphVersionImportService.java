@@ -16,6 +16,7 @@
 package at.srfg.graphium.core.service;
 
 import java.io.InputStream;
+import java.util.List;
 
 import at.srfg.graphium.core.exception.GraphAlreadyExistException;
 import at.srfg.graphium.core.exception.GraphImportException;
@@ -26,5 +27,8 @@ public interface IGraphVersionImportService<T extends IBaseWaySegment> {
 	void importGraphVersion(String graphName, String version, InputStream stream, 
 			boolean overrideIfExists)  
 					throws GraphImportException, GraphAlreadyExistException;
-	
+
+	void importGraphVersion(String graphName, String version, InputStream stream, List<String> excludedXInfosList,
+							boolean overrideIfExists)
+			throws GraphImportException, GraphAlreadyExistException;
 }

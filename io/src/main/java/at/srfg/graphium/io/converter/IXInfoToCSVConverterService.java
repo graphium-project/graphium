@@ -15,13 +15,13 @@
  */
 package at.srfg.graphium.io.converter;
 
-import at.srfg.graphium.io.dto.IBaseSegmentDTO;
-import at.srfg.graphium.model.IBaseSegment;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
+
+import at.srfg.graphium.io.dto.IBaseSegmentDTO;
+import at.srfg.graphium.model.IBaseSegment;
 
 public interface IXInfoToCSVConverterService {
 

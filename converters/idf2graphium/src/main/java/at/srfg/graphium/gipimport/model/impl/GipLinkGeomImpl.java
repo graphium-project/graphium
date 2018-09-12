@@ -15,8 +15,9 @@
  */
 package at.srfg.graphium.gipimport.model.impl;
 
-import at.srfg.graphium.gipimport.model.IGipLinkGeom;
 import com.vividsolutions.jts.geom.LineString;
+
+import at.srfg.graphium.gipimport.model.IGipLinkGeom;
 
 public class GipLinkGeomImpl implements IGipLinkGeom {
 

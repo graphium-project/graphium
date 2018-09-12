@@ -16,6 +16,31 @@
 
 package at.srfg.graphium.api.springconfig;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.io.WKTReader;
+
 import at.srfg.graphium.core.exception.GraphNotExistsException;
 import at.srfg.graphium.core.exception.GraphViewNotExistsException;
 import at.srfg.graphium.core.persistence.IWayGraphReadDao;
@@ -24,25 +49,20 @@ import at.srfg.graphium.core.persistence.IWayGraphViewDao;
 import at.srfg.graphium.geomutils.GeometryUtils;
 import at.srfg.graphium.io.exception.WaySegmentSerializationException;
 import at.srfg.graphium.io.outputformat.ISegmentOutputFormat;
-import at.srfg.graphium.model.*;
-import at.srfg.graphium.model.impl.*;
+import at.srfg.graphium.model.Access;
+import at.srfg.graphium.model.FormOfWay;
+import at.srfg.graphium.model.FuncRoadClass;
+import at.srfg.graphium.model.ISegmentXInfo;
+import at.srfg.graphium.model.IWayGraphVersionMetadata;
+import at.srfg.graphium.model.IWaySegmentConnection;
+import at.srfg.graphium.model.State;
+import at.srfg.graphium.model.impl.WayGraph;
+import at.srfg.graphium.model.impl.WayGraphVersionMetadata;
+import at.srfg.graphium.model.impl.WaySegment;
+import at.srfg.graphium.model.impl.WaySegmentConnection;
 import at.srfg.graphium.model.management.impl.Source;
 import at.srfg.graphium.model.view.IWayGraphView;
 import at.srfg.graphium.model.view.impl.WayGraphView;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.io.WKTReader;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
-
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 /**
  * Salzburg Research ForschungsgesmbH (c) 2018
