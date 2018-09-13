@@ -16,7 +16,11 @@
 package at.srfg.graphium.gipimport.model.impl;
 
 
-import at.srfg.graphium.gipimport.model.*;
+import at.srfg.graphium.gipimport.model.IGipLink;
+import at.srfg.graphium.gipimport.model.IGipLinkGeom;
+import at.srfg.graphium.gipimport.model.IGipModelFactory;
+import at.srfg.graphium.gipimport.model.IGipNode;
+import at.srfg.graphium.gipimport.model.IGipTurnEdge;
 
 public class GipModelFactory implements IGipModelFactory {
 

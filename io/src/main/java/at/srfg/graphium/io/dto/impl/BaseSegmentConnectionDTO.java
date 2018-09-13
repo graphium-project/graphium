@@ -15,13 +15,14 @@
  */
 package at.srfg.graphium.io.dto.impl;
 
-import at.srfg.graphium.io.dto.IBaseSegmentConnectionDTO;
-import at.srfg.graphium.io.dto.IConnectionXInfoDTO;
+import java.util.List;
+import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import java.util.List;
-import java.util.Map;
+import at.srfg.graphium.io.dto.IBaseSegmentConnectionDTO;
+import at.srfg.graphium.io.dto.IConnectionXInfoDTO;
 
 /**
  * Created by shennebe on 27.09.2016.

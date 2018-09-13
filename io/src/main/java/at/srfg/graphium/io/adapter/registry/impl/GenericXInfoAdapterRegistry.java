@@ -15,15 +15,15 @@
  */
 package at.srfg.graphium.io.adapter.registry.impl;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import at.srfg.graphium.io.adapter.IXInfoDTOAdapter;
 import at.srfg.graphium.io.adapter.exception.XInfoNotSupportedException;
 import at.srfg.graphium.io.adapter.registry.IXinfoAdapterRegistry;
 import at.srfg.graphium.io.dto.IXInfoDTO;
 import at.srfg.graphium.model.IXInfo;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Abstract Registry for Connection and Segment XInfo. This has been created to prevent duplicate code. The Autowired

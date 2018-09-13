@@ -15,15 +15,15 @@
  */
 package at.srfg.graphium.io.converter.impl;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import at.srfg.graphium.io.dto.IBaseSegmentDTO;
 import at.srfg.graphium.io.dto.ISegmentXInfoDTO;
 import at.srfg.graphium.model.IBaseSegment;
 import at.srfg.graphium.model.ISegmentXInfo;
 import javafx.util.Pair;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by shennebe on 10.02.2017.

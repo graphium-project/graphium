@@ -24,14 +24,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.FileAlreadyExistsException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import at.srfg.graphium.api.exceptions.ValidationException;
-import at.srfg.graphium.model.impl.AbstractSegmentXInfo;
-import at.srfg.graphium.model.impl.AbstractXInfoModelTypeAware;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.input.TeeInputStream;
 import org.apache.commons.io.output.TeeOutputStream;
@@ -43,6 +43,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.vividsolutions.jts.geom.Polygon;
 
+import at.srfg.graphium.api.exceptions.ValidationException;
 import at.srfg.graphium.api.service.IGraphService;
 import at.srfg.graphium.core.exception.GraphAlreadyExistException;
 import at.srfg.graphium.core.exception.GraphImportException;
@@ -60,9 +61,7 @@ import at.srfg.graphium.model.IBaseWaySegment;
 import at.srfg.graphium.model.IConnectionXInfo;
 import at.srfg.graphium.model.ISegmentXInfo;
 import at.srfg.graphium.model.IWayGraphVersionMetadata;
-
-import javax.annotation.Resource;
-import javax.print.DocFlavor;
+import at.srfg.graphium.model.impl.AbstractXInfoModelTypeAware;
 
 /**
  * @author mwimmer

@@ -15,17 +15,17 @@
  */
 package at.srfg.graphium.postgis.persistence.impl;
 
-import at.srfg.graphium.core.exception.GraphAlreadyExistException;
-import at.srfg.graphium.core.exception.GraphNotExistsException;
-import at.srfg.graphium.core.exception.GraphStorageException;
-import at.srfg.graphium.core.helper.GraphVersionHelper;
-import at.srfg.graphium.core.persistence.IWayGraphVersionMetadataDao;
-import at.srfg.graphium.core.persistence.IWayGraphWriteDao;
-import at.srfg.graphium.core.persistence.IXInfoDao;
-import at.srfg.graphium.core.persistence.IXInfoDaoRegistry;
-import at.srfg.graphium.model.*;
-import at.srfg.graphium.postgis.persistence.ISegmentToSqlParameterSetConverter;
-import com.vividsolutions.jts.io.WKTWriter;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,11 +35,23 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.*;
+import com.vividsolutions.jts.io.WKTWriter;
+
+import at.srfg.graphium.core.exception.GraphAlreadyExistException;
+import at.srfg.graphium.core.exception.GraphNotExistsException;
+import at.srfg.graphium.core.exception.GraphStorageException;
+import at.srfg.graphium.core.helper.GraphVersionHelper;
+import at.srfg.graphium.core.persistence.IWayGraphVersionMetadataDao;
+import at.srfg.graphium.core.persistence.IWayGraphWriteDao;
+import at.srfg.graphium.core.persistence.IXInfoDao;
+import at.srfg.graphium.core.persistence.IXInfoDaoRegistry;
+import at.srfg.graphium.model.IBaseSegment;
+import at.srfg.graphium.model.IBaseWaySegment;
+import at.srfg.graphium.model.IConnectionXInfo;
+import at.srfg.graphium.model.ISegmentXInfo;
+import at.srfg.graphium.model.IWayGraphVersionMetadata;
+import at.srfg.graphium.model.IWaySegmentConnection;
+import at.srfg.graphium.postgis.persistence.ISegmentToSqlParameterSetConverter;
 
 /**
  * @author mwimmer
@@ -50,8 +62,6 @@ public class WayBaseGraphWriteDaoImpl<W extends IBaseWaySegment>
 
 	private static Logger log = LoggerFactory.getLogger(WayBaseGraphWriteDaoImpl.class);
 
-	private static int counter = 0;
-	
 	protected WKTWriter wktWriter;
 	protected IXInfoDaoRegistry<ISegmentXInfo,IConnectionXInfo> xInfoDaoRegistry;
 	protected IWayGraphVersionMetadataDao metadataDao;

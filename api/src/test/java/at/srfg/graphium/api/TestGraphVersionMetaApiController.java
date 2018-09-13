@@ -45,12 +45,12 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import at.srfg.graphium.core.service.impl.GraphVersionMetadataServiceImpl;
 import at.srfg.graphium.io.dto.impl.GraphVersionMetadataDTOImpl;
 import at.srfg.graphium.model.IWayGraphVersionMetadata;
 import at.srfg.graphium.model.State;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Created by shennebe on 30.08.2016.

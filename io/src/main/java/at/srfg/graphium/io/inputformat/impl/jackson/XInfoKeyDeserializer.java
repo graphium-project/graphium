@@ -15,11 +15,11 @@
  */
 package at.srfg.graphium.io.inputformat.impl.jackson;
 
+import java.io.IOException;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdKeyDeserializer;
-
-import java.io.IOException;
 
 /**
  * Created by shennebe on 12.10.2016.

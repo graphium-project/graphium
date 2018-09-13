@@ -18,7 +18,6 @@ package at.srfg.graphium.io.outputformat;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import at.srfg.graphium.io.outputformat.IWayGraphOutputFormat;
 import at.srfg.graphium.model.IBaseWaySegment;
 
 /**

@@ -15,10 +15,6 @@
  */
 package at.srfg.graphium.io.dto.impl;
 
-import at.srfg.graphium.io.dto.IBaseSegmentConnectionDTO;
-import at.srfg.graphium.io.dto.IBaseSegmentDTO;
-import at.srfg.graphium.io.dto.ISegmentXInfoDTO;
-
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +22,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+import at.srfg.graphium.io.dto.IBaseSegmentConnectionDTO;
+import at.srfg.graphium.io.dto.IBaseSegmentDTO;
+import at.srfg.graphium.io.dto.ISegmentXInfoDTO;
 
 /**
  * Created by shennebe on 27.09.2016.

@@ -22,6 +22,14 @@
  **/
 package at.srfg.graphium.core.persistence.impl;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import at.srfg.graphium.core.exception.GraphAlreadyExistException;
 import at.srfg.graphium.core.exception.GraphNotExistsException;
 import at.srfg.graphium.core.exception.GraphStorageException;
@@ -31,14 +39,6 @@ import at.srfg.graphium.model.IBaseSegment;
 import at.srfg.graphium.model.IWayGraphVersionMetadata;
 import at.srfg.graphium.model.IWaySegment;
 import at.srfg.graphium.model.IWaySegmentConnection;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 public class CompositeGraphWriteDaoImpl<W extends IWaySegment> implements IWayGraphWriteDao<W>, ICompositeWayGraphWriteDao<W>{
 

@@ -36,7 +36,15 @@ public class ViewDao<T extends IBaseSegment, X extends ISegmentXInfo> extends Wa
 	public void saveTestXInfoView(IWayGraph graph, String viewName) {
 		getJdbcTemplate().execute(
 				"CREATE OR REPLACE VIEW graphs.vw_" + viewName + " AS " + 
-				" WITH wayseg AS (SELECT wayseg.id, " + 
+				" SELECT wayseg.*, " +
+				"		rdm.segment_id AS rdm_segment_id, " +
+				"	    rdm.direction_tow AS rdm_direction_tow, " +
+				"	    rdm.graphversion_id AS rdm_graphversion_id, " +
+				"	    rdm.start_offset AS rdm_start_offset, " +
+				"	    rdm.end_offset AS rdm_end_offset, " +
+				"	    rdm.type AS rdm_type " +
+				" FROM ( " +
+				"  SELECT wayseg.id, " + 
 				"    wayseg.graphversion_id AS wayseg_graphversion_id, " + 
 				"    wayseg.geometry AS wayseg_geometry, " + 
 				"    wayseg.length AS wayseg_length, " + 
@@ -67,15 +75,7 @@ public class ViewDao<T extends IBaseSegment, X extends ISegmentXInfo> extends Wa
 				"   FROM graphs.waysegments wayseg " + 
 				"     LEFT OUTER JOIN graphs.waysegment_connections con_start ON con_start.node_id = wayseg.startnode_id AND con_start.from_segment_id = wayseg.id AND con_start.to_segment_id <> wayseg.id AND con_start.graphversion_id = wayseg.graphversion_id " + 
 				"     LEFT OUTER JOIN graphs.waysegment_connections con_end ON con_end.node_id = wayseg.endnode_id AND con_end.from_segment_id = wayseg.id AND con_end.to_segment_id <> wayseg.id AND con_end.graphversion_id = wayseg.graphversion_id " + 
-				"  GROUP BY wayseg.id) " +
-				"SELECT wayseg.*," +
-				"	rdm.segment_id AS rdm_segment_id, " + 
-				"	rdm.direction_tow AS rdm_direction_tow, " + 
-				"	rdm.graphversion_id AS rdm_graphversion_id, " + 
-				"	rdm.start_offset AS rdm_start_offset, " + 
-				"	rdm.end_offset AS rdm_end_offset, " + 
-				"	rdm.type AS rdm_type " + 
-				" FROM wayseg " +
+				"  GROUP BY wayseg.id) AS wayseg " +
 				"LEFT OUTER JOIN graphs.roaddamages rdm ON (rdm.segment_id = wayseg.id AND rdm.graphversion_id = wayseg.wayseg_graphversion_id);" 
 				);
 		

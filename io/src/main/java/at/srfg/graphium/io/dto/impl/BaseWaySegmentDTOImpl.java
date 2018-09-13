@@ -18,8 +18,6 @@ package at.srfg.graphium.io.dto.impl;
 import java.util.List;
 import java.util.Map;
 
-import at.srfg.graphium.io.outputformat.impl.jackson.JacksonGeometrySerializer;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -30,6 +28,7 @@ import at.srfg.graphium.io.dto.IBaseSegmentConnectionDTO;
 import at.srfg.graphium.io.dto.IBaseWaySegmentDTO;
 import at.srfg.graphium.io.dto.ISegmentXInfoDTO;
 import at.srfg.graphium.io.inputformat.impl.jackson.JacksonLineStringDeserializer;
+import at.srfg.graphium.io.outputformat.impl.jackson.JacksonGeometrySerializer;
 
 /**
  * @author mwimmer

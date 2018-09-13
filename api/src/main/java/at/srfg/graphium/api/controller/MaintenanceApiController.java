@@ -18,10 +18,10 @@ package at.srfg.graphium.api.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-
-import at.srfg.graphium.io.dto.IServerStatusDTO;
-import at.srfg.graphium.api.service.IServerStatusService;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import at.srfg.graphium.api.service.IServerStatusService;
+import at.srfg.graphium.io.dto.IServerStatusDTO;
 
 /**
  * @author mwimmer

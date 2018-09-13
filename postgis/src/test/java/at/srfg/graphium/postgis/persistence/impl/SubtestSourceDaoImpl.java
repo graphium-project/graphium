@@ -15,13 +15,13 @@
  */
 package at.srfg.graphium.postgis.persistence.impl;
 
-import at.srfg.graphium.ITestGraphiumPostgis;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.Assert;
 
+import at.srfg.graphium.ITestGraphiumPostgis;
 import at.srfg.graphium.core.persistence.ISourceDao;
 import at.srfg.graphium.model.ISource;
 import at.srfg.graphium.model.management.impl.Source;

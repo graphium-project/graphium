@@ -15,11 +15,9 @@
  */
 package at.srfg.graphium.gipimport.model.impl;
 
-import at.srfg.graphium.gipimport.model.IGipNode;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Point;
-
 import java.io.Serializable;
+
+import at.srfg.graphium.gipimport.model.IGipNode;
 
 public class GipNodeImpl implements IGipNode, Serializable {
 

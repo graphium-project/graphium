@@ -1,5 +1,22 @@
 package at.srfg.graphium.core.springconfig;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.io.WKTReader;
+
 import at.srfg.graphium.core.persistence.IWayGraphVersionMetadataDao;
 import at.srfg.graphium.model.Access;
 import at.srfg.graphium.model.IWayGraphVersionMetadata;
@@ -7,17 +24,6 @@ import at.srfg.graphium.model.State;
 import at.srfg.graphium.model.impl.WayGraph;
 import at.srfg.graphium.model.impl.WayGraphVersionMetadata;
 import at.srfg.graphium.model.management.impl.Source;
-import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.io.WKTReader;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * Salzburg Research ForschungsgesmbH (c) 2018

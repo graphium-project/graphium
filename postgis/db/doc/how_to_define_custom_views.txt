@@ -194,7 +194,8 @@ ORDER BY id
 Beispiel mit LEFT OUTER JOIN auf eine XInfo-Table mit Einschränkung auf graphversion_id:
 ========================================================================================
 CREATE OR REPLACE VIEW graphs.vw_gip_at_frc_0_4 AS 
- WITH wayseg AS (
+SELECT wayseg.*, def.*
+FROM (
   SELECT wayseg.id,
     wayseg.graphversion_id AS wayseg_graphversion_id,
     st_asewkb(wayseg.geometry) AS wayseg_geometry,
@@ -229,8 +230,7 @@ CREATE OR REPLACE VIEW graphs.vw_gip_at_frc_0_4 AS
 	LEFT OUTER JOIN graphs.waysegment_connections con_end
 	ON (con_end.node_id = wayseg.endnode_id AND con_end.from_segment_id = wayseg.id AND con_end.to_segment_id <> wayseg.id AND con_end.graphversion_id = wayseg.graphversion_id)
 	GROUP BY wayseg.id
-)
-SELECT * FROM wayseg
+) AS wayseg
 LEFT OUTER JOIN graphs.default_xinfo def ON (def.segment_id = wayseg.id
   AND def.graphversion_id = wayseg.graphversion_id)
 ORDER BY id
