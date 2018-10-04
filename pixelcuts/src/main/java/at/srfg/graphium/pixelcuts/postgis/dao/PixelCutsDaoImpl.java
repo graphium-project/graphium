@@ -52,7 +52,7 @@ public class PixelCutsDaoImpl extends AbstractSegmentXInfoTypeAwareDao<IPixelCut
 								" CONSTRAINT graphs_"+ TABLE_NAME + "_waygraphmetadata_fk FOREIGN KEY (graphversion_id) " +
 							    "  REFERENCES graphs.waygraphmetadata (id) MATCH SIMPLE " +
 							    "  ON UPDATE NO ACTION ON DELETE CASCADE " +
-								" ) WITH ( OIDS=FALSE );";
+								" ) INHERITS (%SCHEMA%xinfo) WITH ( OIDS=FALSE );";
 	
 	public PixelCutsDaoImpl() {
 		super(new PixelCut());
