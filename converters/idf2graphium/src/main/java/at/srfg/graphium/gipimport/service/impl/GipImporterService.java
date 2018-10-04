@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -43,6 +44,7 @@ import at.srfg.graphium.io.adapter.registry.ISegmentAdapterRegistry;
 import at.srfg.graphium.io.adapter.registry.IXinfoAdapterRegistry;
 import at.srfg.graphium.io.adapter.registry.impl.SegmentAdapterRegistryImpl;
 import at.srfg.graphium.io.adapter.registry.impl.SegmentXInfoAdapterRegistry;
+import at.srfg.graphium.io.csv.ICsvXInfoFactory;
 import at.srfg.graphium.io.dto.IBaseSegmentDTO;
 import at.srfg.graphium.io.dto.IGraphVersionMetadataDTO;
 import at.srfg.graphium.io.dto.ISegmentXInfoDTO;
@@ -120,6 +122,23 @@ public class GipImporterService<T extends IBaseSegment, D extends IBaseSegmentDT
     	List<IXInfoDTOAdapter<? extends IXInfo, ? extends IXInfoDTO>> xInfoAdapters = new ArrayList<>();
     	xInfoAdapters.add(pixelCutAdapter);
     	xInfoAdapters.add(defaultXInfoAdapter);
+    	
+		// create optional XInfo adapter for CSV files - has to be from type ICsvXInfoFactory
+    	if (config.getCsvConfig() != null) {
+    		for (Entry<Object, Object> entry : config.getCsvConfig().entrySet()) {
+    			String className = (String) entry.getValue();
+    			
+    			try {
+					Class<?> factoryClass = Class.forName(className);
+					@SuppressWarnings("unchecked")
+					ICsvXInfoFactory<ISegmentXInfo, ISegmentXInfoDTO> factory = (ICsvXInfoFactory<ISegmentXInfo, ISegmentXInfoDTO>) factoryClass.newInstance();
+					xInfoAdapters.add(factory);
+					
+    			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+    				throw new RuntimeException(e);
+    			}
+    		}
+    	}
     	
     	IXinfoAdapterRegistry<ISegmentXInfo, ISegmentXInfoDTO> segmentXInfoAdapterRegistry = 
     			new SegmentXInfoAdapterRegistry(xInfoAdapters);

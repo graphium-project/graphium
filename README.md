@@ -130,44 +130,47 @@ Example API call to generate a JSON file from GIP data:
 |              | -access-types                 | Comma separated List of Access Types, to be considered. If not set, all access types will be considered |
 | -e           | --pixel-cut-enable-short-conn | By default short connections below 3.5 meter with frc 0 are ignored. This is to filter the connections between highways and streets. If this option is set all gip links are considered |
 | -fc            | --full-connectivity | Creates a full connected network ignoring one ways (default = false) |
+|  | --xinfo-csv | Defines optional CSV file to convert into XInfo object; pattern: <FILENAME>=<XInfoFactoryClass><br />Therefore a jar is needed containing all necessary classes for creating and processing the custom XInfo objects (see graphium-pixelcuts). This jar has to linked via `java -cp executable.jar;libs/*;. at.srfg....IDFConverter`. The <XInfoFactoryClass> has to be a class implementing the interface ICsvXInfoFactory. All XInfo objects will be written to the output JSON file as xInfo array entries. |
 
 
 ## Quickstart
 
-1. Building
+1. Install PostgreSQL: https://www.postgresql.org/download/
 
-   `mvn clean install`
-
-2. Install PostgreSQL: https://www.postgresql.org/download/
+2. Install PostGIS: https://postgis.net/install/
 
 3. Create Database (using *psql*)
 
    ```sql
    CREATE ROLE graphium LOGIN ENCRYPTED PASSWORD 'md5e85d3e0c9e3a933a0c9103b21ed017df'
       VALID UNTIL 'infinity';
-
+   
    CREATE DATABASE graphium WITH OWNER = graphium;
-
+   
    \i /path/to/graphium-postgis/db/composite/create_graphium_database.sql
    ```
 
 4. Install Apache Tomcat: http://tomcat.apache.org/
 
-5. Deploy tutorial's Graphium central server (*graphium-tutorial-central-server-1.0.0.war*) on Apache Tomcat and start
+5. Building
 
-6. Download OSM File:
+   `mvn clean install`
+
+6. Deploy tutorial's Graphium central server (*graphium-tutorial-central-server-1.0.0.war*) on Apache Tomcat and start
+
+7. Download OSM File:
 
    ```
    curl http://download.geofabrik.de/europe/austria-latest.osm.pbf -o /data/osm/austria-latest.osm.pbf
    ```
 
-7. Convert OSM File into Graphium's JSON format:
+8. Convert OSM File into Graphium's JSON format:
 
    ```
    java -jar osm2graphium_1.0.0.one-jar.jar -i /data/osm/austria-latest.osm.pbf -o /path/to/output -n osm_at -v 170929 -q 20000 -t 5 -highwayTypes "motorway, motorway_link, primary, primary_link"
    ```
 
-8. Import OSM into Graphium central server
+9. Import OSM into Graphium central server
 
    ```
    curl -X POST "http://localhost:8080/graphium-tutorial-central-server-1.0.0/api/segments/graphs/osm_at/versions/170929?overrideIfExists=true" -F "file=@/path/to/output/osm_at.json"

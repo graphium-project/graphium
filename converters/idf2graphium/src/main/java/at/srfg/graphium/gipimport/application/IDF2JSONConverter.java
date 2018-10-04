@@ -17,6 +17,7 @@ package at.srfg.graphium.gipimport.application;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Properties;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -71,7 +72,8 @@ public class IDF2JSONConverter {
         options.addOption(Option.builder("e").longOpt("pixel-cut-enable-short-conn").desc("By default short connections below 3.5 meter with frc 0 are ignored. This is to filter the connections between highways and streets. If this option is set all gip links are considered").build());
         options.addOption(Option.builder("bl").longOpt("extract-buslane-info").desc("By default no bus lane info will be extracted.").build());
         options.addOption(Option.builder("fc").longOpt("full-connectivity").hasArg().argName("full_connectivity").desc("Create a full connected network ignoring one ways (default = false)").build());
-
+        options.addOption(Option.builder().longOpt("xinfo-csv").hasArgs().valueSeparator('=').desc("Defines optional CSV file to convert into XInfo object; pattern: <FILENAME>=<XInfoFactoryClass>").build());
+        
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = null;
         try {
@@ -84,7 +86,12 @@ public class IDF2JSONConverter {
             String version = null;
             Integer[] frcValues = null;
             Access[] accessTypes = null;
-
+            Properties csvConfig = null;
+            
+            if (cmd.hasOption("xinfo-csv")) {
+            	csvConfig = cmd.getOptionProperties("xinfo-csv");
+            }
+            
             if (cmd.hasOption('h')) {
                 HelpFormatter helpFormatter = new HelpFormatter();
                 helpFormatter.printHelp("java -jar idf2graphium-0.1.0.one-jar.jar [OPTION]...", options);
@@ -131,7 +138,7 @@ public class IDF2JSONConverter {
             }
 
             IImportConfig config = ImportConfig.getConfig(name,version,gipFile)
-                    .outPutDir(outputDirectory).frcList(frcValues).accessTypes(accessTypes);
+                    .outPutDir(outputDirectory).frcList(frcValues).accessTypes(accessTypes).setCsvConfig(csvConfig);
 
             Date now = new Date();
             if (cmd.hasOption("vf")) {

@@ -18,6 +18,8 @@ package at.srfg.graphium.gipimport.model.impl;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import com.vividsolutions.jts.geom.Polygon;
@@ -54,6 +56,7 @@ public class ImportConfig implements IImportConfig {
     private boolean calculatePixelCut = true;
     private boolean extractBusLaneInfo = false;
     private boolean enableFullConnectivity = false;
+    private Properties csvConfig; // CSV filename + XInfo factory
 
     public static IImportConfig getConfig(String graphName, String version,
                                          String inputIDFFile) {
@@ -191,6 +194,12 @@ public class ImportConfig implements IImportConfig {
     }
     
     @Override
+    public IImportConfig setCsvConfig(Properties csvConfig) {
+		this.csvConfig = csvConfig;
+		return this;
+	}
+
+	@Override
     public int getQueueSize() {
         return queueSize;
     }
@@ -304,6 +313,11 @@ public class ImportConfig implements IImportConfig {
 	@Override
 	public boolean isEnableFullConnectivity() {
 		return enableFullConnectivity;
+	}
+
+    @Override
+    public Properties getCsvConfig() {
+		return csvConfig;
 	}
 
 	@Override

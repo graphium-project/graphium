@@ -25,10 +25,13 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.zip.ZipInputStream;
@@ -52,12 +55,14 @@ import at.srfg.graphium.gipimport.model.impl.GipModelFactory;
 import at.srfg.graphium.gipimport.model.impl.IDFMetadataImpl;
 import at.srfg.graphium.gipimport.parser.IGipParser;
 import at.srfg.graphium.gipimport.parser.IGipSectionParser;
+import at.srfg.graphium.gipimport.xinfo.CsvAdapterService;
 import at.srfg.graphium.model.Access;
 import at.srfg.graphium.model.FormOfWay;
 import at.srfg.graphium.model.FuncRoadClass;
 import at.srfg.graphium.model.IBaseGraphModelFactory;
 import at.srfg.graphium.model.IBaseSegment;
 import at.srfg.graphium.model.IDefaultSegmentXInfo;
+import at.srfg.graphium.model.ISegmentXInfo;
 import at.srfg.graphium.model.IWaySegment;
 import at.srfg.graphium.model.IWaySegmentConnection;
 import at.srfg.graphium.model.impl.DefaultSegmentXInfo;
@@ -187,17 +192,35 @@ public class GipParserImpl<T extends IBaseSegment> implements IGipParser<T> {
 			TLongSet linksToEnqueue = linkCoordinatesParser.getResult();
 			TLongObjectMap<IGipLink> links = linkParser.getResult();
 			TLongObjectMap<List<IGipTurnEdge>> turnEdges = turnEdgeParser.getResult();
-			TLongObjectMap<IPixelCut> renderingResultPerSegment = null;
+			TLongObjectMap<List<ISegmentXInfo>> optionalXInfos = new TLongObjectHashMap<>();
+			
+//			TLongObjectMap<IPixelCut> renderingResultPerSegment = null;
 			TLongObjectMap<Map<String, Object>> buslaneMap = linkUseParser.getResult();
 			TLongObjectMap<Map<String, Object>> defaultTags = new TSynchronizedLongObjectMap<>(new TLongObjectHashMap<>());
 			defaultTags.putAll(buslaneMap);
 
 			if (config.isCalculatePixelCut()) {
-				renderingResultPerSegment = this.calculatePixelCutOffset(config,linksToEnqueue,links);
+//				renderingResultPerSegment = this.calculatePixelCutOffset(config,linksToEnqueue,links);
+				TLongObjectMap<IPixelCut> pixelCuts = this.calculatePixelCutOffset(config,linksToEnqueue,links);
+				if (pixelCuts != null) {
+					for (Long segmentId : pixelCuts.keys()) {
+						addToXInfos(optionalXInfos, segmentId, Collections.singletonList(pixelCuts.get(segmentId)));
+					}
+				}
+			}
+			
+			if (config.getCsvConfig() != null) {
+				// read optional CSV files and adapt into XInfo objects
+				TLongObjectMap<List<ISegmentXInfo>> xinfoList = this.adaptCsvFiles(config.getCsvConfig(), encoding);
+				if (xinfoList != null) {
+					for (Long segmentId : xinfoList.keys()) {
+						addToXInfos(optionalXInfos, segmentId, xinfoList.get(segmentId));
+					}
+				}
 			}
 
 			if (finished) {
-				enqueueSegments(linksToEnqueue, links, turnEdges, renderingResultPerSegment, defaultTags, queue, config);
+				enqueueSegments(linksToEnqueue, links, turnEdges, optionalXInfos, defaultTags, queue, config);
 			}
 			
 			log.info("segmentation tasks enqueued: " + statistics.getNrOfSegmentTasks());
@@ -213,6 +236,40 @@ public class GipParserImpl<T extends IBaseSegment> implements IGipParser<T> {
 			log.error(e.toString());
 		}
 
+	}
+
+	private TLongObjectMap<List<ISegmentXInfo>> adaptCsvFiles(Properties csvConfig, String encoding) {
+		TLongObjectMap<List<ISegmentXInfo>> xinfoList = null;
+		for (Entry<Object, Object> entry : csvConfig.entrySet()) {
+			String fileName = (String) entry.getKey();
+			String className = (String) entry.getValue();
+
+			log.info("Adapting CSV file " + fileName + "...");
+
+			CsvAdapterService csvadapter = new CsvAdapterService();
+			TLongObjectMap<List<ISegmentXInfo>> csvXinfoMap = csvadapter.adaptCsvFile(fileName, className, encoding);
+			if (xinfoList == null) {
+				xinfoList = csvXinfoMap;
+			} else {
+				for (long segmentId : csvXinfoMap.keys()) {
+					if (!xinfoList.containsKey(segmentId)) {
+						xinfoList.put(segmentId, new ArrayList<>());
+					}
+					xinfoList.get(segmentId).addAll(csvXinfoMap.get(segmentId));
+				}
+			}
+			
+			log.info("Adapting CSV file " + fileName + "finished");
+
+		}
+		return xinfoList;
+	}
+
+	private void addToXInfos(TLongObjectMap<List<ISegmentXInfo>> optionalXInfos, long segmentId, List<ISegmentXInfo> xinfoList) {
+		if (!optionalXInfos.containsKey(segmentId)) {
+			optionalXInfos.put(segmentId, new ArrayList<>());
+		}
+		optionalXInfos.get(segmentId).addAll(xinfoList);
 	}
 
 	private TLongObjectMap<IPixelCut> calculatePixelCutOffset(IImportConfig config,
@@ -267,13 +324,14 @@ public class GipParserImpl<T extends IBaseSegment> implements IGipParser<T> {
 	protected void enqueueSegments(final TLongSet linksToEnqueue,
 								   final TLongObjectMap<IGipLink> links,
 								   final TLongObjectMap<List<IGipTurnEdge>> turnEdges,
-								   final TLongObjectMap<IPixelCut> rendering,
+								   //final TLongObjectMap<IPixelCut> rendering,
+								   TLongObjectMap<List<ISegmentXInfo>> optionalXInfos,
 								   final TLongObjectMap<Map<String, Object>> defaultTags,
 								   final BlockingQueue<T> queue,
 								   final IImportConfig config) {
-		if (rendering != null) {
-			log.info("Rendering Table" + rendering.size());
-		}
+//		if (rendering != null) {
+//			log.info("Rendering Table" + rendering.size());
+//		}
 		
 		if (config.isImportGip()) {
 			TLongObjectMap<TLongList> fullNodeConnections = null;
@@ -345,10 +403,17 @@ public class GipParserImpl<T extends IBaseSegment> implements IGipParser<T> {
 				waySeg.setUrban(link.isUrban());
 				waySeg.setTimestamp(beginParseDate);
 				
-				if (rendering != null) {
-					IPixelCut renderingInfo = null;
-					renderingInfo = rendering.get(link.getId());
-					segment.addXInfo(renderingInfo);
+//				if (rendering != null) {
+//					IPixelCut renderingInfo = null;
+//					renderingInfo = rendering.get(link.getId());
+//					segment.addXInfo(renderingInfo);
+//				}
+				
+				if (optionalXInfos != null) {
+					List<ISegmentXInfo> xinfoList = optionalXInfos.get(link.getId());
+					if (xinfoList != null && !xinfoList.isEmpty()) {
+						segment.addXInfo(xinfoList);
+					}
 				}
 				
 				if (defaultTags != null && defaultTags.containsKey(link.getId())) {
@@ -374,15 +439,15 @@ public class GipParserImpl<T extends IBaseSegment> implements IGipParser<T> {
 			}
 		}
 		// only if rendering is present and no gip import done
-		else if (rendering != null) {
+		else if (optionalXInfos != null) {
 			
-			rendering.forEachEntry( new TLongObjectProcedure<IPixelCut>() {
+			optionalXInfos.forEachEntry( new TLongObjectProcedure<List<ISegmentXInfo>>() {
 
 				@Override
-				public boolean execute(long key, IPixelCut pixelCut) {
+				public boolean execute(long key, List<ISegmentXInfo> xinfoList) {
 					T segment = segmentFactory.newSegment();
 					segment.setId(key);
-					segment.addXInfo(pixelCut);
+					segment.addXInfo(xinfoList);
 					try {
 						queue.put(segment);
 					} catch (InterruptedException e) {
@@ -392,6 +457,25 @@ public class GipParserImpl<T extends IBaseSegment> implements IGipParser<T> {
 					return true;
 				}
 			});
+//		// only if rendering is present and no gip import done
+//		else if (rendering != null) {
+//			
+//			rendering.forEachEntry( new TLongObjectProcedure<IPixelCut>() {
+//
+//				@Override
+//				public boolean execute(long key, IPixelCut pixelCut) {
+//					T segment = segmentFactory.newSegment();
+//					segment.setId(key);
+//					segment.addXInfo(pixelCut);
+//					try {
+//						queue.put(segment);
+//					} catch (InterruptedException e) {
+//						log.error(e.toString());
+//					}
+//					
+//					return true;
+//				}
+//			});
 			
 		}
 	}
