@@ -211,6 +211,9 @@ public class GipParserImpl<T extends IBaseSegment> implements IGipParser<T> {
 			
 			if (config.getCsvConfig() != null) {
 				// read optional CSV files and adapt into XInfo objects
+				if (config.getCsvEncodingName() != null) {
+					encoding = config.getCsvEncodingName();
+				}
 				TLongObjectMap<List<ISegmentXInfo>> xinfoList = this.adaptCsvFiles(config.getCsvConfig(), encoding);
 				if (xinfoList != null) {
 					for (Long segmentId : xinfoList.keys()) {

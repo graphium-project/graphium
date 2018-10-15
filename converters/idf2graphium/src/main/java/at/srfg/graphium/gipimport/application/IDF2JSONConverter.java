@@ -73,6 +73,7 @@ public class IDF2JSONConverter {
         options.addOption(Option.builder("bl").longOpt("extract-buslane-info").desc("By default no bus lane info will be extracted.").build());
         options.addOption(Option.builder("fc").longOpt("full-connectivity").hasArg().argName("full_connectivity").desc("Create a full connected network ignoring one ways (default = false)").build());
         options.addOption(Option.builder().longOpt("xinfo-csv").hasArgs().valueSeparator('=').desc("Defines optional CSV file to convert into XInfo object; pattern: <FILENAME>=<XInfoFactoryClass>").build());
+        options.addOption(Option.builder().longOpt("csv-encoding").hasArgs().desc("Encoding name of CSV files").build());
         
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = null;
@@ -178,6 +179,10 @@ public class IDF2JSONConverter {
             	}
             }
 
+            if (cmd.hasOption("csv-encoding")) {
+            	config.setCsvEncodingName(cmd.getOptionValue("csv-encoding"));
+            }
+            
             log.info("Starte IDF to JSON Converter ...");
 
             System.setProperty("org.geotools.referencing.forceXY", "true");

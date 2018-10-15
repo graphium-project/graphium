@@ -113,4 +113,8 @@ public interface IImportConfig {
 	Properties getCsvConfig();
 
 	IImportConfig setCsvConfig(Properties csvConfig);
+	
+	String getCsvEncodingName();
+	
+	IImportConfig setCsvEncodingName(String csvEncodingName);
 }
