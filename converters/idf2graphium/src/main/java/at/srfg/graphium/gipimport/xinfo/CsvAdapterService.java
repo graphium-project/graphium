@@ -53,6 +53,10 @@ public class CsvAdapterService {
 			InputStream inputStream = new FileInputStream(fileName);
 			file = new BufferedReader(new InputStreamReader(inputStream, encoding));
 			String line = file.readLine();
+			
+			// in case of UTF-8 first line could begin with BOM
+			line = line.replace("\uFEFF", "");
+			
 			reader = new CSVReader(new StringReader(line), ';');
 			
 			if (line != null) {
