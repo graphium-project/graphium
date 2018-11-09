@@ -69,27 +69,17 @@
 			</plugin>
 			
 			
-			
-			
-			
-			
 			<plugin>
 				<groupId>com.mycila</groupId>
 				<artifactId>license-maven-plugin</artifactId>
 				<version>3.0</version>
 				<configuration>
-					
-					
 					<header>com/mycila/maven/plugin/license/templates/APACHE-2.txt</header>
 			   		<properties>
 						<owner>Salzburg Research Forschungsgesellschaft</owner>
 						<email>graphium@salzburgresearch.at</email>
 						<project.inceptionYear>2017</project.inceptionYear>
 					</properties>
-					
-					
-					
-					
 					<includes>
 						<include>**/*.java</include>
 					</includes>
@@ -113,7 +103,6 @@
 
 	<properties>
 		<graphium.version>1.0.2-SNAPSHOT</graphium.version>
-		
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<slf4j-log4j12.version>1.7.21</slf4j-log4j12.version>
 		<junit.version>4.12</junit.version>
