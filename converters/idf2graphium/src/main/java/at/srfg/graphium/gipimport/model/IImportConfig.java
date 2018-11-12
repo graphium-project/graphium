@@ -16,6 +16,7 @@
 package at.srfg.graphium.gipimport.model;
 
 import java.util.Date;
+import java.util.Properties;
 import java.util.Set;
 
 import com.vividsolutions.jts.geom.Polygon;
@@ -108,4 +109,12 @@ public interface IImportConfig {
 	IImportConfig enableFullConnectivity();
 	
 	boolean isEnableFullConnectivity();
+
+	Properties getCsvConfig();
+
+	IImportConfig setCsvConfig(Properties csvConfig);
+	
+	String getCsvEncodingName();
+	
+	IImportConfig setCsvEncodingName(String csvEncodingName);
 }

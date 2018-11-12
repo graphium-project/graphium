@@ -134,7 +134,7 @@ public class DefaultSegmentXInfoDaoImpl extends AbstractSegmentXInfoTypeAwareDao
 			xInfo.setGraphVersionId(graphVersionId);
 		}
 		getJdbcTemplate().update("DELETE FROM " + schema + TABLENAME + " WHERE segment_id=? AND direction_tow=? AND graphversion_id=?",
-				xInfo.getSegmentId(), xInfo.isDirectionTow(), xInfo.getGraphVersionId(), xInfo.getValues());
+				xInfo.getSegmentId(), xInfo.isDirectionTow(), xInfo.getGraphVersionId());
 	}
 
 	@Override

@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>at.srfg.graphium</groupId>
 	<artifactId>graphium-parent</artifactId>
-	<version>1.0.1</version>
+	<version>1.0.2</version>
 	<packaging>pom</packaging>
 
 	<name>graphium-builder</name>
@@ -30,11 +30,6 @@
 			<id>anwagner</id>
 			<name>Andreas Wagner</name>
 			<email>andreas.wagner@salzburgresearch.at</email>
-		</developer>
-		<developer>
-			<id>shennebe</id>
-			<name>Stefan Henneberger</name>
-			<email>stefan.henneberger@salzburgresearch.at</email>
 		</developer>
 		<developer>
 			<id>schwarzst</id>
@@ -74,27 +69,17 @@
 			</plugin>
 			
 			
-			
-			
-			
-			
 			<plugin>
 				<groupId>com.mycila</groupId>
 				<artifactId>license-maven-plugin</artifactId>
 				<version>3.0</version>
 				<configuration>
-					
-					
 					<header>com/mycila/maven/plugin/license/templates/APACHE-2.txt</header>
 			   		<properties>
 						<owner>Salzburg Research Forschungsgesellschaft</owner>
 						<email>graphium@salzburgresearch.at</email>
 						<project.inceptionYear>2017</project.inceptionYear>
 					</properties>
-					
-					
-					
-					
 					<includes>
 						<include>**/*.java</include>
 					</includes>
@@ -117,15 +102,14 @@
 	</build>
 
 	<properties>
-		<graphium.version>1.0.1</graphium.version>
-		
+		<graphium.version>1.0.2</graphium.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<slf4j-log4j12.version>1.7.21</slf4j-log4j12.version>
 		<junit.version>4.12</junit.version>
 		<jts.version>1.13</jts.version>
 		<jackson.json.legacy.version>1.9.6</jackson.json.legacy.version>
 		<jackson.json.version>2.8.2</jackson.json.version>
-		<org.springframework.version>4.3.3.RELEASE</org.springframework.version>
+		<org.springframework.version>4.3.20.RELEASE</org.springframework.version>
 		<spring-security.version>4.1.3.RELEASE</spring-security.version>
 		<cglib.version>2.2.2</cglib.version>
 		<commons.lang3.version>3.4</commons.lang3.version>
