@@ -43,23 +43,16 @@ import at.srfg.graphium.model.IWayGraphVersionMetadata;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "classpath:/application-context-graphium-api-client-template.xml",
 		"classpath:/application-context-graphium-api-client-test.xml"})
-public class TestGraphVersionCacheImpl {
+public class TestGraphVersionCacheImpl extends AbstractGraphMetadataTest {
 
 	private static Logger log = LoggerFactory.getLogger(TestGraphVersionCacheImpl.class);
 	
 	@Autowired
 	public IGraphVersionCache graphVersionCache;
 
-	private String graphName = "osm_at";
-
 	@Test
-	public void test(){
-		//TODO use mockMVC and fix tests
-	}
-
-	//TODO use mockMVC and fix tests
-	//@Test
 	public void testGetCurrentGraphVersion() {
+		setupMetadataStub();
 		IWayGraphVersionMetadata metadata = null;
 		Date timestamp = new Date();
 		try {
@@ -68,8 +61,7 @@ public class TestGraphVersionCacheImpl {
 				| GraphNotFoundException e) {
 			log.error("error accessing graphium api...", e);
 		}
-		
-		Assert.assertNotNull(metadata);
+		assertMetadata(metadata);
 	}
 	
 }

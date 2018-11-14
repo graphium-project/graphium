@@ -20,7 +20,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Observable;
 import java.util.Observer;
 import java.util.stream.Collectors;
 
@@ -28,18 +27,8 @@ import javax.annotation.PostConstruct;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.config.RequestConfig.Builder;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import at.srfg.graphium.api.client.ICurrentGraphVersionCache;
 import at.srfg.graphium.api.client.exception.GraphNotFoundException;
@@ -54,56 +43,27 @@ import at.srfg.graphium.model.IWayGraphVersionMetadata;
  * @author mwimmer
  *
  */
-public class CurrentGraphVersionCacheImpl extends Observable implements ICurrentGraphVersionCache {
+public class CurrentGraphVersionCacheImpl extends AbstractGraphiumApiClient
+//extends Observable 
+implements ICurrentGraphVersionCache {
 
-	protected static Logger log = LoggerFactory.getLogger(CurrentGraphVersionCacheImpl.class);
-	
 	protected static final String GRAPH_READ_CURRENT_VERSION_METADATA = "metadata/graphs/{graph}/versions/current";
 	
 	protected Map<String, CachedWayGraphVersionMetadataWrapper> currentGraphVersions = new HashMap<String, CachedWayGraphVersionMetadataWrapper>();
-	protected String externalGraphserverApiUrl = null;
-	protected int connectionRequestTimeout = 5000;
-	protected int connectTimeout = 5000;
-	protected int socketTimeout = 5000;
-	protected int maxConnections = 5;
 
 	// refresh every minute if required
 	protected int refreshMetadataIfOlderThenSec = 60;
 	
-	protected CloseableHttpClient httpClient;
-	protected ObjectMapper objectMapper;
 	protected IAdapter<IWayGraphVersionMetadata, IGraphVersionMetadataDTO> adapter;
 	
 	@PostConstruct
 	public void setup() {
-		if (this.httpClient == null) {
-			this.httpClient = createDefaultHttpClient();
-		}
-		objectMapper = new ObjectMapper();
+		super.setup();
 		if(adapter == null) {
 			adapter = new GraphVersionMetadataDTO2GraphVersionMetadataAdapter();
 		}
 	}
 	
-	protected CloseableHttpClient createDefaultHttpClient() {
-		
-		PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
-		cm.setMaxTotal(maxConnections);
-		cm.setDefaultMaxPerRoute(maxConnections);
-		
-	   Builder config = RequestConfig.custom()
-				.setConnectionRequestTimeout(connectionRequestTimeout)
-				.setConnectTimeout(connectTimeout)
-				.setSocketTimeout(socketTimeout);
-
-       // TODO: Set Credentials
-		CloseableHttpClient httpClient = HttpClients.custom()
-		        .setConnectionManager(cm).setDefaultRequestConfig(config.build())
-		        .build();
-		return httpClient;		
-	}
-	
-
 	/**
 	 * should be triggered periodically
 	 */
@@ -128,9 +88,8 @@ public class CurrentGraphVersionCacheImpl extends Observable implements ICurrent
 			log.error("error, graphname was null, can not create api connection string...");
 			return null;
 		}
-	
-		String uri = externalGraphserverApiUrl + (externalGraphserverApiUrl.endsWith("/") ? "" : "/") + 
-				GRAPH_READ_CURRENT_VERSION_METADATA.replace("{graph}", graphName);
+
+		String uri = getGraphResolvedUrl(GRAPH_READ_CURRENT_VERSION_METADATA, graphName);
 		
 		CloseableHttpResponse response = null;
 		try {
@@ -215,14 +174,6 @@ public class CurrentGraphVersionCacheImpl extends Observable implements ICurrent
 		}
 	}
 
-	public String getExternalGraphserverApiUrl() {
-		return externalGraphserverApiUrl;
-	}
-
-	public void setExternalGraphserverApiUrl(String externalGraphserverApiUrl) {
-		this.externalGraphserverApiUrl = externalGraphserverApiUrl;
-	}
-
 	public Map<String, IWayGraphVersionMetadata> getCurrentGraphVersions() {
 		Map<String, IWayGraphVersionMetadata> unwrapped =
 		    currentGraphVersions.entrySet().stream()
@@ -233,52 +184,12 @@ public class CurrentGraphVersionCacheImpl extends Observable implements ICurrent
 		return unwrapped;
 	}
 	
-	public int getConnectionRequestTimeout() {
-		return connectionRequestTimeout;
-	}
-
-	public void setConnectionRequestTimeout(int connectionRequestTimeout) {
-		this.connectionRequestTimeout = connectionRequestTimeout;
-	}
-
-	public int getConnectTimeout() {
-		return connectTimeout;
-	}
-
-	public void setConnectTimeout(int connectTimeout) {
-		this.connectTimeout = connectTimeout;
-	}
-
-	public int getSocketTimeout() {
-		return socketTimeout;
-	}
-
-	public void setSocketTimeout(int socketTimeout) {
-		this.socketTimeout = socketTimeout;
-	}
-
-	public int getMaxConnections() {
-		return maxConnections;
-	}
-
-	public void setMaxConnections(int maxConnections) {
-		this.maxConnections = maxConnections;
-	}
-	
 	public int getRefreshMetadataIfOlderThenSec() {
 		return refreshMetadataIfOlderThenSec;
 	}
 
 	public void setRefreshMetadataIfOlderThenSec(int refreshMetadataIfOlderThenSec) {
 		this.refreshMetadataIfOlderThenSec = refreshMetadataIfOlderThenSec;
-	}
-
-	public HttpClient getHttpClient() {
-		return httpClient;
-	}
-
-	public void setHttpClient(CloseableHttpClient httpClient) {
-		this.httpClient = httpClient;
 	}
 
 	public IAdapter<IWayGraphVersionMetadata, IGraphVersionMetadataDTO> getAdapter() {

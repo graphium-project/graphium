@@ -93,8 +93,7 @@ public class GraphVersionCacheImpl extends CurrentGraphVersionCacheImpl implemen
 	}
 
 	private void readGraphVersionMetadataList(String graphName) throws GraphiumServerAccessException, GraphNotFoundException {
-		String uri = externalGraphserverApiUrl + (externalGraphserverApiUrl.endsWith("/") ? "" : "/") + 
-				GRAPH_READ_VERSION_METADATA_LIST.replace("{graph}", graphName);
+		String uri = getGraphResolvedUrl(GRAPH_READ_VERSION_METADATA_LIST, graphName);
 		
 		CloseableHttpResponse response = null;
 		try {

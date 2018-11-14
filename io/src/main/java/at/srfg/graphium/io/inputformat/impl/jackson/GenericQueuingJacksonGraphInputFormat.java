@@ -41,12 +41,12 @@ public class GenericQueuingJacksonGraphInputFormat<T extends IBaseWaySegment>
 		extends GenericQueuingJacksonSegmentInputFormat<T>
 		implements IQueuingGraphInputFormat<T> {
 	
+	protected IAdapter<IWayGraphVersionMetadata, IGraphVersionMetadataDTO> metadataAdapter;
+	
 	public GenericQueuingJacksonGraphInputFormat(
 			ISegmentAdapterRegistry<IBaseSegmentDTO, T> adapterRegistry) {
 		super(adapterRegistry);
 	}
-
-	protected IAdapter<IWayGraphVersionMetadata, IGraphVersionMetadataDTO> metadataAdapter;
 
 	/**
 	 * @param stream InputStream containing JSON data

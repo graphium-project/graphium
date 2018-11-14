@@ -176,7 +176,7 @@ public abstract class AbstractGraphApiController<T extends IBaseWaySegment> {
 		this.metadataService = metadataService;
 	}
 
-	public void setGraphApiService(IGraphService graphApiService) {
+	public void setGraphApiService(IGraphService<T> graphApiService) {
 		this.graphApiService = graphApiService;
 	}
 
