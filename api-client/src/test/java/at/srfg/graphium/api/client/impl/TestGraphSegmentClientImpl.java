@@ -63,36 +63,7 @@ public class TestGraphSegmentClientImpl {
 				.withHeader("Content-Type", "application/json")
 				.withBodyFile("mockapi/testfiles/graph_osm_at_segments_275732_2870458.json")));
 			
-        DefaultConnectionXInfoAdapter defaultConnectionXInfoAdatper = new DefaultConnectionXInfoAdapter();
-        DefaultSegmentXInfoAdapter defaultSegmentXInfoAdapter = new DefaultSegmentXInfoAdapter();
-            
-        // TODO: fix generics
-//      List<IXInfoDTOAdapter<IConnectionXInfo, IConnectionXInfoDTO>> xInfoConnectionAdapters = new ArrayList<>();
-        List xInfoConnectionAdapters = new ArrayList<>();
-        xInfoConnectionAdapters.add(defaultConnectionXInfoAdatper);
-
-//      IXinfoAdapterRegistry<? extends IConnectionXInfo,? extends IConnectionXInfoDTO> adapterConnectionXInfoRegistry =
-//		new GenericXInfoAdapterRegistry<>(Collections.singletonList(defaultConnectionXInfoAdatper));
-        GenericXInfoAdapterRegistry adapterConnectionXInfoRegistry = 
-        		new GenericXInfoAdapterRegistry<>(Collections.singletonList(defaultConnectionXInfoAdatper));
-        
-
-        GenericXInfoAdapterRegistry adapterSegmentXInfoRegsitry = new SegmentXInfoAdapterRegistry<>(xInfoConnectionAdapters);
-        
-        AbstractSegmentDTOAdapter<IWaySegmentDTO, IWaySegment> adapterWay = new WaySegment2SegmentDTOAdapter<>();
-        adapterWay.setConnectionXInfoAdapterRegistry(adapterConnectionXInfoRegistry);
-        adapterWay.setSegmentXInfoAdapterRegistry(adapterSegmentXInfoRegsitry);
-
-        ISegmentAdapterRegistry<IBaseSegmentDTO, IWaySegment> adapterRegistry = new SegmentAdapterRegistryImpl<>();
-
-        List adapterList = new ArrayList<>();
-        adapterList.add(adapterWay);
-
-        adapterRegistry.setAdapters(adapterList);
-		
-		ISegmentInputFormat<IWaySegment> inputFormat = new GenericQueuingJacksonSegmentInputFormat<IWaySegment>(adapterRegistry);
-		GenericGraphSegmentClientImpl<IWaySegment> client = new GenericGraphSegmentClientImpl<IWaySegment>(inputFormat, 
-				"http://localhost:9111/graphium-tutorial-central-server/api/");
+		GenericGraphSegmentClientImpl<IWaySegment> client = new GenericGraphSegmentClientImpl<IWaySegment>("http://localhost:9111/graphium-tutorial-central-server/api/");
 		client.setup();
 		try {
 			// one segment
