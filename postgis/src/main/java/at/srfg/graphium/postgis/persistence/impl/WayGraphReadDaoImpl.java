@@ -268,22 +268,25 @@ public class WayGraphReadDaoImpl<T extends IBaseSegment, X extends ISegmentXInfo
 			T segment = null;
 		
 			// iterate result set;
-			rs.next();
-			do {
-				segment = rsExtractor.extractData(rs);
-
-				// last one produced
-				if (segment != null) {
-					// try to serialize to stream
-					outputFormat.serialize(segment);
-					i++;
-				}
-				
-				if (i % 10000 == 0) {
-					log.info(i + " segments loaded");
-				}
-			} while (segment != null);
+			boolean atLeastOneRowFound = rs.next();
 			
+			if (atLeastOneRowFound) {
+				do {
+					segment = rsExtractor.extractData(rs);
+	
+					// last one produced
+					if (segment != null) {
+						// try to serialize to stream
+						outputFormat.serialize(segment);
+						i++;
+					}
+					
+					if (i % 10000 == 0) {
+						log.info(i + " segments loaded");
+					}
+				} while (segment != null);
+			}
+				
 			log.info(i + " segments loaded");
 			
 		} catch (Exception e) {
