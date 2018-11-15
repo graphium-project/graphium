@@ -49,7 +49,7 @@ public class TestCurrentGraphVersionCacheImpl extends AbstractGraphMetadataTest 
 
 	@Test
 	public void testGetCurrentGraphVersion() {
-		setupMetadataStub();
+		setupCurrentMetadataStub();
 		IWayGraphVersionMetadata metadata = null;
 		try {
 			metadata = currentGraphVersionCache.getCurrentGraphVersion(graphName);

@@ -13,19 +13,27 @@ import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import at.srfg.graphium.model.IWayGraphVersionMetadata;
 import at.srfg.graphium.model.State;
 
-public class AbstractGraphMetadataTest {
+public abstract class AbstractGraphMetadataTest {
 
 	@Rule
 	public WireMockRule wireMockRule = new WireMockRule(9111);
 	
 	protected String graphName = "osm_at";
 	
-	protected void setupMetadataStub() {
+	protected void setupCurrentMetadataStub() {
 		stubFor(get(urlEqualTo("/graphium-central-server/api/metadata/graphs/osm_at/versions/current")).willReturn(
 				aResponse()
 				.withStatus(200)
 				.withHeader("Content-Type", "application/json")
-				.withBodyFile("mockapi/testfiles/graph_osm_at_metadata.json")));
+				.withBodyFile("mockapi/testfiles/graph_osm_at_metadata_version.json")));
+	}
+	
+	protected void setupMetadataListStub() {
+		stubFor(get(urlEqualTo("/graphium-central-server/api/metadata/graphs/osm_at/versions")).willReturn(
+				aResponse()
+				.withStatus(200)
+				.withHeader("Content-Type", "application/json")
+				.withBodyFile("mockapi/testfiles/graph_osm_at_metadata_versions.json")));
 	}
 	
 	protected void assertMetadata(IWayGraphVersionMetadata metadata) {

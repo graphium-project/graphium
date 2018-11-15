@@ -37,71 +37,77 @@ import at.srfg.graphium.model.IWayGraphVersionMetadata;
  * @author mwimmer
  *
  */
-public class GenericQueuingJacksonGraphInputFormat<T extends IBaseWaySegment> 
-		extends GenericQueuingJacksonSegmentInputFormat<T>
-		implements IQueuingGraphInputFormat<T> {
-	
+public class GenericQueuingJacksonGraphInputFormat<T extends IBaseWaySegment>
+		extends GenericQueuingJacksonSegmentInputFormat<T> implements IQueuingGraphInputFormat<T> {
+
 	protected IAdapter<IWayGraphVersionMetadata, IGraphVersionMetadataDTO> metadataAdapter;
-	
-	public GenericQueuingJacksonGraphInputFormat(
-			ISegmentAdapterRegistry<IBaseSegmentDTO, T> adapterRegistry) {
+
+	public GenericQueuingJacksonGraphInputFormat(ISegmentAdapterRegistry<IBaseSegmentDTO, T> adapterRegistry) {
 		super(adapterRegistry);
 	}
 
+	public GenericQueuingJacksonGraphInputFormat(ISegmentAdapterRegistry<IBaseSegmentDTO, T> adapterRegistry,
+			IAdapter<IWayGraphVersionMetadata, IGraphVersionMetadataDTO> metadataAdapter) {
+		super(adapterRegistry);
+		this.metadataAdapter = metadataAdapter;
+	}
+
 	/**
-	 * @param stream InputStream containing JSON data
-	 * @param segmentsQueue Queue retrieving parsed way segment objects
-	 * @param metadataQueue Queue retrieving parsed metadata object; there will be retrieved only one object 
+	 * @param stream
+	 *            InputStream containing JSON data
+	 * @param segmentsQueue
+	 *            Queue retrieving parsed way segment objects
+	 * @param metadataQueue
+	 *            Queue retrieving parsed metadata object; there will be retrieved
+	 *            only one object
 	 */
 	@Override
-	public void deserialize(InputStream stream, BlockingQueue<T> segmentsQueue, 
-			BlockingQueue<IWayGraphVersionMetadata> metadataQueue)
-			throws WaySegmentDeserializationException {
-		
+	public void deserialize(InputStream stream, BlockingQueue<T> segmentsQueue,
+			BlockingQueue<IWayGraphVersionMetadata> metadataQueue) throws WaySegmentDeserializationException {
+
 		try {
 			JsonParser jp = jsonFactory.createParser(stream);
-		
+
 			JsonToken token = jp.nextToken();
-			
-    		long count = 0;
-    		
-    		ISegmentAdapter<IBaseSegmentDTO, T> adapter = null;
-			while (!jp.isClosed()){
+
+			long count = 0;
+
+			ISegmentAdapter<IBaseSegmentDTO, T> adapter = null;
+			while (!jp.isClosed()) {
 				token = jp.nextToken();
 				if (token != null && token != JsonToken.END_ARRAY) {
-	
-					if (jp.getCurrentToken() == JsonToken.FIELD_NAME &&
-						jp.getCurrentName().equals("graphVersionMetadata")) {
+
+					if (jp.getCurrentToken() == JsonToken.FIELD_NAME
+							&& jp.getCurrentName().equals("graphVersionMetadata")) {
 
 						jp.nextToken();
 						IGraphVersionMetadataDTO dto = jp.readValueAs(GraphVersionMetadataDTOImpl.class);
-						IWayGraphVersionMetadata metadata  = metadataAdapter.adapt(dto);
+						IWayGraphVersionMetadata metadata = metadataAdapter.adapt(dto);
 						metadataQueue.offer(metadata, 500, TimeUnit.MILLISECONDS);
-					} 
-					// extract type of segments. its encoded as the name of the array field holding the segments
-					else if (jp.getCurrentToken() == JsonToken.FIELD_NAME) {    			
-	    				String segmentType = jp.getCurrentName();
+					}
+					// extract type of segments. its encoded as the name of the array field holding
+					// the segments
+					else if (jp.getCurrentToken() == JsonToken.FIELD_NAME) {
+						String segmentType = jp.getCurrentName();
 						adapter = this.getAndRegisterDeserializers(segmentType);
-	    			}
-					else if (jp.getCurrentToken() != JsonToken.END_OBJECT) {
-	    				enqueue(segmentsQueue, processSegment(jp, adapter));
-	    				count++;
-					}					
-				}				
+					} else if (jp.getCurrentToken() != JsonToken.END_OBJECT) {
+						enqueue(segmentsQueue, processSegment(jp, adapter));
+						count++;
+					}
+				}
 			}
 			log.info("parsed and enqueued: " + count + " segments");
 		} catch (Exception e) {
-			throw new WaySegmentDeserializationException(e.getMessage(),e);
-	    }
+			throw new WaySegmentDeserializationException(e.getMessage(), e);
+		}
 	}
 
 	public IAdapter<IWayGraphVersionMetadata, IGraphVersionMetadataDTO> getMetadataAdapter() {
 		return metadataAdapter;
 	}
 
-	public void setMetadataAdapter(
-			IAdapter<IWayGraphVersionMetadata, IGraphVersionMetadataDTO> metadataAdapter) {
+	public void setMetadataAdapter(IAdapter<IWayGraphVersionMetadata, IGraphVersionMetadataDTO> metadataAdapter) {
 		this.metadataAdapter = metadataAdapter;
 	}
-	
+
 }

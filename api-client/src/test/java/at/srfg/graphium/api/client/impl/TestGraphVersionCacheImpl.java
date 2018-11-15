@@ -23,7 +23,6 @@ package at.srfg.graphium.api.client.impl;
 
 import java.util.Date;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -52,7 +51,7 @@ public class TestGraphVersionCacheImpl extends AbstractGraphMetadataTest {
 
 	@Test
 	public void testGetCurrentGraphVersion() {
-		setupMetadataStub();
+		setupMetadataListStub(); 
 		IWayGraphVersionMetadata metadata = null;
 		Date timestamp = new Date();
 		try {
