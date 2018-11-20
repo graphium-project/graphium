@@ -59,7 +59,7 @@ public class GenericGraphSegmentClientImpl<T extends IBaseWaySegment> extends Ab
 	public void setup() {
 		super.setup();
 		if(this.inputFormat == null) {
-			createDefaultHttpClient();
+			createDefaultInputFormat();
 		}
 	}
 	
