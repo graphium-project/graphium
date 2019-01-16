@@ -76,10 +76,12 @@ public class CsvAdapterService {
 					
 					ISegmentXInfo xinfo = factory.adapt(attributes);
 					
-					if (!xinfoMap.containsKey(xinfo.getSegmentId())) {
-						xinfoMap.put(xinfo.getSegmentId(), new ArrayList<>());
+					if (xinfo != null) {
+						if (!xinfoMap.containsKey(xinfo.getSegmentId())) {
+							xinfoMap.put(xinfo.getSegmentId(), new ArrayList<>());
+						}
+						xinfoMap.get(xinfo.getSegmentId()).add(xinfo);
 					}
-					xinfoMap.get(xinfo.getSegmentId()).add(xinfo);
 
 					line = file.readLine();
 				}
