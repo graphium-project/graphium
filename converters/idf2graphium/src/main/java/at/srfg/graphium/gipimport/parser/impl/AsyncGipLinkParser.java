@@ -156,6 +156,8 @@ public class AsyncGipLinkParser implements Supplier<IGipLink> {
                     link.setTunnel(Float.parseFloat(values[atrPos.get("BRUNNEL")]) == 2.0);
                 }
 
+                int baustatus = Integer.parseInt(values[atrPos.get("BAUSTATUS")]);
+                
                 //this.links.put(link.getId(), link);
 
                 boolean valid = true;
@@ -165,6 +167,11 @@ public class AsyncGipLinkParser implements Supplier<IGipLink> {
                     valid = false;
                 }
 
+                if (baustatus != 5) {
+                	// accept only completed segments
+                	valid = false;
+                }
+                
                 if (valid && accessTypes != null && !accessTypes.isEmpty()) {
                     boolean accessFound = ParserHelper.validateAccess(link.getAccessTow(), accessTypes);
                     if (!accessFound) {
