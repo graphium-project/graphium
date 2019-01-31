@@ -98,12 +98,12 @@ public class CurrentGraphVersionCacheImpl extends AbstractGraphiumApiClient<IGra
     	IWayGraphVersionMetadata metadataNew = adapter.adapt(metadataDTO);
     	CachedWayGraphVersionMetadataWrapper metadataNewWrapped = null;
     	// check if metadata is newer then cached one and store if required
-    	if (metadataNew != null) {
+    	if (metadataNew != null) {    		
     		metadataNewWrapped = new CachedWayGraphVersionMetadataWrapper(metadataNew, new Date());
+    		// update in cache to get new cached timestamp
+			currentGraphVersions.put(graphName, metadataNewWrapped);
     		if(metadataCurrentWrapped == null || !metadataNew.getVersion().equals(metadataCurrentWrapped.metadata.getVersion())) {            		
-    			currentGraphVersions.put(graphName, metadataNewWrapped);
-				log.info("new current version with ID " + metadataNew.getId() + " for graph " + graphName + " found");
-				
+				log.info("new current version with ID " + metadataNew.getId() + " for graph " + graphName + " found");				
 				setChanged();
 				notifyObservers(metadataNew);					
     		}
