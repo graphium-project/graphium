@@ -146,6 +146,26 @@ public interface IWayGraphReadDao<T extends IBaseSegment> {
 	List<T> findNearestSegments(String graphName, String version, Point referencePoint, double radiusInKm,
 			int maxNrOfSegments) throws GraphNotExistsException;
 
+	/**
+	 * 
+	 * @param viewName
+	 * @param version
+	 * @return
+	 */
 	List<T> getStreetSegments(String viewName, String version);
+
+	/**
+	 * streams segments with incoming connected to segments with given ids
+	 * 
+	 * @param outputFormat format used for streaming
+	 * @param graphName graph name
+	 * @param version version of graph
+	 * @param ids id set of segments where connected segments should be retrieved
+	 * @throws WaySegmentSerializationException thrown on error during serialization
+	 * @throws GraphNotExistsException thrown if graph name/version combination dosn´t exist
+	 */
+	void streamIncomingConnectedStreetSegments(ISegmentOutputFormat<T> outputFormat, String graphName, String version,
+			Set<Long> ids)
+			throws WaySegmentSerializationException, GraphNotExistsException;
 
 }

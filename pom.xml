@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>at.srfg.graphium</groupId>
 	<artifactId>graphium-parent</artifactId>
@@ -19,7 +21,7 @@
 		<name>Salzburg Research Forschungsgesellschaft m.b.H.</name>
 		<url>https://www.salzburgresearch.at/</url>
 	</organization>
-	
+
 	<developers>
 		<developer>
 			<id>micwimmer</id>
@@ -37,7 +39,7 @@
 			<email>stefan.schwarz@salzburgresearch.at</email>
 		</developer>
 	</developers>
- 	
+
 	<build>
 		<plugins>
 			<plugin>
@@ -67,15 +69,15 @@
 					</execution>
 				</executions>
 			</plugin>
-			
-			
+
+
 			<plugin>
 				<groupId>com.mycila</groupId>
 				<artifactId>license-maven-plugin</artifactId>
 				<version>3.0</version>
 				<configuration>
 					<header>com/mycila/maven/plugin/license/templates/APACHE-2.txt</header>
-			   		<properties>
+					<properties>
 						<owner>Salzburg Research Forschungsgesellschaft</owner>
 						<email>graphium@salzburgresearch.at</email>
 						<project.inceptionYear>2017</project.inceptionYear>
@@ -97,7 +99,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
 		</plugins>
 	</build>
 
@@ -115,7 +117,7 @@
 		<commons.lang3.version>3.4</commons.lang3.version>
 		<org.apache.httpcomponents.version>4.5.2</org.apache.httpcomponents.version>
 	</properties>
-	
+
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -125,8 +127,8 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
-			
-			
+
+
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-core</artifactId>
@@ -155,7 +157,7 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-	
+
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -174,8 +176,8 @@
 		<module>model</module>
 		<module>postgis</module>
 		<module>utils</module>
-	 	<module>converters/idf2graphium</module>
-	 	<module>converters/osm2graphium</module>
+		<module>converters/idf2graphium</module>
+		<module>converters/osm2graphium</module>
 		<module>tutorial/model_extension</module>
 		<module>tutorial/central_server</module>
 	</modules>
@@ -186,4 +188,16 @@
 		<developerConnection>scm:git:https://github.com/graphium-project/graphium.git</developerConnection>
 	</scm>
 
+	<distributionManagement>
+		<repository>
+			<id>LIS Artifactory Server</id>
+			<name>LIS Artifactory Server-releases</name>
+			<url>http://lisutil.salzburgresearch.at/artifactory/libs-release-local</url>
+		</repository>
+		<snapshotRepository>
+			<id>LIS Artifactory Server</id>
+			<name>LIS Artifactory Server-snapshots</name>
+			<url>http://lisutil.salzburgresearch.at/artifactory/libs-snapshot-local</url>
+		</snapshotRepository>
+	</distributionManagement>
 </project>

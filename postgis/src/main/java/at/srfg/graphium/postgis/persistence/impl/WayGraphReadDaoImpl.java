@@ -30,6 +30,7 @@ import java.util.concurrent.BlockingQueue;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
@@ -253,7 +254,11 @@ public class WayGraphReadDaoImpl<T extends IBaseSegment, X extends ISegmentXInfo
 			idsMap.put("id", ids);
 		}
 		String query = ViewParseUtil.prepareViewFilterQuery(view, graphVersion, schema, rsExtractor, order, idsMap);
-		
+		doStreamTravels(query, rsExtractor, outputFormat);
+	}
+	
+	protected void doStreamTravels(String query, ISegmentResultSetExtractor<T, X> rsExtractor, 
+			ISegmentOutputFormat<T> outputFormat) throws WaySegmentSerializationException {
 		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -301,10 +306,27 @@ public class WayGraphReadDaoImpl<T extends IBaseSegment, X extends ISegmentXInfo
 				}
 			if (ps != null) JdbcUtils.closeStatement(ps);
 			if (rs != null) JdbcUtils.closeResultSet(rs);
-		}
-		
+		}		
 	}
 
+	@Override
+	public void streamIncomingConnectedStreetSegments(ISegmentOutputFormat<T> outputFormat, String viewName, String version,
+			Set<Long> ids)
+			throws WaySegmentSerializationException, GraphNotExistsException {
+
+		IWayGraphView view = viewDao.getView(viewName);
+		// parse filter query to detect concerned tables
+		Set<String> tableAliases = ViewParseUtil.parseTableAliases(viewDao.getViewDefinition(view));
+				
+		// use object factory to retrieved all needed ResultSetExtractors
+		ISegmentResultSetExtractor<T, X> rsExtractor = resultSetExtractorFactory.getResultSetExtractor(tableAliases);
+		
+		String query = ViewParseUtil.prepareViewFilterConJoinedQuery(view, version, schema, rsExtractor, null, null);
+		
+		query += " AND con.from_segment_id = id AND con.to_segment_id in (" + StringUtils.join(ids, ",")+ ")";	
+		doStreamTravels(query, rsExtractor, outputFormat);	
+	}
+	
 	/**
 	 * @param timestamp
 	 * @return
