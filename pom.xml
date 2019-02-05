@@ -188,16 +188,4 @@
 		<developerConnection>scm:git:https://github.com/graphium-project/graphium.git</developerConnection>
 	</scm>
 
-	<distributionManagement>
-		<repository>
-			<id>LIS Artifactory Server</id>
-			<name>LIS Artifactory Server-releases</name>
-			<url>http://lisutil.salzburgresearch.at/artifactory/libs-release-local</url>
-		</repository>
-		<snapshotRepository>
-			<id>LIS Artifactory Server</id>
-			<name>LIS Artifactory Server-snapshots</name>
-			<url>http://lisutil.salzburgresearch.at/artifactory/libs-snapshot-local</url>
-		</snapshotRepository>
-	</distributionManagement>
 </project>
