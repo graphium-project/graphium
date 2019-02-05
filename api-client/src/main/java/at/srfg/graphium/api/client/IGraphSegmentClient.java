@@ -12,4 +12,7 @@ public interface IGraphSegmentClient<T extends IBaseWaySegment> {
 	public List<T> getSegments(String graphName, String graphVersion, Set<Long> ids)
 			throws GraphNotFoundException, GraphiumServerAccessException;
 
+	public List<T> getIncomingConnectedSegments(String graphName, String graphVersion, Set<Long> ids)
+			throws GraphNotFoundException, GraphiumServerAccessException;
+	
 }

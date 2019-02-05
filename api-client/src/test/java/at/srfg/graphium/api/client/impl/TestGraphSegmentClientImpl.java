@@ -7,7 +7,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -23,18 +22,6 @@ import com.github.tomakehurst.wiremock.junit.WireMockRule;
 
 import at.srfg.graphium.api.client.exception.GraphNotFoundException;
 import at.srfg.graphium.api.client.exception.GraphiumServerAccessException;
-import at.srfg.graphium.io.adapter.impl.AbstractSegmentDTOAdapter;
-import at.srfg.graphium.io.adapter.impl.DefaultConnectionXInfoAdapter;
-import at.srfg.graphium.io.adapter.impl.DefaultSegmentXInfoAdapter;
-import at.srfg.graphium.io.adapter.impl.WaySegment2SegmentDTOAdapter;
-import at.srfg.graphium.io.adapter.registry.ISegmentAdapterRegistry;
-import at.srfg.graphium.io.adapter.registry.impl.GenericXInfoAdapterRegistry;
-import at.srfg.graphium.io.adapter.registry.impl.SegmentAdapterRegistryImpl;
-import at.srfg.graphium.io.adapter.registry.impl.SegmentXInfoAdapterRegistry;
-import at.srfg.graphium.io.dto.IBaseSegmentDTO;
-import at.srfg.graphium.io.dto.IWaySegmentDTO;
-import at.srfg.graphium.io.inputformat.ISegmentInputFormat;
-import at.srfg.graphium.io.inputformat.impl.jackson.GenericQueuingJacksonSegmentInputFormat;
 import at.srfg.graphium.model.IWaySegment;
 
 public class TestGraphSegmentClientImpl {
@@ -84,6 +71,38 @@ public class TestGraphSegmentClientImpl {
 			Assert.assertEquals("A1 - Westautobahn", dtosMulti.get(0).getName());
 			Assert.assertEquals("A1 - Westautobahn", dtosMulti.get(1).getName());
 			
+		} catch (GraphNotFoundException e) {
+			log.error("graph not found", e);
+		} catch (GraphiumServerAccessException e) {
+			log.error("error accessing graphium moc", e);
+		}
+	}
+	
+	
+	@Test
+	public void getTestIncomingConnectedSegments() throws IOException {
+		log.info("test /graphium-tutorial-central-server/api/segments/graphs/osm_at/versions/171007/incomingconnected");
+		
+		stubFor(get(urlPathMatching("/graphium-tutorial-central-server/api/segments/graphs/osm_at/versions/171007/incomingconnected")).
+				withQueryParam("ids",matching("91071156,4442184"))
+				.willReturn(
+				aResponse()
+				.withStatus(200)
+				.withHeader("Content-Type", "application/json")
+				.withBodyFile("mockapi/testfiles/graph_osm_at_incomingconnected_segments_4442184_91071156.json")));
+			
+		GenericGraphSegmentClientImpl<IWaySegment> client = new GenericGraphSegmentClientImpl<IWaySegment>("http://localhost:9111/graphium-tutorial-central-server/api/");
+		client.setup();
+		try {
+			// multiple segments
+			Set<Long> segmentIds = new HashSet<>();
+			segmentIds.add(4442184l); segmentIds.add(91071156l);
+			List<IWaySegment> dtosMulti = client.getIncomingConnectedSegments("osm_at", "171007", segmentIds);
+			Assert.assertNotNull("dto list should not be null!", dtosMulti);
+			Assert.assertEquals(3, dtosMulti.size());
+			Assert.assertEquals(4484475l, dtosMulti.get(0).getId());
+			Assert.assertEquals(187922780l, dtosMulti.get(1).getId());
+			Assert.assertEquals(376715064l, dtosMulti.get(2).getId());			
 		} catch (GraphNotFoundException e) {
 			log.error("graph not found", e);
 		} catch (GraphiumServerAccessException e) {

@@ -33,6 +33,8 @@ public class GenericGraphSegmentClientImpl<T extends IBaseWaySegment> extends Ab
 		implements IGraphSegmentClient<T> {
 
 	protected static final String GRAPH_READ_SEGMENTS_LIST = "segments/graphs/{graph}/versions/{version}";
+	protected static final String GRAPH_READ_INCOMINGCONNECTED_SEGMENTS_LIST = 
+			"segments/graphs/{graph}/versions/{version}/incomingconnected";
 				
 	private ISegmentInputFormat<T> inputFormat;
 
@@ -95,12 +97,40 @@ public class GenericGraphSegmentClientImpl<T extends IBaseWaySegment> extends Ab
 	}
 	
 	@Override
-	public List<T> getSegments(String graphName, String graphVersion, Set<Long> ids) throws GraphNotFoundException, GraphiumServerAccessException {
+	public List<T> getSegments(String graphName, String graphVersion, Set<Long> ids)
+			throws GraphNotFoundException, GraphiumServerAccessException {
+		return doGetSegments(GRAPH_READ_SEGMENTS_LIST, graphName, graphVersion, ids);
+//		Map<String, String> requestParams = new HashMap<>();
+//		requestParams.put("{graph}", graphName);
+//		requestParams.put("{version}", graphVersion);
+//		
+//		String uri = externalGraphserverApiUrl + resolveUrlTemplates(GRAPH_READ_SEGMENTS_LIST, requestParams);
+//		uri += "?ids=" + ids.stream().map(e -> ""+ e).collect(Collectors.joining(","));
+//		return doHttpRequest(uri, graphName,
+//				httpEntity -> {
+//					try {
+//						return inputFormat.deserialize(httpEntity.getContent());
+//					}  catch (WaySegmentDeserializationException e) {
+//						log.error("error deserializing waysegments", e);
+//					} 			
+//					// TODO: exception up?
+//					return null;
+//				});
+	}
+	
+	@Override
+	public List<T> getIncomingConnectedSegments(String graphName, String graphVersion, Set<Long> ids)
+			throws GraphNotFoundException, GraphiumServerAccessException {
+		return doGetSegments(GRAPH_READ_INCOMINGCONNECTED_SEGMENTS_LIST, graphName, graphVersion, ids);
+	}
+	
+	public List<T> doGetSegments(String url, String graphName, String graphVersion, Set<Long> ids) 
+			throws GraphNotFoundException, GraphiumServerAccessException {
 		Map<String, String> requestParams = new HashMap<>();
 		requestParams.put("{graph}", graphName);
 		requestParams.put("{version}", graphVersion);
 		
-		String uri = externalGraphserverApiUrl + resolveUrlTemplates(GRAPH_READ_SEGMENTS_LIST, requestParams);
+		String uri = externalGraphserverApiUrl + resolveUrlTemplates(url, requestParams);
 		uri += "?ids=" + ids.stream().map(e -> ""+ e).collect(Collectors.joining(","));
 		return doHttpRequest(uri, graphName,
 				httpEntity -> {
