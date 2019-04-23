@@ -128,8 +128,9 @@ public class ViewParseUtil {
 		String query = "SELECT *" + 
 				(view.isWaySegmentsIncluded() ? ", st_asewkb(wayseg_geometry) AS wayseg_geometry_ewkb" : "") +
 				" FROM " + schema + view.getDbViewName() 
-				+  " LEFT JOIN graphs.waysegment_connections con ON "
-				+ "  con.graphversion_id = f_current_graphversion_immutable('" + view.getGraph().getName() + "', '" + graphVersion + "')";
+				+ " LEFT JOIN graphs.waysegment_connections con ON "
+				+ "  con.graphversion_id = f_current_graphversion_immutable('" + view.getGraph().getName() + "', '" + graphVersion + "')"
+				+ " AND con.from_segment_id = id";
 
 		return addFiltersAndOrder(query, view, graphVersion, schema, order, additionalFilter);
 	}

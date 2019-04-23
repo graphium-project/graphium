@@ -321,9 +321,14 @@ public class WayGraphReadDaoImpl<T extends IBaseSegment, X extends ISegmentXInfo
 		// use object factory to retrieved all needed ResultSetExtractors
 		ISegmentResultSetExtractor<T, X> rsExtractor = resultSetExtractorFactory.getResultSetExtractor(tableAliases);
 		
-		String query = ViewParseUtil.prepareViewFilterConJoinedQuery(view, version, schema, rsExtractor, null, null);
+		Map<String, Set<Long>> idsMap = null;
+		if (ids != null && !ids.isEmpty()) {
+			idsMap = new HashMap<>();
+			idsMap.put("con.to_segment_id", ids);
+		}
+
+		String query = ViewParseUtil.prepareViewFilterConJoinedQuery(view, version, schema, rsExtractor, null, idsMap);
 		
-		query += " AND con.from_segment_id = id AND con.to_segment_id in (" + StringUtils.join(ids, ",")+ ")";	
 		doStreamTravels(query, rsExtractor, outputFormat);	
 	}
 	
