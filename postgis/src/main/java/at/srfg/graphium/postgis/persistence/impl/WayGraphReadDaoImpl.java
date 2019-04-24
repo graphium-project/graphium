@@ -19,7 +19,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.datasource.DataSourceUtils;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.util.Assert;
 
@@ -321,13 +324,41 @@ public class WayGraphReadDaoImpl<T extends IBaseSegment, X extends ISegmentXInfo
 		// use object factory to retrieved all needed ResultSetExtractors
 		ISegmentResultSetExtractor<T, X> rsExtractor = resultSetExtractorFactory.getResultSetExtractor(tableAliases);
 		
+		// performance version
+		// read all IDs of connected segments
+		Object[] args = new Object[2];
+		args[0] = view.getGraph().getName();
+		args[1] = version;
+		int[] types = new int[2];
+		types[0] = Types.VARCHAR;
+		types[1] = Types.VARCHAR;
+		
+		List<Long> fromSegmentIds = getJdbcTemplate().queryForList(
+				"SELECT from_segment_id FROM " + schema + PARENT_CONNECTION_TABLE_NAME +
+				" WHERE graphversion_id = f_current_graphversion_immutable(?, ?)" + 
+				"   AND to_segment_id in (" + StringUtils.join(ids, ", ") + ")",
+				args,
+				types,
+				Long.class);
+		
+		// stream connected segments
 		Map<String, Set<Long>> idsMap = null;
-		if (ids != null && !ids.isEmpty()) {
+		if (fromSegmentIds != null && !fromSegmentIds.isEmpty()) {
 			idsMap = new HashMap<>();
-			idsMap.put("con.to_segment_id", ids);
+			idsMap.put("id", new HashSet<>(fromSegmentIds));
 		}
-
-		String query = ViewParseUtil.prepareViewFilterConJoinedQuery(view, version, schema, rsExtractor, null, idsMap);
+		
+		String query = ViewParseUtil.prepareViewFilterQuery(view, version, schema, rsExtractor, null, idsMap);
+		
+		// slow version
+		
+//		Map<String, Set<Long>> idsMap = null;
+//		if (ids != null && !ids.isEmpty()) {
+//			idsMap = new HashMap<>();
+//			idsMap.put("con.to_segment_id", ids);
+//		}
+//
+//		String query = ViewParseUtil.prepareViewFilterConJoinedQuery(view, version, schema, rsExtractor, null, idsMap);
 		
 		doStreamTravels(query, rsExtractor, outputFormat);	
 	}
