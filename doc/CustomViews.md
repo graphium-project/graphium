@@ -47,14 +47,27 @@ CREATE OR REPLACE VIEW graphs.vw_osm_at AS
     wayseg.urban AS wayseg_urban,
     wayseg."timestamp" AS wayseg_timestamp,
     wayseg.tags AS wayseg_tags,
-    array_agg(con_start.*::character varying) AS startnodesegments,
-    array_agg(con_end.*::character varying) AS endnodesegments
+    COALESCE(startnodesegments.startnodesegments, '{NULL}') AS startnodesegments,
+	COALESCE(endnodesegments.endnodesegments, '{NULL}') AS endnodesegments
    FROM graphs.waysegments wayseg
-   	LEFT OUTER JOIN graphs.waysegment_connections con_start
-	ON (con_start.node_id = wayseg.startnode_id AND con_start.from_segment_id = wayseg.id AND con_start.to_segment_id <> wayseg.id AND con_start.graphversion_id = wayseg.graphversion_id)
-	LEFT OUTER JOIN graphs.waysegment_connections con_end
-	ON (con_end.node_id = wayseg.endnode_id AND con_end.from_segment_id = wayseg.id AND con_end.to_segment_id <> wayseg.id AND con_end.graphversion_id = wayseg.graphversion_id)
-GROUP BY wayseg.id;
+   	LEFT OUTER JOIN
+		LATERAL (select array_agg(con_start.*::character varying) AS startnodesegments,
+				 con_start.graphversion_id
+			  FROM graphs.waysegment_connections con_start 
+			  WHERE con_start.node_id = wayseg.startnode_id 
+			  AND con_start.from_segment_id = wayseg.id 
+		GROUP BY con_start.from_segment_id, con_start.graphversion_id
+		) AS startnodesegments
+		ON startnodesegments.graphversion_id = wayseg.graphversion_id
+	LEFT OUTER JOIN
+		LATERAL (select array_agg(con_end.*::character varying) AS endnodesegments,
+				 con_end.graphversion_id
+			  FROM graphs.waysegment_connections con_end 
+			  WHERE con_end.node_id = wayseg.endnode_id 
+			  AND con_end.from_segment_id = wayseg.id 
+		GROUP BY con_end.from_segment_id, con_end.graphversion_id
+		) AS endnodesegments
+		ON endnodesegments.graphversion_id = wayseg.graphversion_id;
 ```
 
 Custom-View
@@ -76,7 +89,7 @@ Each custom view has to be registered to the Graphium server by inserting an ent
 
 - dbviewname: name of the view with prefix "vw_"
 
-  Beispiel:
+  example:
 
   "osm_at";5;"";0;0;"";"2017-05-09 09:13:44.743+02";"vw_osm_at";TRUE
 
@@ -91,17 +104,29 @@ SELECT wayseg.id,
 
     wayseg."timestamp" AS wayseg_timestamp,
     wayseg.tags AS wayseg_tags,
-    array_agg(con_start.*::character varying) AS startnodesegments,
-    array_agg(con_end.*::character varying) AS endnodesegments
+    COALESCE(startnodesegments.startnodesegments, '{NULL}') AS startnodesegments,
+	COALESCE(endnodesegments.endnodesegments, '{NULL}') AS endnodesegments
    FROM graphs.waysegments wayseg
-   	LEFT OUTER JOIN graphs.waysegment_connections con_start
-	ON (con_start.node_id = wayseg.startnode_id AND con_start.from_segment_id = wayseg.id AND con_start.to_segment_id <> wayseg.id AND con_start.graphversion_id = wayseg.graphversion_id)
-	LEFT OUTER JOIN graphs.waysegment_connections con_end
-	ON (con_end.node_id = wayseg.endnode_id AND con_end.from_segment_id = wayseg.id AND con_end.to_segment_id <> wayseg.id AND con_end.graphversion_id = wayseg.graphversion_id)   
+    LEFT OUTER JOIN
+		LATERAL (select array_agg(con_start.*::character varying) AS startnodesegments,
+				 con_start.graphversion_id
+			  FROM graphs.waysegment_connections con_start 
+			  WHERE con_start.node_id = wayseg.startnode_id 
+			  AND con_start.from_segment_id = wayseg.id 
+		GROUP BY con_start.from_segment_id, con_start.graphversion_id
+		) AS startnodesegments
+		ON startnodesegments.graphversion_id = wayseg.graphversion_id
+	LEFT OUTER JOIN
+		LATERAL (select array_agg(con_end.*::character varying) AS endnodesegments,
+				 con_end.graphversion_id
+			  FROM graphs.waysegment_connections con_end 
+			  WHERE con_end.node_id = wayseg.endnode_id 
+			  AND con_end.from_segment_id = wayseg.id 
+		GROUP BY con_end.from_segment_id, con_end.graphversion_id
+		) AS endnodesegments
+		ON endnodesegments.graphversion_id = wayseg.graphversion_id 
 
-WHERE wayseg.frc >= 0 AND wayseg.frc < 1
-  
-GROUP BY wayseg.id;
+WHERE wayseg.frc >= 0 AND wayseg.frc < 1;
 ```
 
 ### Example join a XInfo table:
@@ -116,20 +141,32 @@ SELECT wayseg.id,
 
     wayseg."timestamp" AS wayseg_timestamp,
     wayseg.tags AS wayseg_tags,
-    array_agg(con_start.*::character varying) AS startnodesegments,
-    array_agg(con_end.*::character varying) AS endnodesegments,
+    COALESCE(startnodesegments.startnodesegments, '{NULL}') AS startnodesegments,
+	COALESCE(endnodesegments.endnodesegments, '{NULL}') AS endnodesegments,
 
     def.tags
    
    FROM graphs.waysegments wayseg
-   	LEFT OUTER JOIN graphs.waysegment_connections con_start
-	ON (con_start.node_id = wayseg.startnode_id AND con_start.from_segment_id = wayseg.id AND con_start.to_segment_id <> wayseg.id AND con_start.graphversion_id = wayseg.graphversion_id)
-	LEFT OUTER JOIN graphs.waysegment_connections con_end
-	ON (con_end.node_id = wayseg.endnode_id AND con_end.from_segment_id = wayseg.id AND con_end.to_segment_id <> wayseg.id AND con_end.graphversion_id = wayseg.graphversion_id)
+   	LEFT OUTER JOIN
+		LATERAL (select array_agg(con_start.*::character varying) AS startnodesegments,
+				 con_start.graphversion_id
+			  FROM graphs.waysegment_connections con_start 
+			  WHERE con_start.node_id = wayseg.startnode_id 
+			  AND con_start.from_segment_id = wayseg.id 
+		GROUP BY con_start.from_segment_id, con_start.graphversion_id
+		) AS startnodesegments
+		ON startnodesegments.graphversion_id = wayseg.graphversion_id
+	LEFT OUTER JOIN
+		LATERAL (select array_agg(con_end.*::character varying) AS endnodesegments,
+				 con_end.graphversion_id
+			  FROM graphs.waysegment_connections con_end 
+			  WHERE con_end.node_id = wayseg.endnode_id 
+			  AND con_end.from_segment_id = wayseg.id 
+		GROUP BY con_end.from_segment_id, con_end.graphversion_id
+		) AS endnodesegments
+		ON endnodesegments.graphversion_id = wayseg.graphversion_id
     
-    LEFT OUTER JOIN graphs.default_xinfo def ON (def.segment_id = wayseg.id) 
-
-GROUP BY wayseg.id;
+    LEFT OUTER JOIN graphs.default_xinfo def ON (def.segment_id = wayseg.id);
 ```
 
 ### Example join a XInfo table and restrict on graphversion_id:
@@ -144,18 +181,30 @@ SELECT wayseg.id,
 
     wayseg."timestamp" AS wayseg_timestamp,
     wayseg.tags AS wayseg_tags,
-    array_agg(con_start.*::character varying) AS startnodesegments,
-    array_agg(con_end.*::character varying) AS endnodesegments,
+    COALESCE(startnodesegments.startnodesegments, '{NULL}') AS startnodesegments,
+	COALESCE(endnodesegments.endnodesegments, '{NULL}') AS endnodesegments,
 
     def.tags
    
    FROM graphs.waysegments wayseg
-   	LEFT OUTER JOIN graphs.waysegment_connections con_start
-	ON (con_start.node_id = wayseg.startnode_id AND con_start.from_segment_id = wayseg.id AND con_start.to_segment_id <> wayseg.id AND con_start.graphversion_id = wayseg.graphversion_id)
-	LEFT OUTER JOIN graphs.waysegment_connections con_end
-	ON (con_end.node_id = wayseg.endnode_id AND con_end.from_segment_id = wayseg.id AND con_end.to_segment_id <> wayseg.id AND con_end.graphversion_id = wayseg.graphversion_id)
+   	LEFT OUTER JOIN
+		LATERAL (select array_agg(con_start.*::character varying) AS startnodesegments,
+				 con_start.graphversion_id
+			  FROM graphs.waysegment_connections con_start 
+			  WHERE con_start.node_id = wayseg.startnode_id 
+			  AND con_start.from_segment_id = wayseg.id 
+		GROUP BY con_start.from_segment_id, con_start.graphversion_id
+		) AS startnodesegments
+		ON startnodesegments.graphversion_id = wayseg.graphversion_id
+	LEFT OUTER JOIN
+		LATERAL (select array_agg(con_end.*::character varying) AS endnodesegments,
+				 con_end.graphversion_id
+			  FROM graphs.waysegment_connections con_end 
+			  WHERE con_end.node_id = wayseg.endnode_id 
+			  AND con_end.from_segment_id = wayseg.id 
+		GROUP BY con_end.from_segment_id, con_end.graphversion_id
+		) AS endnodesegments
+		ON endnodesegments.graphversion_id = wayseg.graphversion_id
     
-    LEFT OUTER JOIN graphs.default_xinfo def ON (def.segment_id = wayseg.id AND def.graphversion_id = wayseg.graphversion_id) 
-
-GROUP BY wayseg.id;
+    LEFT OUTER JOIN graphs.default_xinfo def ON (def.segment_id = wayseg.id AND def.graphversion_id = wayseg.graphversion_id);
 ```
