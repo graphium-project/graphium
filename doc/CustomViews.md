@@ -83,15 +83,19 @@ If the default view doesn't fulfills ones needs custom views can be defined. Som
 * Don't use LIMIT.
 * The view has to be granted correctly.
 
+### Register custom view
+
 Each custom view has to be registered to the Graphium server by inserting an entry in the table *waygraph_view_metadata*:
 
-- viewname: name of the view without prefix "vw_"
+- viewname: name of the view *without* prefix "vw_"
+- dbviewname: name of the view *with* prefix "vw_"
+- graph_id: graph id of the parent graph
 
-- dbviewname: name of the view with prefix "vw_"
+Example:
 
-  example:
-
-  "osm_at";5;"";0;0;"";"2017-05-09 09:13:44.743+02";"vw_osm_at";TRUE
+```
+"osm_at";5;"";0;0;"";"2017-05-09 09:13:44.743+02";"vw_osm_at";TRUE
+```
 
 ### Example restriction on functional road class:
 ```
