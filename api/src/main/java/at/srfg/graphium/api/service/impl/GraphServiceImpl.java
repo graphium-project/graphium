@@ -61,6 +61,7 @@ import at.srfg.graphium.model.IBaseWaySegment;
 import at.srfg.graphium.model.IConnectionXInfo;
 import at.srfg.graphium.model.ISegmentXInfo;
 import at.srfg.graphium.model.IWayGraphVersionMetadata;
+import at.srfg.graphium.model.IXInfo;
 import at.srfg.graphium.model.impl.AbstractXInfoModelTypeAware;
 
 /**
@@ -81,7 +82,7 @@ public class GraphServiceImpl<T extends IBaseWaySegment> implements IGraphServic
 	private boolean cacheGraphFiles = false;
 
 	@Autowired(required = false)
-	private List<AbstractXInfoModelTypeAware> registeredXInfosList;
+	private List<AbstractXInfoModelTypeAware<? extends IXInfo>> registeredXInfosList;
 	
 	private String graphFileUploadDirectory;
 
@@ -350,38 +351,47 @@ public class GraphServiceImpl<T extends IBaseWaySegment> implements IGraphServic
 
 	@Override
 	public void streamStreetSegments(
-			IWayGraphOutputFormat<T> outputFormat, Polygon bounds,
-			String graphName, String version)
-			throws WaySegmentSerializationException, GraphNotExistsException {
+		IWayGraphOutputFormat<T> outputFormat, Polygon bounds,
+		String graphName, String version)
+		throws WaySegmentSerializationException, GraphNotExistsException {
+	
+		// TODO: Hier sollen die View-Metadaten und dann die Graph-Metadaten gelesen werden!
+		// Daher müssen hier je nach View-Filter die Metadaten generiert werden. Zudem muss im Metadaten-Objekt der 
+		// Original-Graphname und -Version mit dem zugrunde liegenden Graphen belegt werden!
+	
+		IWayGraphVersionMetadata metadata = metadataService.getWayGraphVersionMetadata(graphName, version);
 		
-			// TODO: Hier sollen die View-Metadaten und dann die Graph-Metadaten gelesen werden!
-			// Daher müssen hier je nach View-Filter die Metadaten generiert werden. Zudem muss im Metadaten-Objekt der 
-			// Original-Graphname und -Version mit dem zugrunde liegenden Graphen belegt werden!
-		
-			IWayGraphVersionMetadata metadata = metadataService.getWayGraphVersionMetadata(graphName, version);
-			
-			outputFormat.serialize(metadata);
-//			graphReadService.streamStreetSegments(outputFormat.getSegmentOutputFormat(), bounds, graphName, version);
-			graphReadService.streamStreetSegments(outputFormat, bounds, graphName, version);
-			outputFormat.close();
-		
+		outputFormat.serialize(metadata);
+		graphReadService.streamStreetSegments(outputFormat, bounds, graphName, version);
+		outputFormat.close();		
 	}
 
 	@Override
 	public void streamStreetSegments(
-			IWayGraphOutputFormat<T> outputFormat,
-			String graphName, String version, Set<Long> ids)
-			throws WaySegmentSerializationException, GraphNotExistsException {
+		IWayGraphOutputFormat<T> outputFormat,
+		String graphName, String version, Set<Long> ids)
+		throws WaySegmentSerializationException, GraphNotExistsException {
+	
+		IWayGraphVersionMetadata metadata = metadataService.getWayGraphVersionMetadata(graphName, version);
 		
-			IWayGraphVersionMetadata metadata = metadataService.getWayGraphVersionMetadata(graphName, version);
-			
-			outputFormat.serialize(metadata);
-//			graphReadService.streamStreetSegments(outputFormat.getSegmentOutputFormat(), ids, graphName, version);
-			graphReadService.streamStreetSegments(outputFormat, ids, graphName, version);
-			outputFormat.close();
-		
+		outputFormat.serialize(metadata);
+		graphReadService.streamStreetSegments(outputFormat, ids, graphName, version);
+		outputFormat.close();		
 	}
 
+	@Override
+	public void streamIncomingConnectedStreetSegments(IWayGraphVersionMetadata metadata, OutputStream outputStream,
+			Set<Long> ids)
+			throws WaySegmentSerializationException, GraphNotExistsException, IOException {
+		log.info("start streaming neighbours of " + ids.size() + " segments of graph " + metadata.getGraphName() + " and version " + metadata.getVersion());
+		IWayGraphOutputFormat<T> graphOutputFormat = graphOutputFormatFactory.getWayGraphOutputFormat(outputStream);
+		
+		graphOutputFormat.serialize(metadata);
+		graphReadService.streamIncomingConnectedStreetSegments(graphOutputFormat,
+				metadata.getGraphName(), metadata.getVersion(), ids);
+		graphOutputFormat.close();
+	}
+	
 	@Override
 	public void deleteGraphVersion(String graphName, String version, boolean keepMetadata) throws GraphNotExistsException {
 		log.info("Deleting graph " + graphName + " in version " + version + " - metadata will be " + (keepMetadata ? "set to state DELETED (soft delete)" : "deleted"));

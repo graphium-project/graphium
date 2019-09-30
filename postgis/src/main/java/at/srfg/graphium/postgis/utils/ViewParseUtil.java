@@ -40,8 +40,6 @@ public class ViewParseUtil {
 	
 	private final static List<String> fromClausekeyWords = new ArrayList<>(Arrays.asList("INNER", "OUTER", "LEFT", "RIGHT", "FULL", "JOIN", "AS", "ON", "="));
 	private final static List<String> fromClauseFinishedkeyWords = new ArrayList<>(Arrays.asList("WHERE", "GROUP", "HAVING", "WINDOW", "ORDER", "LIMIT", "OFFSET", "FETCH", "FOR"));
-	private final static String GRAPHNAME_PLACEHOLDER = "%GRAPHNAME%";
-	private final static String VERSION_PLACEHOLDER = "%VERSION%";
 	
 	public static Set<String> parseTableAliases(String filter) {
 		Set<String> tableAliases = new HashSet<>();
@@ -85,6 +83,12 @@ public class ViewParseUtil {
 		String query = "SELECT *" + 
 					(view.isWaySegmentsIncluded() ? ", st_asewkb(wayseg_geometry) AS wayseg_geometry_ewkb" : "") +
 					" FROM " + schema + view.getDbViewName();
+		
+		return addFiltersAndOrder(query, view, graphVersion,schema, order, additionalFilter);
+	}
+	
+	protected static String addFiltersAndOrder(String query, IWayGraphView view, String graphVersion, String schema,			
+			GraphReadOrder order, Map<String, ? extends Object> additionalFilter) {
 		StringBuilder filters = new StringBuilder();
 		
 		if (view.isWaySegmentsIncluded() && graphVersion != null) {
@@ -112,8 +116,23 @@ public class ViewParseUtil {
 		if (order != null) {
 			query += " ORDER BY " + order.getAttribute() + " " + order.getOrder();
 		}
-
+		
 		return query;
+
+	}
+	
+	public static String prepareViewFilterConJoinedQuery(IWayGraphView view, String graphVersion, String schema,
+			ISegmentResultSetExtractor<? extends IBaseSegment, ? extends ISegmentXInfo> rsExtractor,
+			GraphReadOrder order, Map<String, ? extends Object> additionalFilter) {
+		
+		String query = "SELECT *" + 
+				(view.isWaySegmentsIncluded() ? ", st_asewkb(wayseg_geometry) AS wayseg_geometry_ewkb" : "") +
+				" FROM " + schema + view.getDbViewName() 
+				+ " LEFT JOIN graphs.waysegment_connections con ON "
+				+ "  con.graphversion_id = f_current_graphversion_immutable('" + view.getGraph().getName() + "', '" + graphVersion + "')"
+				+ " AND con.from_segment_id = id";
+
+		return addFiltersAndOrder(query, view, graphVersion, schema, order, additionalFilter);
 	}
 	
 	public static boolean hasWhereClause(String query) {

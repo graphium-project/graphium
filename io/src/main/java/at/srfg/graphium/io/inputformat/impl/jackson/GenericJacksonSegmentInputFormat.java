@@ -34,6 +34,7 @@ import at.srfg.graphium.io.adapter.registry.ISegmentAdapterRegistry;
 import at.srfg.graphium.io.dto.IBaseSegmentDTO;
 import at.srfg.graphium.io.dto.IConnectionXInfoDTO;
 import at.srfg.graphium.io.dto.ISegmentXInfoDTO;
+import at.srfg.graphium.io.dto.impl.GraphVersionMetadataDTOImpl;
 import at.srfg.graphium.io.exception.WaySegmentDeserializationException;
 import at.srfg.graphium.io.inputformat.ISegmentInputFormat;
 import at.srfg.graphium.model.IBaseSegment;
@@ -66,9 +67,18 @@ public abstract class GenericJacksonSegmentInputFormat<T extends IBaseSegment>
     		while(!jp.isClosed()){
     			token = jp.nextToken();
     			// extract type of segments. its encoded as the name of the array field holding the segments
-    			if (jp.getCurrentToken() == JsonToken.FIELD_NAME) {    			
-    				String segmentType = jp.getCurrentName();
-    				adapter = this.getAndRegisterDeserializers(segmentType);
+    			if (jp.getCurrentToken() == JsonToken.FIELD_NAME) {
+    				// skip metadata, allow full graph json with metadata to be parsed as segment only list
+    				if (jp.getCurrentName().equals("graphVersionMetadata")) {
+    					jp.nextToken();
+    					jp.readValueAs(GraphVersionMetadataDTOImpl.class);
+    				}
+    				else {
+    					String segmentType = jp.getCurrentName();
+        				adapter = this.getAndRegisterDeserializers(segmentType);
+    				}
+//    				String segmentType = jp.getCurrentName();
+//    				adapter = this.getAndRegisterDeserializers(segmentType);
     			}
     			else if(token != null && token != JsonToken.END_ARRAY && token != JsonToken.END_OBJECT) {
     				segments.add(processSegment(jp, adapter));

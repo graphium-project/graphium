@@ -15,6 +15,7 @@
  */
 package at.srfg.graphium.postgis.persistence.resultsetextractors;
 
+import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -144,13 +145,19 @@ public class WaySegmentResultSetExtractor<S extends IBaseSegment> implements ISe
 	private void mapConnections(IWaySegment segment, ResultSet rs) {
 		try {
 			if (rs.findColumn("startnodesegments") > -1) {
-				segment.setStartNodeCons(createNodeConnections((rs.getArray("startnodesegments")).getArray()));
+				Array arr = rs.getArray("startnodesegments");
+				if (arr != null) {
+					segment.setStartNodeCons(createNodeConnections(arr.getArray()));
+				}
 			}
 		} catch (SQLException e) {}
 		
 		try {
 			if (rs.findColumn("endnodesegments") > -1) {
-				segment.setEndNodeCons(createNodeConnections((rs.getArray("endnodesegments")).getArray()));
+				Array arr = rs.getArray("endnodesegments");
+				if (arr != null) {
+					segment.setEndNodeCons(createNodeConnections(arr.getArray()));
+				}
 			}
 		} catch (SQLException e) {}
 	}

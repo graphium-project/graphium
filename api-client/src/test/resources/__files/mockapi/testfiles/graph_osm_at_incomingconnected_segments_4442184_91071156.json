@@ -1,0 +1,115 @@
+{
+  "graphVersionMetadata" : {
+    "id" : 1,
+    "graphName" : "osm_at",
+    "version" : "171007",
+    "originGraphName" : "osm_at",
+    "originVersion" : "171007",
+    "state" : "INITIAL",
+    "validFrom" : 1508524987380,
+    "coveredArea" : "POLYGON ((9.528048700000001 46.456383, 9.528048700000001 48.5237569, 17.1181546 48.5237569, 17.1181546 46.456383, 9.528048700000001 46.456383))",
+    "segmentsCount" : 12656,
+    "connectionsCount" : 12632,
+    "accessTypes" : [ ],
+    "tags" : { },
+    "source" : "OSM",
+    "type" : "waysegment",
+    "creationTimestamp" : 0,
+    "storageTimestamp" : 1508525561622,
+    "creator" : "Importer"
+  },
+  "waysegment" : [ {
+    "id" : 4484475,
+    "connection" : [ {
+      "nodeId" : 27484986,
+      "toSegmentId" : 456912201,
+      "access" : [ "PRIVATE_CAR" ]
+    }, {
+      "nodeId" : 1057468406,
+      "toSegmentId" : 91071156,
+      "access" : [ "PRIVATE_CAR" ]
+    } ],
+    "geometry" : "LINESTRING (14.3063245 47.539793100000004, 14.3053082 47.5414873, 14.3041858 47.5431728, 14.3023693 47.545603400000005, 14.301759400000002 47.5464289, 14.300993700000001 47.5476084)",
+    "name" : "A9 - Selzthaltunnel",
+    "wayId" : 4484475,
+    "startNodeIndex" : 0,
+    "startNodeId" : 27484986,
+    "endNodeIndex" : 5,
+    "endNodeId" : 1057468406,
+    "maxSpeedTow" : 60,
+    "maxSpeedBkw" : 60,
+    "calcSpeedTow" : 60,
+    "calcSpeedBkw" : 60,
+    "lanesTow" : 1,
+    "lanesBkw" : 1,
+    "frc" : 0,
+    "formOfWay" : "PART_OF_MOTORWAY",
+    "accessTow" : [ "PRIVATE_CAR" ],
+    "accessBkw" : [ "PRIVATE_CAR" ],
+    "tunnel" : true,
+    "bridge" : false,
+    "urban" : false
+  }, {
+    "id" : 187922780,
+    "connection" : [ {
+      "nodeId" : 21100630,
+      "toSegmentId" : 91071156,
+      "access" : [ "PRIVATE_CAR" ]
+    }, {
+      "nodeId" : 21099836,
+      "toSegmentId" : 4442184,
+      "access" : [ "PRIVATE_CAR" ]
+    } ],
+    "geometry" : "LINESTRING (14.3005168 47.5488724, 14.300296300000001 47.549715400000004, 14.3001856 47.550386, 14.300141000000002 47.5507192, 14.300116500000001 47.5510023, 14.300101900000001 47.5512801, 14.3000869 47.551698200000004, 14.300088800000001 47.552185800000004)",
+    "name" : "A9 - Pyhrn Autobahn",
+    "wayId" : 187922780,
+    "startNodeIndex" : 0,
+    "startNodeId" : 21100630,
+    "endNodeIndex" : 7,
+    "endNodeId" : 21099836,
+    "maxSpeedTow" : 60,
+    "maxSpeedBkw" : 60,
+    "calcSpeedTow" : 60,
+    "calcSpeedBkw" : 60,
+    "lanesTow" : 1,
+    "lanesBkw" : 1,
+    "frc" : 0,
+    "formOfWay" : "PART_OF_MOTORWAY",
+    "accessTow" : [ "PRIVATE_CAR" ],
+    "accessBkw" : [ "PRIVATE_CAR" ],
+    "tunnel" : false,
+    "bridge" : true,
+    "urban" : false
+  }, {
+    "id" : 376715064,
+    "connection" : [ {
+      "nodeId" : 2413308595,
+      "toSegmentId" : 4442184,
+      "access" : [ "PRIVATE_CAR" ]
+    }, {
+      "nodeId" : 1440505346,
+      "toSegmentId" : 130886692,
+      "access" : [ "PRIVATE_CAR" ]
+    } ],
+    "geometry" : "LINESTRING (14.300187800000002 47.553176900000004, 14.300249500000001 47.553572200000005, 14.300369100000001 47.554112200000006, 14.3005338 47.554711000000005, 14.300710700000002 47.5552021, 14.3009859 47.5559184, 14.301252900000001 47.556476700000005)",
+    "name" : "A9 - Pyhrn Autobahn",
+    "wayId" : 376715064,
+    "startNodeIndex" : 0,
+    "startNodeId" : 2413308595,
+    "endNodeIndex" : 6,
+    "endNodeId" : 1440505346,
+    "maxSpeedTow" : 130,
+    "maxSpeedBkw" : 130,
+    "calcSpeedTow" : 130,
+    "calcSpeedBkw" : 130,
+    "lanesTow" : 1,
+    "lanesBkw" : 1,
+    "frc" : 0,
+    "formOfWay" : "PART_OF_MOTORWAY",
+    "accessTow" : [ "PRIVATE_CAR" ],
+    "accessBkw" : [ "PRIVATE_CAR" ],
+    "tunnel" : false,
+    "bridge" : true,
+    "urban" : false
+  } ]
+}

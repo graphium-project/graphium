@@ -59,6 +59,7 @@ import at.srfg.graphium.model.State;
 @WebAppConfiguration
 @ContextConfiguration({"classpath:application-context-graphium-api-test.xml"})
 public class TestGraphApiController {
+	
 	private static Logger log = LoggerFactory.getLogger(TestGraphApiController.class);
 
 	@Autowired

@@ -88,7 +88,7 @@ public class GipImporterService<T extends IBaseSegment, D extends IBaseSegmentDT
     public GipImporterService() {}
 
 
-    private IWayGraphVersionMetadata getVersionMetadata(IImportConfig config) {
+    private IWayGraphVersionMetadata getVersionMetadata(IImportConfig config, IDFMetadata idfMetaData) {
         IWayGraphVersionMetadata metadata = new WayGraphVersionMetadata();
         metadata.setGraphName(config.getGraphName());
         metadata.setVersion(config.getVersion());
@@ -99,6 +99,7 @@ public class GipImporterService<T extends IBaseSegment, D extends IBaseSegmentDT
         metadata.setSource(new Source(1, "GIP"));
         metadata.setSegmentsCount(-1);
         metadata.setConnectionsCount(-1);
+        metadata.getTags().put("originalGraphVersion", idfMetaData.getDbName());
         return metadata;
     }
 
@@ -200,7 +201,7 @@ public class GipImporterService<T extends IBaseSegment, D extends IBaseSegmentDT
             BlockingQueue<T> queue = new ArrayBlockingQueue<>(config.getQueueSize());
 
             if(config.isImportGip() && outputFormat instanceof IWayGraphOutputFormat) {
-            	((IWayGraphOutputFormat)outputFormat).serialize(this.getVersionMetadata(config));
+            	((IWayGraphOutputFormat)outputFormat).serialize(this.getVersionMetadata(config, idfMetaData));
             }
 
             Thread producerThread = producer.produceLinks(queue, config, idfMetaData);

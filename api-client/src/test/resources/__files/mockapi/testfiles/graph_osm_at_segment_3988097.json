@@ -1,0 +1,48 @@
+{
+	"graphVersionMetadata": {
+		"id": 1,
+		"graphName": "osm_at",
+		"version": "171007",
+		"originGraphName": "osm_at",
+		"originVersion": "171007",
+		"state": "INITIAL",
+		"validFrom": 1508524987380,
+		"coveredArea": "POLYGON ((9.528048700000001 46.456383, 9.528048700000001 48.5237569, 17.1181546 48.5237569, 17.1181546 46.456383, 9.528048700000001 46.456383))",
+		"segmentsCount": 12656,
+		"connectionsCount": 12632,
+		"accessTypes": [],
+		"tags": {},
+		"source": "OSM",
+		"type": "waysegment",
+		"creationTimestamp": 0,
+		"storageTimestamp": 1508525561622,
+		"creator": "Importer"
+	},
+	"waysegment": [{
+		"id": 3988097,
+		"connection": [{
+			"nodeId": 1165956136,
+			"toSegmentId": 153588752,
+			"access": ["PRIVATE_CAR"]
+		}],
+		"geometry": "LINESTRING (16.3848492 48.1617851, 16.3851756 48.1621922, 16.3853601 48.162502, 16.385557300000002 48.1628903, 16.385697200000003 48.163327300000006, 16.3858404 48.1638959, 16.3859771 48.1642651, 16.3861585 48.164640600000006, 16.3863016 48.164865500000005, 16.3865932 48.1652003, 16.3870759 48.1656564)",
+		"name": "A23 - Suedosttangente",
+		"wayId": 3988097,
+		"startNodeIndex": 0,
+		"startNodeId": 20835111,
+		"endNodeIndex": 10,
+		"endNodeId": 1165956136,
+		"maxSpeedTow": 80,
+		"maxSpeedBkw": -1,
+		"calcSpeedTow": 80,
+		"calcSpeedBkw": -1,
+		"lanesTow": 1,
+		"lanesBkw": -1,
+		"frc": 0,
+		"formOfWay": "PART_OF_MOTORWAY",
+		"accessTow": ["PRIVATE_CAR"],
+		"tunnel": false,
+		"bridge": false,
+		"urban": false
+	}]
+}
