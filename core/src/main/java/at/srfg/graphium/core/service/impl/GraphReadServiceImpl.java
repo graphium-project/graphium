@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import com.vividsolutions.jts.geom.Polygon;
 
 import at.srfg.graphium.core.exception.GraphNotExistsException;
@@ -29,6 +31,7 @@ import at.srfg.graphium.io.exception.WaySegmentSerializationException;
 import at.srfg.graphium.io.outputformat.ISegmentOutputFormat;
 import at.srfg.graphium.model.IBaseWaySegment;
 
+@Transactional(readOnly=true)
 public class GraphReadServiceImpl<T extends IBaseWaySegment> implements IGraphReadService<T> {
 		
 	private IWayGraphReadDao<T> readDao;
@@ -56,8 +59,7 @@ public class GraphReadServiceImpl<T extends IBaseWaySegment> implements IGraphRe
 	@Override
 	public void streamStreetSegments(
 			ISegmentOutputFormat<T> outputFormat,
-			Polygon bounds, String graphName, Date timestamp) throws GraphNotExistsException, WaySegmentSerializationException {
-		
+			Polygon bounds, String graphName, Date timestamp) throws GraphNotExistsException, WaySegmentSerializationException {		
 		readDao.streamSegments(outputFormat, bounds, graphName, timestamp);
 	}
 
@@ -79,6 +81,13 @@ public class GraphReadServiceImpl<T extends IBaseWaySegment> implements IGraphRe
 		readDao.readStreetSegments(queue, graphName, version, order);
 	}
 
+	@Override
+	public void streamIncomingConnectedStreetSegments(ISegmentOutputFormat<T> outputFormat, String graphName, String version,
+			Set<Long> ids)
+			throws WaySegmentSerializationException, GraphNotExistsException {
+		readDao.streamIncomingConnectedStreetSegments(outputFormat, graphName, version, ids);
+	}
+	
 	public IWayGraphReadDao<T> getReadDao() {
 		return readDao;
 	}

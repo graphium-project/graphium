@@ -125,18 +125,29 @@ public class WayGraphViewDaoImpl<T extends IBaseSegment, X extends ISegmentXInfo
 			
 			String dbView = "CREATE OR REPLACE VIEW " + schema + DEFAULT_VIEW_PREFIX + "_" + wayGraph.getName() + " AS " +
 					"SELECT " + attributes.toString() +
-				    ", array_agg(distinct con_start.*::character varying) AS startnodesegments," +
-					" array_agg(distinct con_end.*::character varying) AS endnodesegments " +
-					"FROM " + schema + PARENT_SEGMENT_TABLE_NAME + " AS " + waySegmentRowMapper.getPrefix() + 
-				   	" LEFT OUTER JOIN " + schema + PARENT_CONNECTION_TABLE_NAME + " con_start " + 
-					" ON (con_start.node_id = " + waySegmentRowMapper.getPrefix() + ".startnode_id AND con_start.from_segment_id = " + waySegmentRowMapper.getPrefix() + ".id AND " +
-					" con_start.to_segment_id <> " + waySegmentRowMapper.getPrefix() + ".id AND con_start.graphversion_id = " + waySegmentRowMapper.getPrefix() + ".graphversion_id)" +
-					" LEFT OUTER JOIN " + schema + PARENT_CONNECTION_TABLE_NAME + " con_end " +
-					" ON (con_end.node_id = " + waySegmentRowMapper.getPrefix() + ".endnode_id AND con_end.from_segment_id = " + waySegmentRowMapper.getPrefix() + ".id " +
-					" AND con_end.to_segment_id <> " + waySegmentRowMapper.getPrefix() + ".id AND con_end.graphversion_id = " + waySegmentRowMapper.getPrefix() + ".graphversion_id)" +
-					" GROUP BY wayseg.id";   
+				    ", COALESCE(startnodesegments.startnodesegments, '{NULL}') AS startnodesegments" + 
+				    ", COALESCE(endnodesegments.endnodesegments, '{NULL}') AS endnodesegments " +
+				    "FROM " + schema + PARENT_SEGMENT_TABLE_NAME + " AS " + waySegmentRowMapper.getPrefix() + 
+				   	" LEFT OUTER JOIN" +
+				   	" LATERAL (select array_agg(con_start.*::character varying) AS startnodesegments," +
+					"  con_start.graphversion_id" +
+				    " FROM graphs.waysegment_connections con_start" + 
+				    " WHERE con_start.node_id = wayseg.startnode_id" +
+				    "   AND con_start.from_segment_id = wayseg.id" +
+				    " GROUP BY con_start.from_segment_id, con_start.graphversion_id" +
+				    " ) AS startnodesegments" +
+				    " ON startnodesegments.graphversion_id = wayseg.graphversion_id" +
+				    " LEFT OUTER JOIN" +
+				    " LATERAL (select array_agg(con_end.*::character varying) AS endnodesegments,"+
+					"  con_end.graphversion_id" +
+					" FROM graphs.waysegment_connections con_end" +
+					" WHERE con_end.node_id = wayseg.endnode_id" +
+					"  AND con_end.from_segment_id = wayseg.id" +
+					" GROUP BY con_end.from_segment_id, con_end.graphversion_id" +
+					" ) AS endnodesegments" +
+					" ON endnodesegments.graphversion_id = wayseg.graphversion_id";
 			getJdbcTemplate().execute(dbView);
-
+			
 			// create new default view
 			IWayGraphView view = new WayGraphView(wayGraph.getName(), wayGraph, DEFAULT_VIEW_PREFIX + "_" + wayGraph.getName(), true, null, 0, 0, null);
 			saveView(view);

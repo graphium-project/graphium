@@ -1,0 +1,20 @@
+[
+	{
+		"id": 1,
+		"graphName": "osm_at",
+		"version": "171007",
+		"originGraphName": "osm_at",
+		"originVersion": "171007",
+		"state": "ACTIVE",
+		"validFrom": 1508524987380,
+		"coveredArea": "POLYGON ((9.528048700000001 46.456383, 9.528048700000001 48.5237569, 17.1181546 48.5237569, 17.1181546 46.456383, 9.528048700000001 46.456383))",
+		"segmentsCount": 0,
+		"connectionsCount": 0,
+		"accessTypes": [],
+		"source": "OSM",
+		"type": "waysegment",
+		"creationTimestamp": 1508525561460,
+		"storageTimestamp": 1508525561622,
+		"creator": "Importer"
+	}
+]

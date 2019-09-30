@@ -16,8 +16,9 @@
 	
     <bean id="graphVersionCache"
 		class="at.srfg.graphium.api.client.impl.GraphVersionCacheImpl">
+		<constructor-arg name="currentGraphVersionCache" ref="currentGraphVersionCache" />
 		<property name="externalGraphserverApiUrl" value="${graph.server.url}"/>	
-		<property name="refreshMetadataIfOlderThenSec" value="60" />	
+		<!-- <property name="refreshMetadataIfOlderThenSec" value="60" />	-->
 	</bean>
 	
 </beans>

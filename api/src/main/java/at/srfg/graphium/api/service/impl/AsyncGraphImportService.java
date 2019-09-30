@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import at.srfg.graphium.api.events.notifier.IGraphVersionImportFinishedNotifier;
 import at.srfg.graphium.core.persistence.IWayGraphVersionMetadataDao;
 import at.srfg.graphium.core.service.IGraphVersionImportService;
+import at.srfg.graphium.model.IBaseWaySegment;
 import at.srfg.graphium.model.IWayGraphVersionMetadata;
 
 /**
@@ -34,17 +35,17 @@ import at.srfg.graphium.model.IWayGraphVersionMetadata;
  * @author mwimmer
  *
  */
-public class AsyncGraphImportService implements Runnable {
+public class AsyncGraphImportService<T extends IBaseWaySegment> implements Runnable {
 	
 	private static Logger log = LoggerFactory.getLogger(AsyncGraphImportService.class);
 
-	private IGraphVersionImportService importService;
+	private IGraphVersionImportService<T> importService;
 	private IGraphVersionImportFinishedNotifier importFinishedNotifier;
 	private List<GraphVersionsImportInfo> importInfoList;
 	private boolean compressed = false;
 	private IWayGraphVersionMetadataDao metadataDao;
 	
-	public AsyncGraphImportService(IGraphVersionImportService importService, IGraphVersionImportFinishedNotifier importFinishedNotifier,
+	public AsyncGraphImportService(IGraphVersionImportService<T> importService, IGraphVersionImportFinishedNotifier importFinishedNotifier,
 			IWayGraphVersionMetadataDao metadataDao, List<GraphVersionsImportInfo> importInfoList, boolean compressed) {
 		super();
 		this.importService = importService;

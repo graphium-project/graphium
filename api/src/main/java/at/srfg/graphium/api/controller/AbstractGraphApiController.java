@@ -25,7 +25,6 @@ import java.util.zip.GZIPOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -77,14 +76,13 @@ public abstract class AbstractGraphApiController<T extends IBaseWaySegment> {
             @RequestParam(value = "file") MultipartFile file)
 			throws GraphAlreadyExistException, GraphImportException, IOException, ValidationException {
     	
-		//return this.importGraph(graphName,version,overrideIfExists,file);
 		return this.importGraph(graphName,version,overrideIfExists,excludedXInfos, file);
     }
 
     //private IGraphVersionMetadataDTO importGraph(String graphName, String version, boolean overrideIfExists, MultipartFile file)
     private IGraphVersionMetadataDTO importGraph(String graphName, String version, boolean overrideIfExists, String excludedXInfos, MultipartFile file)
 			throws GraphAlreadyExistException, GraphImportException, IOException, ValidationException {
-		//IWayGraphVersionMetadata metadata = this.graphApiService.importGraph(graphName, version, overrideIfExists, file);
+    	
 		IWayGraphVersionMetadata metadata = this.graphApiService.importGraph(graphName, version, overrideIfExists, excludedXInfos, file);
 
 		log.info("Import finished");
@@ -98,6 +96,7 @@ public abstract class AbstractGraphApiController<T extends IBaseWaySegment> {
 			@PathVariable(value = "graph") String graphName,
 			@PathVariable(value = "version") String version,
 			@RequestParam(value = "keepMetadata", required = false, defaultValue = "true") Boolean keepMetadata) throws GraphNotExistsException {
+		
 		graphApiService.deleteGraphVersion(graphName, version, keepMetadata);
 		if (keepMetadata) {
 			return this.adapter.adapt(metadataService.getWayGraphVersionMetadata(graphName, version));
@@ -106,7 +105,6 @@ public abstract class AbstractGraphApiController<T extends IBaseWaySegment> {
 		}
 	}
 
-	@Transactional(readOnly=true)
 	@RequestMapping(value = "/graphs/{graph}/versions/{version}", method = RequestMethod.GET)
 	public void getGraphVersion(
 			@RequestHeader(value = "Accept", required = false, defaultValue = MediaType.APPLICATION_JSON_VALUE) String acceptTypes,
@@ -119,19 +117,10 @@ public abstract class AbstractGraphApiController<T extends IBaseWaySegment> {
 			throws ResourceNotFoundException, HttpMediaTypeNotAcceptableException, GraphNotExistsException, 
 			IOException, WaySegmentSerializationException {
 
-		IWayGraphVersionMetadata metadata;
-
+		IWayGraphVersionMetadata metadata = getMetadata(graphName, versionName);
+		
 		if (compress) {
 			outputStream = new GZIPOutputStream(outputStream);
-		}
-
-		if (versionName.equalsIgnoreCase("current")) {
-			metadata = metadataService.getCurrentWayGraphVersionMetadata(graphName);
-		} else {
-			metadata = metadataService.getWayGraphVersionMetadata(graphName, versionName);
-		}
-		if (metadata == null) {
-			throw new GraphNotExistsException("No graph with name " + graphName + " and version " + versionName + " exists", graphName);
 		}
 		
 		if (ids == null) {
@@ -142,7 +131,37 @@ public abstract class AbstractGraphApiController<T extends IBaseWaySegment> {
 		}
 	}
 
+	// eigener Endpoint //graphs/{graph}/versions/{version}/connected?ids=MANDATORY&incomming=OPTIONAL_DEFAULT_TRUE&outgoing=OPTIONAL_DEFAULT_TRUE
+	@RequestMapping(value = "/graphs/{graph}/versions/{version}/incomingconnected", method = RequestMethod.GET)
+	public void getConnectedSegments(
+			@RequestHeader(value = "Accept", required = false, defaultValue = MediaType.APPLICATION_JSON_VALUE) String acceptTypes,
+			@RequestHeader(value = "Accept-Charset", required = false) String charset,
+			@PathVariable(value = "graph") String graphName,
+			@PathVariable(value = "version") String versionName,
+			@RequestParam(value = "ids", required = true) List<Long> ids,
+			OutputStream outputStream)
+			throws ResourceNotFoundException, HttpMediaTypeNotAcceptableException, GraphNotExistsException, 
+			IOException, WaySegmentSerializationException {
 
+		IWayGraphVersionMetadata metadata = getMetadata(graphName, versionName);
+		
+		graphApiService.streamIncomingConnectedStreetSegments(metadata, outputStream, new HashSet<>(ids));
+	}
+	
+	protected IWayGraphVersionMetadata getMetadata(String graphName, String versionName) throws GraphNotExistsException {
+		IWayGraphVersionMetadata metadata;
+
+		if (versionName.equalsIgnoreCase("current")) {
+			metadata = metadataService.getCurrentWayGraphVersionMetadata(graphName);
+		} else {
+			metadata = metadataService.getWayGraphVersionMetadata(graphName, versionName);
+		}
+		if (metadata == null) {
+			throw new GraphNotExistsException("No graph with name " + graphName + " and version " + versionName + " exists", graphName);
+		}
+		return metadata;
+	}
+	
 	public IGraphService<T> getGraphApiReadService() {
 		return graphApiService;
 	}
@@ -176,7 +195,7 @@ public abstract class AbstractGraphApiController<T extends IBaseWaySegment> {
 		this.metadataService = metadataService;
 	}
 
-	public void setGraphApiService(IGraphService graphApiService) {
+	public void setGraphApiService(IGraphService<T> graphApiService) {
 		this.graphApiService = graphApiService;
 	}
 

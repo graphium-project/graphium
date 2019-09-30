@@ -32,6 +32,7 @@ import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 import com.vividsolutions.jts.io.WKTWriter;
+import com.vividsolutions.jts.linearref.LengthIndexedLine;
 import com.vividsolutions.jts.linearref.LinearLocation;
 import com.vividsolutions.jts.linearref.LocationIndexedLine;
 import com.vividsolutions.jts.operation.distance.DistanceOp;
@@ -97,6 +98,21 @@ public class GeometryUtils {
 		return point;
 	}
 
+	/**
+	 * Returns the offset of a given coordinate on a linestring. Values: 0..1f
+	 * @param coord
+	 * @param lineString
+	 * @return
+	 */
+	public static double offsetOnLineString(Coordinate coord, LineString lineString) {
+		LengthIndexedLine lengthIndexedGeom = new LengthIndexedLine(lineString);
+		double segEndLength =  lengthIndexedGeom.getEndIndex();	
+		double startCoordLength = lengthIndexedGeom.project(coord);
+		double percentageInLine = 1d / segEndLength * startCoordLength;
+		
+		return percentageInLine;
+	}
+	
 	/**
 	 * Creates a com.vividsolutions.jts.geom.Point
 	 * 

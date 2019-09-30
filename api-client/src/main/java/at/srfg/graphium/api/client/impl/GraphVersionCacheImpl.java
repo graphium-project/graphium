@@ -21,8 +21,8 @@
  */
 package at.srfg.graphium.api.client.impl;
 
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -30,13 +30,9 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
 
 import at.srfg.graphium.api.client.IGraphVersionCache;
 import at.srfg.graphium.api.client.exception.GraphNotFoundException;
@@ -49,12 +45,18 @@ import at.srfg.graphium.model.State;
 /**
  * @author mwimmer
  */
-public class GraphVersionCacheImpl extends CurrentGraphVersionCacheImpl implements IGraphVersionCache {
+public class GraphVersionCacheImpl extends AbstractGraphiumApiClient<List<IGraphVersionMetadataDTO>> implements IGraphVersionCache {
 
 	protected static final String GRAPH_READ_VERSION_METADATA_LIST = "metadata/graphs/{graph}/versions";
 	
 	protected Map<String, CachedWayGraphVersionMetadataListWrapper> graphVersions = new HashMap<>();
 
+	protected CurrentGraphVersionCacheImpl currentGraphVersionCache;
+	
+	public GraphVersionCacheImpl(CurrentGraphVersionCacheImpl currentGraphVersionCache) {
+		this.currentGraphVersionCache = currentGraphVersionCache;
+	}
+	
 	@PostConstruct
 	public void setup() {
 		super.setup();
@@ -68,7 +70,7 @@ public class GraphVersionCacheImpl extends CurrentGraphVersionCacheImpl implemen
 			return null;
 		}
 		if (!graphVersions.containsKey(graphName) ||
-				checkRefreshRequired(graphVersions.get(graphName).cachedAt)) {
+				currentGraphVersionCache.checkRefreshRequired(graphVersions.get(graphName).cachedAt)) {
 			readGraphVersionMetadataList(graphName);
 		}
 		if (!graphVersions.containsKey(graphName)) {
@@ -93,49 +95,28 @@ public class GraphVersionCacheImpl extends CurrentGraphVersionCacheImpl implemen
 	}
 
 	private void readGraphVersionMetadataList(String graphName) throws GraphiumServerAccessException, GraphNotFoundException {
-		String uri = externalGraphserverApiUrl + (externalGraphserverApiUrl.endsWith("/") ? "" : "/") + 
-				GRAPH_READ_VERSION_METADATA_LIST.replace("{graph}", graphName);
-		
-		CloseableHttpResponse response = null;
-		try {
-        	
-            HttpGet httpget = new HttpGet(uri);
-            
-            response = this.httpClient.execute(httpget);
-            HttpEntity resEntity = response.getEntity();
-            if (response.getStatusLine().getStatusCode() == 200 && resEntity != null) {
-            	List<IGraphVersionMetadataDTO> dtoList = objectMapper.readValue(resEntity.getContent(), new TypeReference<List<GraphVersionMetadataDTOImpl>>(){});
-            	if (dtoList != null && !dtoList.isEmpty()) {
-            		List<IWayGraphVersionMetadata> metadataList = new ArrayList<>();
-            		CachedWayGraphVersionMetadataListWrapper metadatas = new CachedWayGraphVersionMetadataListWrapper(metadataList, new Date());
-	            	for (IGraphVersionMetadataDTO dto : dtoList) {
-	            		metadataList.add(adapter.adapt(dto));
-	            	}
-	            	graphVersions.put(graphName, metadatas);
-            	} else {
-            		graphVersions.remove(graphName);
-            	}
-            	         	            	
-            }
-            else if (response.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_FOUND) {
-            	throw new GraphNotFoundException(graphName);
-            }
-            else {
-            	throw new GraphiumServerAccessException(response.getStatusLine().getStatusCode());
-            }
-        } catch (IOException | UnsupportedOperationException e) {
-			log.error("Error while reading current graph version ID", e);
-			throw new GraphiumServerAccessException(e);
-		} finally {
-			try {
-				if (response != null) {
-					response.close();
-				}
-			} catch (IOException e) {
-				log.error("Error while reading current graph version ID", e);
-				throw new GraphiumServerAccessException(e);
-			}
-		}
+		String uri = externalGraphserverApiUrl + resolveUrlTemplates(GRAPH_READ_VERSION_METADATA_LIST, Collections.singletonMap("{graph}", graphName));
+		List<IGraphVersionMetadataDTO> metadataDTOs = doHttpRequest(uri, graphName, httpEntity -> {
+					try {
+						return objectMapper.readValue(httpEntity.getContent(), new TypeReference<List<GraphVersionMetadataDTOImpl>>(){});
+					} catch (JsonParseException e) {
+						log.error("error parsing json stream", e);
+					} catch (JsonMappingException e) {
+						log.error("error mapping json to DTO", e);
+					}
+					// TODO: throw
+					return null;
+				});
+		if (metadataDTOs != null && !metadataDTOs.isEmpty()) {
+    		List<IWayGraphVersionMetadata> metadataList = new ArrayList<>();
+    		CachedWayGraphVersionMetadataListWrapper metadatas = new CachedWayGraphVersionMetadataListWrapper(metadataList, new Date());
+        	for (IGraphVersionMetadataDTO dto : metadataDTOs) {
+        		metadataList.add(currentGraphVersionCache.getAdapter().adapt(dto));
+        	}
+        	graphVersions.put(graphName, metadatas);
+    	} else {
+    		graphVersions.remove(graphName);
+    	}
 	}
 	
 	class CachedWayGraphVersionMetadataListWrapper {
@@ -146,6 +127,18 @@ public class GraphVersionCacheImpl extends CurrentGraphVersionCacheImpl implemen
 			this.metadataList = metadataList;
 			this.cachedAt = cachedAt;
 		}
+	}
+
+	// delegate ICurrentGraphVersionCache to injected client
+	@Override
+	public void readCurrentGraphVersions() {
+		currentGraphVersionCache.readCurrentGraphVersions();
+	}
+
+	@Override
+	public IWayGraphVersionMetadata getCurrentGraphVersion(String graphName)
+			throws IllegalArgumentException, GraphiumServerAccessException, GraphNotFoundException {
+		return currentGraphVersionCache.getCurrentGraphVersion(graphName);
 	}
 
 }

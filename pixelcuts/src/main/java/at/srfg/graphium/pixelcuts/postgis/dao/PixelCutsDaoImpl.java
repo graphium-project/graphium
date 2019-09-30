@@ -48,7 +48,7 @@ public class PixelCutsDaoImpl extends AbstractSegmentXInfoTypeAwareDao<IPixelCut
 								" start_cut_left double precision, " +
 								" end_cut_right double precision, " +
 								" end_cut_left double precision, " +
-								" CONSTRAINT pk_"+ TABLE_NAME + "_id PRIMARY KEY (segment_id, graphversion_id)," +
+								" CONSTRAINT pk_"+ TABLE_NAME + "_id PRIMARY KEY (graphversion_id, segment_id)," +
 								" CONSTRAINT graphs_"+ TABLE_NAME + "_waygraphmetadata_fk FOREIGN KEY (graphversion_id) " +
 							    "  REFERENCES graphs.waygraphmetadata (id) MATCH SIMPLE " +
 							    "  ON UPDATE NO ACTION ON DELETE CASCADE " +

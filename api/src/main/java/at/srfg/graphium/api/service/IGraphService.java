@@ -37,7 +37,7 @@ import at.srfg.graphium.model.IWayGraphVersionMetadata;
  *
  */
 public interface IGraphService<T extends IBaseWaySegment> {
-	
+
 	/**
 	 * 
 	 * @param metadata
@@ -54,7 +54,7 @@ public interface IGraphService<T extends IBaseWaySegment> {
 	 * @param outputStream
 	 * @throws IOException
 	 * @throws WaySegmentSerializationException
-	 * @throws GraphNotExistsException 
+	 * @throws GraphNotExistsException
 	 */
 	void streamGraphVersion(IWayGraphVersionMetadata metadata, OutputStream outputStream, Set<Long> ids)
 			throws IOException, WaySegmentSerializationException, GraphNotExistsException;
@@ -70,7 +70,8 @@ public interface IGraphService<T extends IBaseWaySegment> {
 	 * @throws GraphAlreadyExistException
 	 * @throws GraphImportException
 	 */
-	IWayGraphVersionMetadata importGraph(String graphName, String version, boolean overrideIfExists, MultipartFile file) throws IOException, GraphAlreadyExistException, GraphImportException, ValidationException;
+	IWayGraphVersionMetadata importGraph(String graphName, String version, boolean overrideIfExists, MultipartFile file)
+			throws IOException, GraphAlreadyExistException, GraphImportException, ValidationException;
 
 	/**
 	 *
@@ -84,8 +85,9 @@ public interface IGraphService<T extends IBaseWaySegment> {
 	 * @throws GraphAlreadyExistException
 	 * @throws GraphImportException
 	 */
-	IWayGraphVersionMetadata importGraph(String graphName, String version, boolean overrideIfExists, String excludedXInfos, MultipartFile file) throws IOException, GraphAlreadyExistException, GraphImportException, ValidationException;
-
+	IWayGraphVersionMetadata importGraph(String graphName, String version, boolean overrideIfExists,
+			String excludedXInfos, MultipartFile file)
+			throws IOException, GraphAlreadyExistException, GraphImportException, ValidationException;
 
 	/**
 	 * @param outputFormat
@@ -93,19 +95,23 @@ public interface IGraphService<T extends IBaseWaySegment> {
 	 * @param graphName
 	 * @param version
 	 * @throws WaySegmentSerializationException
-	 * @throws GraphNotExistsException 
+	 * @throws GraphNotExistsException
 	 */
-	void streamStreetSegments(IWayGraphOutputFormat<T> outputFormat,
-			Polygon bounds, String graphName, String version)
-		throws WaySegmentSerializationException, GraphNotExistsException;
+	void streamStreetSegments(IWayGraphOutputFormat<T> outputFormat, Polygon bounds, String graphName, String version)
+			throws WaySegmentSerializationException, GraphNotExistsException;
 
 	/**
-	 * Deletes a graph version. If keepMetadata is set to false the metadata entry will be kept and its state will be changed to DELETED. 
-	 * Otherwise the metadata entry will be deleted, too.
-	 * @param graphName		Name of the graph
-	 * @param version		Name of the version
-	 * @param keepMetadata	Keep (true) or delete (false) metadata entry
-	 * @throws GraphNotExistsException 
+	 * Deletes a graph version. If keepMetadata is set to false the metadata entry
+	 * will be kept and its state will be changed to DELETED. Otherwise the metadata
+	 * entry will be deleted, too.
+	 * 
+	 * @param graphName
+	 *            Name of the graph
+	 * @param version
+	 *            Name of the version
+	 * @param keepMetadata
+	 *            Keep (true) or delete (false) metadata entry
+	 * @throws GraphNotExistsException
 	 */
 	void deleteGraphVersion(String graphName, String version, boolean keepMetadata) throws GraphNotExistsException;
 
@@ -115,9 +121,23 @@ public interface IGraphService<T extends IBaseWaySegment> {
 	 * @param version
 	 * @param ids
 	 * @throws WaySegmentSerializationException
-	 * @throws GraphNotExistsException 
+	 * @throws GraphNotExistsException
 	 */
 	void streamStreetSegments(IWayGraphOutputFormat<T> outputFormat, String graphName, String version, Set<Long> ids)
 			throws WaySegmentSerializationException, GraphNotExistsException;
-	
+
+	/**
+	 * streams segments with incoming connected to segments with given ids
+	 * 
+	 * @param outputStream stream to write serialized data to
+	 * @param metadata metadata of the graph (name, version, ...)
+	 * @param ids id set of segments where connected segments should be retrieved
+	 * @throws WaySegmentSerializationException thrown on error during serialization
+	 * @throws GraphNotExistsException thrown if graph name/version combination dosn´t exist
+	 * @throws IOException 
+	 */
+	void streamIncomingConnectedStreetSegments(IWayGraphVersionMetadata metadata, OutputStream outputStream, 
+			Set<Long> ids)
+			throws WaySegmentSerializationException, GraphNotExistsException, IOException;
+
 }

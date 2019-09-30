@@ -130,7 +130,33 @@ public interface IGraphReadService<T extends IBaseSegment> {
 	 */
 	void streamStreetSegments(ISegmentOutputFormat<T> outputFormat, Polygon bounds, String graphName, Date timestamp) throws GraphNotExistsException, WaySegmentSerializationException;
 
+	/**
+	 * Fully read the graph with the given name and version into a queue. used for producer threads which have to iterate a graph
+	 * for some batchjob. geometries will be included but no connection tables! Order can be specified using an GraphReadOrder object
+	 * 
+	 * @param queue queue to pass the data in
+	 * @param graphName name of the graph to read from
+	 * @param version version of the graph
+	 * @param order order the graph segments will be read
+	 * @throws GraphNotExistsException 
+	 * @throws WaySegmentSerializationException 
+	 */
 	void readStreetSegments(BlockingQueue<T> queue, String graphName,
 			String version, GraphReadOrder order) throws GraphNotExistsException, WaySegmentSerializationException;
+	
+	/**
+	 * streams segments with incoming connected to segments with given ids
+	 * 
+	 * @param outputFormat format used for streaming
+	 * @param graphName graph name
+	 * @param version version of graph
+	 * @param ids id set of segments where connected segments should be retrieved
+	 * @throws WaySegmentSerializationException thrown on error during serialization
+	 * @throws GraphNotExistsException thrown if graph name/version combination dosn´t exist
+	 */
+	void streamIncomingConnectedStreetSegments(ISegmentOutputFormat<T> outputFormat, String graphName, String version,
+			Set<Long> ids)
+			throws WaySegmentSerializationException, GraphNotExistsException;
+
 	
 }

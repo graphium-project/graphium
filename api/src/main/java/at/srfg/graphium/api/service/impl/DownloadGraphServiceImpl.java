@@ -31,15 +31,16 @@ import at.srfg.graphium.api.events.notifier.IGraphVersionImportFinishedNotifier;
 import at.srfg.graphium.api.service.IDownloadGraphService;
 import at.srfg.graphium.core.persistence.IWayGraphVersionMetadataDao;
 import at.srfg.graphium.core.service.IGraphVersionImportService;
+import at.srfg.graphium.model.IBaseWaySegment;
 
 /**
  * @author User
  */
-public class DownloadGraphServiceImpl implements IDownloadGraphService {
+public class DownloadGraphServiceImpl<T extends IBaseWaySegment> implements IDownloadGraphService {
 
 	private static Logger log = LoggerFactory.getLogger(DownloadGraphServiceImpl.class);
 	
-	private IGraphVersionImportService importService;
+	private IGraphVersionImportService<T> importService;
 	private IGraphVersionImportFinishedNotifier importFinishedNotifier;
 	private IWayGraphVersionMetadataDao metadataDao;
 
@@ -66,7 +67,7 @@ public class DownloadGraphServiceImpl implements IDownloadGraphService {
 					importInfo.setUrl(url);
 				}
 				
-				new Thread(new AsyncGraphImportService(importService, importFinishedNotifier, metadataDao, importInfoList, false)).start();
+				new Thread(new AsyncGraphImportService<T>(importService, importFinishedNotifier, metadataDao, importInfoList, false)).start();
 			} catch (Exception e) {
 				log.error("error downloading graph version", e);
 				return false;
@@ -75,11 +76,11 @@ public class DownloadGraphServiceImpl implements IDownloadGraphService {
 		return true;
 	}
 
-	public IGraphVersionImportService getImportService() {
+	public IGraphVersionImportService<T> getImportService() {
 		return importService;
 	}
 
-	public void setImportService(IGraphVersionImportService importService) {
+	public void setImportService(IGraphVersionImportService<T> importService) {
 		this.importService = importService;
 	}
 
