@@ -178,6 +178,8 @@
 		<module>converters/osm2graphium</module>
 		<module>tutorial/model_extension</module>
 		<module>tutorial/central_server</module>
+		<module>graphium-hd</module>
+		<module>lanelet2graphium</module>
 	</modules>
 
 	<scm>

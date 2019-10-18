@@ -15,10 +15,12 @@
  */
 package at.srfg.graphium.io.adapter.impl;
 
+import at.srfg.graphium.io.dto.IBaseWaySegmentDTO;
 import at.srfg.graphium.io.dto.IWaySegmentDTO;
 import at.srfg.graphium.io.dto.impl.WaySegmentDTOImpl;
 import at.srfg.graphium.model.FormOfWay;
 import at.srfg.graphium.model.FuncRoadClass;
+import at.srfg.graphium.model.IBaseWaySegment;
 import at.srfg.graphium.model.IWaySegment;
 import at.srfg.graphium.model.impl.WaySegment;
 
@@ -32,7 +34,11 @@ public class WaySegment2SegmentDTOAdapter<O extends IWaySegmentDTO, I extends IW
 	public WaySegment2SegmentDTOAdapter() {
 		super(WaySegment.class, WaySegmentDTOImpl.class);
 	}
-	
+
+	public WaySegment2SegmentDTOAdapter(Class<? extends IWaySegment> modelClass, Class<? extends IWaySegmentDTO> dtoClass) {
+		super(modelClass, dtoClass);
+	}
+
 	@Override
 	public O adapt(I segment) {
 		O segmentDTO = (O) new WaySegmentDTOImpl();
