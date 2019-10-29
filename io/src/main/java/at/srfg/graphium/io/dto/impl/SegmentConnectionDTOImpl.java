@@ -41,8 +41,9 @@ public class SegmentConnectionDTOImpl extends BaseSegmentConnectionDTO implement
 	public SegmentConnectionDTOImpl(long nodeId,
 									long toSegmentId,
 									Map<String, List<IConnectionXInfoDTO>> xInfo,
-									Set<Access> access) {
-		super(nodeId,toSegmentId,xInfo);
+									Set<Access> access,
+									Map<String, String> tags) {
+		super(nodeId,toSegmentId,xInfo, tags);
 		this.access = access;
 	}
 

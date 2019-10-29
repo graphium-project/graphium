@@ -15,6 +15,8 @@
  */
 package at.srfg.graphium.model.impl;
 
+import java.util.HashMap;
+
 import com.vividsolutions.jts.geom.LineString;
 
 import at.srfg.graphium.model.IHDWaySegment;
@@ -30,7 +32,9 @@ public class HDWaySegment extends WaySegment implements IHDWaySegment {
 	private long rightBoarderStartNodeId;
 	private long rightBoarderEndNodeId;
 	
-	public HDWaySegment() {}
+	public HDWaySegment() {
+		tags = new HashMap<>();
+	}
 	
 	public HDWaySegment(LineString leftBoarderGeometry, long leftBoarderStartNodeId, long leftBoarderEndNodeId,
 			LineString rightBoarderGeometry, long rightBoarderStartNodeId, long rightBoarderEndNodeId) {

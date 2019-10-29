@@ -42,6 +42,7 @@ public enum Access {
 	COMBUSTIBLES (20),
 	HAZARDOUS_TO_WATER (21),
 	GARBAGE_COLLECTION_VEHICLE (22),
+	ELECTRIC_CAR (23),
 	NONE (-1);
 	
 	private int id;

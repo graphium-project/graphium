@@ -17,9 +17,13 @@ package at.srfg.graphium.io.dto.impl;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.vividsolutions.jts.geom.LineString;
 
 import at.srfg.graphium.io.dto.IHDWaySegmentDTO;
+import at.srfg.graphium.io.inputformat.impl.jackson.JacksonLineStringDeserializer;
+import at.srfg.graphium.io.outputformat.impl.jackson.JacksonGeometrySerializer;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -46,6 +50,8 @@ public class HDWaySegmentDTO extends WaySegmentDTOImpl implements IHDWaySegmentD
 	}
 
 	@Override
+	@JsonSerialize(using = JacksonGeometrySerializer.class)
+	@JsonDeserialize(using = JacksonLineStringDeserializer.class)
 	public LineString getLeftBoarderGeometry() {
 		return leftBoarderGeometry;
 	}
@@ -76,6 +82,8 @@ public class HDWaySegmentDTO extends WaySegmentDTOImpl implements IHDWaySegmentD
 	}
 	
 	@Override
+	@JsonSerialize(using = JacksonGeometrySerializer.class)
+	@JsonDeserialize(using = JacksonLineStringDeserializer.class)
 	public LineString getRightBoarderGeometry() {
 		return rightBoarderGeometry;
 	}

@@ -37,5 +37,30 @@ public class Constants {
 	public final static String LANELET_SUBTYPE_SOLID_DASHED = "solid_dashed";
 	public final static String LANELET_SUBTYPE_HIGH = "high";
 	public final static String LANELET_SUBTYPE_LOW = "low";
-
+	public final static String LANELET_ONEWAY = "one_way";
+	public final static String LANELET_ROAD_NAME = "road_name";
+	public final static String LANELET_ROAD_SURFACE = "road_surface";
+	public final static String LANELET_REGION = "region";
+	public final static String LANELET_SPEED_LIMIT = "speed_limit";
+	public final static String LANELET_SPEED_LIMIT_MANDATORY = "speed_limit_mandatory ";
+	public final static String LANELET_PARTICIPANT = "participant";
+	
+	public final static String BOARDER_INVERTED = "invertedBoarder";
+	public final static String ROAD_TYPE = "roadType";
+	public final static String LOCATION = "location";
+	public final static String ROAD_SURFACE = "roadSurface";
+	public final static String REGION = "region";
+	public final static String URBAN = "urban";
+	public final static String NONURBAN = "nonurban";
+	
+	public final static String CONNECTION_TYPE = "connectionType";
+	public final static String CONNECTION_TYPE_CONNECTS = "connects";
+	public final static String CONNECTION_TYPE_CONNECTS_FORBIDDEN = "connects_forbidden";
+	public final static String CONNECTION_PARALLEL = "parallel";
+	public final static String CONNECTION_DIRECTION = "direction";
+	public final static String CONNECTION_REVERSE = "reverse";
+	
+	public final static String LEFT = "left";
+	public final static String RIGHT = "right";
+	
 }

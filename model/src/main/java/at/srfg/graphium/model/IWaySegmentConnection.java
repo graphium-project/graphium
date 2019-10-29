@@ -16,6 +16,7 @@
 package at.srfg.graphium.model;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public interface IWaySegmentConnection {
@@ -45,5 +46,11 @@ public interface IWaySegmentConnection {
 	void addXInfo(IConnectionXInfo xInfo);
 	
 	void addXInfo(List<IConnectionXInfo> xInfo);
+
+	Map<String, String> getTags();
+
+	void setTags(Map<String, String> tags);
+
+	void addTag(String key, String value);
 	
 }

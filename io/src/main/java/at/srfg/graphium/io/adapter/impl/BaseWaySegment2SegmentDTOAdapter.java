@@ -101,7 +101,7 @@ public class BaseWaySegment2SegmentDTOAdapter<O extends IBaseWaySegmentDTO, I ex
 		} catch (XInfoNotSupportedException e) {
             log.error("adaption of connection's xinfo failed", e);
 		}
-		return new SegmentConnectionDTOImpl(conn.getNodeId(), conn.getToSegmentId(), connectionXInfoDTOMap, conn.getAccess());
+		return new SegmentConnectionDTOImpl(conn.getNodeId(), conn.getToSegmentId(), connectionXInfoDTOMap, conn.getAccess(), conn.getTags());
 	}
 
 }

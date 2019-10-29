@@ -33,4 +33,9 @@ public interface IBaseSegmentConnectionDTO {
     Map<String, List<IConnectionXInfoDTO>> getxInfo();
 
     void setxInfo(Map<String, List<IConnectionXInfoDTO>> xInfo);
+
+	Map<String, String> getTags();
+
+	void setTags(Map<String, String> tags);
+	
 }

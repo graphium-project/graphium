@@ -32,22 +32,24 @@ import org.slf4j.LoggerFactory;
 import at.srfg.graphium.io.adapter.IAdapter;
 import at.srfg.graphium.io.adapter.ISegmentAdapter;
 import at.srfg.graphium.io.adapter.impl.GraphVersionMetadata2GraphVersionMetadataDTOAdapter;
+import at.srfg.graphium.io.adapter.impl.HDWaySegment2HDWaySegmentDTOAdapter;
 import at.srfg.graphium.io.adapter.impl.WaySegment2SegmentDTOAdapter;
 import at.srfg.graphium.io.adapter.registry.ISegmentAdapterRegistry;
 import at.srfg.graphium.io.adapter.registry.impl.SegmentAdapterRegistryImpl;
 import at.srfg.graphium.io.dto.IGraphVersionMetadataDTO;
-import at.srfg.graphium.io.dto.IWaySegmentDTO;
+import at.srfg.graphium.io.dto.IHDWaySegmentDTO;
 import at.srfg.graphium.io.outputformat.ISegmentOutputFormatFactory;
 import at.srfg.graphium.io.outputformat.IWayGraphOutputFormat;
 import at.srfg.graphium.io.outputformat.IWayGraphOutputFormatFactory;
 import at.srfg.graphium.io.outputformat.impl.jackson.GenericJacksonSegmentOutputFormatFactoryImpl;
 import at.srfg.graphium.io.outputformat.impl.jackson.GenericJacksonWayGraphOutputFormatFactoryImpl;
 import at.srfg.graphium.lanelet2import.adapter.LaneletsAdapter;
+import at.srfg.graphium.lanelet2import.connections.ConnectionsBuilder;
 import at.srfg.graphium.lanelet2import.model.IImportConfig;
 import at.srfg.graphium.lanelet2import.reader.EntitySink;
+import at.srfg.graphium.lanelet2import.reader.LaneletContainer;
 import at.srfg.graphium.model.IHDWaySegment;
 import at.srfg.graphium.model.IWayGraphVersionMetadata;
-import at.srfg.graphium.model.IWaySegment;
 import at.srfg.graphium.model.impl.WayGraphVersionMetadata;
 import at.srfg.graphium.model.management.impl.Source;
 
@@ -59,30 +61,32 @@ public class LaneletImporterService {
 	
 	private static Logger log = LoggerFactory.getLogger(LaneletImporterService.class);
 
-    private IWayGraphOutputFormatFactory<IWaySegment> outputFormatFactory;
+    private IWayGraphOutputFormatFactory<IHDWaySegment> outputFormatFactory;
     private LaneletsAdapter laneletsAdapter;
+    private ConnectionsBuilder connectionsBuilder;
     
     public LaneletImporterService() {
     	
     	IAdapter<IGraphVersionMetadataDTO, IWayGraphVersionMetadata> adapter = 
     			new GraphVersionMetadata2GraphVersionMetadataDTOAdapter();
-    	ISegmentAdapterRegistry<IWaySegmentDTO, IWaySegment> adapterRegistry = 
-    			new SegmentAdapterRegistryImpl<IWaySegmentDTO, IWaySegment>();
+    	ISegmentAdapterRegistry<IHDWaySegmentDTO, IHDWaySegment> adapterRegistry = 
+    			new SegmentAdapterRegistryImpl<IHDWaySegmentDTO, IHDWaySegment>();
     	
-    	WaySegment2SegmentDTOAdapter<IWaySegmentDTO, IWaySegment> waySegmentAdapter = 
-    			new WaySegment2SegmentDTOAdapter<IWaySegmentDTO, IWaySegment>();
-    	List<ISegmentAdapter<IWaySegmentDTO, IWaySegment>> adapters =
-    			new ArrayList<ISegmentAdapter<IWaySegmentDTO,IWaySegment>>();
+    	WaySegment2SegmentDTOAdapter<IHDWaySegmentDTO, IHDWaySegment> waySegmentAdapter = 
+    			new HDWaySegment2HDWaySegmentDTOAdapter<>();
+    	List<ISegmentAdapter<IHDWaySegmentDTO, IHDWaySegment>> adapters =
+    			new ArrayList<ISegmentAdapter<IHDWaySegmentDTO, IHDWaySegment>>();
     	adapters.add(waySegmentAdapter);
     	adapterRegistry.setAdapters(adapters);
     	
-    	ISegmentOutputFormatFactory<IWaySegment> segmentOutputFormatFactory = 
-    			new GenericJacksonSegmentOutputFormatFactoryImpl<IWaySegment>(adapterRegistry);
+    	ISegmentOutputFormatFactory<IHDWaySegment> segmentOutputFormatFactory = 
+    			new GenericJacksonSegmentOutputFormatFactoryImpl<IHDWaySegment>(adapterRegistry);
     	
     	this.outputFormatFactory = 
-    			new GenericJacksonWayGraphOutputFormatFactoryImpl<IWaySegment>(segmentOutputFormatFactory,adapter);
+    			new GenericJacksonWayGraphOutputFormatFactoryImpl<IHDWaySegment>(segmentOutputFormatFactory, adapter);
     	
     	laneletsAdapter = new LaneletsAdapter();
+    	connectionsBuilder = new ConnectionsBuilder();
     }
 
     // TODO: asynchrone Verarbeitung umsetzen!
@@ -102,20 +106,26 @@ public class LaneletImporterService {
         readOsm(entitySink, null, config, false);
 
 //        List<IHDRegulatoryElement> hdRegulatoryElements = adaptRegulatoryElements(entitySink);
-        List<IHDWaySegment> hdWaySegments = adaptLanelets(entitySink);
+        List<IHDWaySegment> lanelets = adaptLanelets(entitySink);
 //        collectRegulatoryElements(hdWaySegment, hdRegulatoryElements);
         
-        log.info(hdWaySegments.size() + " segments adapted");
+        log.info(lanelets.size() + " segments adapted");
+        
+        // build nodeId->Lanelet map
+        LaneletContainer laneletContainer = buildNodeId2LaneletMap(lanelets);
+        
+        // create connections
+        createConnections(lanelets, laneletContainer);
         
         FileOutputStream stream = null;
-        IWayGraphOutputFormat<IWaySegment> outputFormat = null;
-       
+        IWayGraphOutputFormat<IHDWaySegment> outputFormat = null;
+        
         try {
 			stream = new FileOutputStream(config.getOutputDir() + "/" + config.getGraphName() + "_" + config.getVersion() + ".json");
 	        outputFormat = outputFormatFactory.getWayGraphOutputFormat(stream);
-	        outputFormat.serialize(this.getVersionMetadata(config, hdWaySegments.size()));
+	        outputFormat.serialize(this.getVersionMetadata(config, lanelets.size()));
 	        
-	        for (IHDWaySegment hdSegment : hdWaySegments) {
+	        for (IHDWaySegment hdSegment : lanelets) {
 	        	outputFormat.serialize(hdSegment);
 	        }
 	        
@@ -139,10 +149,26 @@ public class LaneletImporterService {
         	}
         }
 
-        log.info("Finished converting Lanelet 2 file");
+        log.info("Finished converting Lanelet2 file");
         
 	}
         
+	private void createConnections(List<IHDWaySegment> lanelets, LaneletContainer laneletContainer) {
+		// TODO
+		for (IHDWaySegment lanelet : lanelets) {
+			connectionsBuilder.build(lanelet, laneletContainer);
+		}
+	}
+
+	private LaneletContainer buildNodeId2LaneletMap(List<IHDWaySegment> lanelets) {
+		LaneletContainer laneletContainer = new LaneletContainer();
+		for (IHDWaySegment lanelet : lanelets) {
+			laneletContainer.addLanelet(lanelet);
+		}
+		
+		return laneletContainer;
+	}
+
 	private List<IHDWaySegment> adaptLanelets(EntitySink entitySink) {
 		return laneletsAdapter.adaptLanelets(entitySink.getRelations(),
 											 entitySink.getWays(),
