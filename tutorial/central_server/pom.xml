@@ -27,19 +27,19 @@
 			<artifactId>spring-security-config</artifactId>	
 		</dependency>
 		
-	<dependency>
+		<dependency>
 			<groupId>at.srfg.graphium</groupId>
 			<artifactId>graphium-core</artifactId>
 			<version>${graphium.version}</version>
 		</dependency>
 	
-	<dependency>
+		<dependency>
 			<groupId>at.srfg.graphium</groupId>
 			<artifactId>graphium-postgis</artifactId>
 			<version>${graphium.version}</version>
 		</dependency>
 		
-	<dependency>
+		<dependency>
 			<groupId>at.srfg.graphium</groupId>
 			<artifactId>graphium-api</artifactId>
 			<version>${graphium.version}</version>
@@ -51,6 +51,12 @@
 			<version>${graphium.version}</version>
 		</dependency>
 		
+		<dependency>
+			<groupId>at.srfg.graphium</groupId>
+			<artifactId>graphium-hd</artifactId>
+			<version>${graphium.version}</version>
+		</dependency>
+
 	</dependencies>
 
 </project>

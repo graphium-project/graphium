@@ -24,5 +24,9 @@
 	<import resource="classpath:/application-context-graphium-pixelcuts.xml" />
 
 	<import resource="classpath:/application-context-graphium-central-server-api.xml" />
+
+	<!-- add graphiumHD -->
+	<import resource="classpath:/application-context-graphium-hd-postgis.xml" />
+	<import resource="classpath:/application-context-graphium-hd-io.xml" />
     
 </beans>
