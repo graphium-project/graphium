@@ -48,8 +48,6 @@ public class EntitySink implements Sink, EntityProcessor {
 
 	@Override
 	public void initialize(Map<String, Object> metaData) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override

@@ -37,7 +37,6 @@ import at.srfg.graphium.model.Access;
 import at.srfg.graphium.model.FormOfWay;
 import at.srfg.graphium.model.FuncRoadClass;
 import at.srfg.graphium.model.IHDWaySegment;
-import at.srfg.graphium.model.IWaySegment;
 import at.srfg.graphium.model.impl.HDWaySegment;
 import gnu.trove.map.hash.TLongObjectHashMap;
 
@@ -109,8 +108,9 @@ public class LaneletsAdapter {
 		Map<String, String> tags = new HashMap<>();
 		relation.getTags().forEach(tag -> tags.put(tag.getKey(), tag.getValue()));
 		
-		setLanes(segment, tags);
 		setRoadCharacteristics(segment, tags);
+		setAccesses(segment, tags);
+		setOnewayAttributes(segment, tags);
 		
 //		setAccess(segment, tags);
 		setOptionalTags(segment, tags);
@@ -293,16 +293,22 @@ public class LaneletsAdapter {
 		return accesses;
 	}
 
-	private void setLanes(IHDWaySegment segment, Map<String, String> tags) {
+	private void setOnewayAttributes(IHDWaySegment segment, Map<String, String> tags) {
 		// see https://github.com/fzi-forschungszentrum-informatik/Lanelet2/blob/master/lanelet2_core/src/Attribute.cpp
 		segment.setLanesTow((short)1);
-		for (String key : tags.keySet()) {
-			if (key.contains(Constants.LANELET_ONEWAY)) {
-				if (tags.get(key).equals("no")) {
-					segment.setLanesBkw((short)1);
-				}
-			}
+
+		Set<Access> accesses = new HashSet<>();
+		boolean oneway = convertAccesses(tags, Constants.LANELET_ONEWAY, "no", accesses);
+
+		if (!accesses.isEmpty()) {
+			segment.setAccessBkw(accesses);
+			segment.setLanesBkw((short)1);
+		} else if (oneway) {
+			// lanelet has tag "one_way=no", but no explicitly set participants
+			segment.setAccessBkw(segment.getAccessTow());
+			segment.setLanesBkw((short)1);
 		}
+		
 	}
 
 	private void determineLaneChanges(IHDWaySegment segment, boolean[] boarderDirections, Way leftBoarder, Way rightBoarder) {
@@ -419,7 +425,7 @@ public class LaneletsAdapter {
 		return Boolean.toString(laneChange);
 	}
 
-	private void setOptionalTags(IWaySegment segment, Map<String, String> tags) {
+	private void setOptionalTags(IHDWaySegment segment, Map<String, String> tags) {
 		// TODO: Tag Direction?
 		
 		if (tags.containsKey(Constants.LANELET_ROAD_NAME)) {
@@ -451,8 +457,70 @@ public class LaneletsAdapter {
 				}
 			}
 		}
-		
-		// TODO: Participants...
+	}
+	
+	private void setAccesses(IHDWaySegment segment, Map<String, String> tags) {
+		Set<Access> accesses = new HashSet<>();
+		convertAccesses(tags, Constants.LANELET_PARTICIPANT, "yes", accesses);
+
+		if (!accesses.isEmpty()) {
+			segment.setAccessTow(accesses);
+		}
+	}
+	
+	/**
+	 * 
+	 * @param tags
+	 * @param keyPrefix
+	 * @param valuePositives
+	 * @param accesses returns all accesses if explicitly defined
+	 * @return true if condition of "keyPrefix" found and value = "valuePositives" is true
+	 */
+	private boolean convertAccesses(Map<String, String> tags, String keyPrefix, String valuePositives, Set<Access> accesses) {
+		boolean conditionTrue = false;
+		for (String key : tags.keySet()) {
+			if (key.contains(keyPrefix)) {
+				if (tags.get(key).equals(valuePositives)) {
+					conditionTrue = true;
+					
+					if (key.equals(keyPrefix + ":" + Constants.LANELET_VEHICLE)) {
+						accesses = allVehiclesAccesses();
+					} else
+					if (key.equals(keyPrefix + ":" + Constants.LANELET_VEHICLE_CAR)) {
+						accesses.add(Access.PRIVATE_CAR);
+						accesses.add(Access.ELECTRIC_CAR);
+					} else
+					if (key.equals(keyPrefix + ":" + Constants.LANELET_VEHICLE_CAR_COMBUSTION)) {
+						accesses.add(Access.PRIVATE_CAR);
+					} else
+					if (key.equals(keyPrefix + ":" + Constants.LANELET_VEHICLE_CAR_ELECTRIC)) {
+						accesses.add(Access.ELECTRIC_CAR);
+					} else
+					if (key.equals(keyPrefix + ":" + Constants.LANELET_VEHICLE_BUS)) {
+						accesses.add(Access.PUBLIC_BUS);
+					} else
+					if (key.equals(keyPrefix + ":" + Constants.LANELET_VEHICLE_TRUCK)) {
+						accesses.add(Access.TRUCK);
+					} else
+					if (key.equals(keyPrefix + ":" + Constants.LANELET_VEHICLE_MOTORCYCLE)) {
+						accesses.add(Access.MOTORCYCLE);
+					} else
+					if (key.equals(keyPrefix + ":" + Constants.LANELET_VEHICLE_TAXI)) {
+						accesses.add(Access.TAXI);
+					} else
+					if (key.equals(keyPrefix + ":" + Constants.LANELET_VEHICLE_EMERGENCY)) {
+						accesses.add(Access.EMERGENCY_VEHICLE);
+					} else
+					if (key.equals(keyPrefix + ":" + Constants.LANELET_PEDESTRIAN)) {
+						accesses.add(Access.PEDESTRIAN);
+					} else
+					if (key.equals(keyPrefix + ":" + Constants.LANELET_BYCICLE)) {
+						accesses.add(Access.BIKE);
+					}
+				}
+			}
+		}
+		return conditionTrue;
 	}
 
 }

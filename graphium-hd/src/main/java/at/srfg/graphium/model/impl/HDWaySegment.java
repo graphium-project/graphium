@@ -20,6 +20,7 @@ import java.util.HashMap;
 import com.vividsolutions.jts.geom.LineString;
 
 import at.srfg.graphium.model.IHDWaySegment;
+import at.srfg.graphium.model.OneWay;
 
 public class HDWaySegment extends WaySegment implements IHDWaySegment {
 
@@ -107,6 +108,15 @@ public class HDWaySegment extends WaySegment implements IHDWaySegment {
 		rightBoarderEndNodeId = endNodeId;
 	}
 	
+	@Override
+	public OneWay isOneway() {
+		if (accessBkw != null && !accessBkw.isEmpty()) {
+			return OneWay.NO_ONEWAY;
+		} else {
+			return OneWay.ONEWAY_TOW; // default
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

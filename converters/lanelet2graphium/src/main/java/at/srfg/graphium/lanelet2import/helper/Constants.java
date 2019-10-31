@@ -44,7 +44,18 @@ public class Constants {
 	public final static String LANELET_SPEED_LIMIT = "speed_limit";
 	public final static String LANELET_SPEED_LIMIT_MANDATORY = "speed_limit_mandatory ";
 	public final static String LANELET_PARTICIPANT = "participant";
-	
+	public final static String LANELET_VEHICLE = "vehicle";
+	public final static String LANELET_VEHICLE_CAR = "vehicle:car";
+	public final static String LANELET_VEHICLE_CAR_ELECTRIC = "vehicle:car:electric";
+	public final static String LANELET_VEHICLE_CAR_COMBUSTION = "vehicle:car:combustion";
+	public final static String LANELET_VEHICLE_BUS = "vehicle:bus";
+	public final static String LANELET_VEHICLE_TRUCK = "vehicle:truck";
+	public final static String LANELET_VEHICLE_MOTORCYCLE = "vehicle:motorcycle";
+	public final static String LANELET_VEHICLE_TAXI = "vehicle:taxi";
+	public final static String LANELET_VEHICLE_EMERGENCY = "vehicle:emergency";
+	public final static String LANELET_PEDESTRIAN = "pedestrian";
+	public final static String LANELET_BYCICLE = "bycicle";
+
 	public final static String BOARDER_INVERTED = "invertedBoarder";
 	public final static String ROAD_TYPE = "roadType";
 	public final static String LOCATION = "location";
