@@ -17,8 +17,8 @@ package at.srfg.graphium.io.adapter.impl;
 
 import at.srfg.graphium.io.dto.IHDWaySegmentDTO;
 import at.srfg.graphium.io.dto.impl.HDWaySegmentDTO;
-import at.srfg.graphium.model.IHDWaySegment;
-import at.srfg.graphium.model.impl.HDWaySegment;
+import at.srfg.graphium.model.hd.IHDWaySegment;
+import at.srfg.graphium.model.hd.impl.HDWaySegment;
 
 public class HDWaySegment2HDWaySegmentDTOAdapter<O extends IHDWaySegmentDTO, I extends IHDWaySegment> extends WaySegment2SegmentDTOAdapter<O, I> {
 

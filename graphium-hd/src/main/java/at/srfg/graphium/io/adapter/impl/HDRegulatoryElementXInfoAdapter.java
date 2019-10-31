@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import at.srfg.graphium.io.dto.impl.HDRegulatoryElementDTO;
-import at.srfg.graphium.model.impl.HDRegulatoryElement;
+import at.srfg.graphium.model.hd.impl.HDRegulatoryElement;
 
 public class HDRegulatoryElementXInfoAdapter extends AbstractXInfoDTOAdapter<HDRegulatoryElement, HDRegulatoryElementDTO> {
 

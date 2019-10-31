@@ -22,7 +22,7 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 
-import at.srfg.graphium.model.IHDWaySegment;
+import at.srfg.graphium.model.hd.IHDWaySegment;
 
 /**
  * @author mwimmer

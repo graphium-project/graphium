@@ -13,14 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.srfg.graphium.model.impl;
+package at.srfg.graphium.model.hd.impl;
 
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.vividsolutions.jts.geom.LineString;
 
-import at.srfg.graphium.model.IHDWaySegment;
+import at.srfg.graphium.model.Access;
+import at.srfg.graphium.model.FormOfWay;
+import at.srfg.graphium.model.FuncRoadClass;
+import at.srfg.graphium.model.ISegmentXInfo;
+import at.srfg.graphium.model.IWaySegmentConnection;
 import at.srfg.graphium.model.OneWay;
+import at.srfg.graphium.model.hd.IHDWaySegment;
+import at.srfg.graphium.model.impl.WaySegment;
 
 public class HDWaySegment extends WaySegment implements IHDWaySegment {
 

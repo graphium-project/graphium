@@ -81,7 +81,7 @@ public class ViewParseUtil {
 			GraphReadOrder order, Map<String, ? extends Object> additionalFilter) {
 		
 		String query = "SELECT *" + 
-					(view.isWaySegmentsIncluded() ? ", st_asewkb(wayseg_geometry) AS wayseg_geometry_ewkb" : "") +
+					(view.isWaySegmentsIncluded() ? rsExtractor.getGeometryManipulationClause() : "") +
 					" FROM " + schema + view.getDbViewName();
 		
 		return addFiltersAndOrder(query, view, graphVersion,schema, order, additionalFilter);

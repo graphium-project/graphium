@@ -78,4 +78,17 @@ public abstract class AbstractWayGraphModelFactory<T extends IBaseWaySegment>
 				storageTimestamp, creator, originUrl);
 	}
 
+	protected List<IWaySegmentConnection> adaptConns(List<IWaySegmentConnection> startNodeCons,
+			   List<IWaySegmentConnection> endNodeCons) {
+		List<IWaySegmentConnection> conns = new ArrayList<>();
+		if (startNodeCons != null) {
+		conns.addAll(startNodeCons);
+		}
+		if (endNodeCons != null) {
+		conns.addAll(endNodeCons);
+		}
+		return conns;
+	}
+
+
 }

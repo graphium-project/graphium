@@ -19,9 +19,9 @@ import java.util.Set;
 
 import at.srfg.graphium.lanelet2import.helper.Constants;
 import at.srfg.graphium.lanelet2import.reader.LaneletContainer;
-import at.srfg.graphium.model.IHDWaySegment;
 import at.srfg.graphium.model.IWaySegmentConnection;
 import at.srfg.graphium.model.OneWay;
+import at.srfg.graphium.model.hd.IHDWaySegment;
 import at.srfg.graphium.osmimport.helper.ConnectionsHelper;
 
 /**

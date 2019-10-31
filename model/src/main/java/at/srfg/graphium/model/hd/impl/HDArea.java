@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.srfg.graphium.model.impl;
+package at.srfg.graphium.model.hd.impl;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-import at.srfg.graphium.model.IHDArea;
+import at.srfg.graphium.model.hd.IHDArea;
+import at.srfg.graphium.model.impl.WaySegment;
 
 public class HDArea extends WaySegment implements IHDArea {
 

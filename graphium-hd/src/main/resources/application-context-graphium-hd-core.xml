@@ -1,0 +1,29 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+    	
+	<!-- services -->
+	<bean id="hdGraphReadService" 
+		class="at.srfg.graphium.core.service.impl.GraphReadServiceImpl">
+		<property name="readDao" ref="postgisHDWayGraphReadDao"/>
+	</bean>
+	
+	<bean id="hdGraphWriteService" 
+		class="at.srfg.graphium.core.service.impl.GraphWriteServiceImpl">
+		<property name="graphWriteDao" ref="postgisHDWayGraphWriteDao"/>
+		<property name="metadataDao" ref="wayGraphVersionMetadataDao"/>
+	</bean>
+	
+</beans>

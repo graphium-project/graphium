@@ -13,15 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.srfg.graphium.model;
+package at.srfg.graphium.model.hd;
 
-public enum HDRegulatoryElementType {
+import java.util.Map;
+
+import com.vividsolutions.jts.geom.Geometry;
+
+import at.srfg.graphium.model.ISegmentXInfo;
+
+public interface IHDRegulatoryElement extends ISegmentXInfo {
+
+	HDRegulatoryElementType getType();
 	
-	TRAFFIC_LIGHT,
-	TRAFFIC_SIGN,
-	SPEED_LIMIT,
-	RIGHT_OF_WAY,
-	DYNAMIC,
-	FALLBACK;
+	void setType(HDRegulatoryElementType type);
+	
+	Geometry getGeometry();
+	
+	void setGeometry(Geometry geometry);
+	
+	Map<String, String> getTags();
+	
+	void setTags(Map<String, String> tags);
+
+	long getId();
+
+	void setId(long id);
+
+	Long getGraphVersionId();
+
+	void setGraphVersionId(Long graphVersionId);
 	
 }

@@ -25,8 +25,8 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 
-import at.srfg.graphium.model.IHDWaySegment;
-import at.srfg.graphium.model.impl.HDWaySegment;
+import at.srfg.graphium.model.hd.IHDWaySegment;
+import at.srfg.graphium.model.hd.impl.HDWaySegment;
 
 public class LaneletHelperTests {
 	protected Logger log = Logger.getLogger(this.getClass().getName());

@@ -48,8 +48,8 @@ import at.srfg.graphium.lanelet2import.connections.ConnectionsBuilder;
 import at.srfg.graphium.lanelet2import.model.IImportConfig;
 import at.srfg.graphium.lanelet2import.reader.EntitySink;
 import at.srfg.graphium.lanelet2import.reader.LaneletContainer;
-import at.srfg.graphium.model.IHDWaySegment;
 import at.srfg.graphium.model.IWayGraphVersionMetadata;
+import at.srfg.graphium.model.hd.IHDWaySegment;
 import at.srfg.graphium.model.impl.WayGraphVersionMetadata;
 import at.srfg.graphium.model.management.impl.Source;
 

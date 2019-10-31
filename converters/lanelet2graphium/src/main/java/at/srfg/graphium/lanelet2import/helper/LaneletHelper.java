@@ -32,7 +32,7 @@ import com.vividsolutions.jts.linearref.LinearLocation;
 import com.vividsolutions.jts.linearref.LocationIndexedLine;
 
 import at.srfg.graphium.geomutils.GeometryUtils;
-import at.srfg.graphium.model.IHDWaySegment;
+import at.srfg.graphium.model.hd.IHDWaySegment;
 import gnu.trove.map.hash.TLongObjectHashMap;
 
 /**

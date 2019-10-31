@@ -184,7 +184,7 @@ public class WaySegmentResultSetExtractor<S extends IBaseSegment, W extends IWay
 		
 		if (createfullWaySegment) {
 		
-			W waySegment = (W) new WaySegment();
+			W waySegment = createSegment();
 			waySegment.setId(segmentId);
 
 			mapSegment(waySegment, rs);
@@ -202,6 +202,10 @@ public class WaySegmentResultSetExtractor<S extends IBaseSegment, W extends IWay
 			segment = (S) new BaseSegment(segmentId, null);
 		}
 		return segment;
+	}
+
+	protected W createSegment() {
+		return (W) new WaySegment();
 	}
 
 	/**
@@ -381,5 +385,10 @@ public class WaySegmentResultSetExtractor<S extends IBaseSegment, W extends IWay
 		if (!found) {
 			rowMappers.add(rowMapper);
 		}
+	}
+
+	@Override
+	public String getGeometryManipulationClause() {
+		return ", st_asewkb(wayseg_geometry) AS wayseg_geometry_ewkb";
 	}
 }

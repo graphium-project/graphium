@@ -18,7 +18,7 @@ package at.srfg.graphium.lanelet2import.reader;
 import java.util.HashSet;
 import java.util.Set;
 
-import at.srfg.graphium.model.IHDWaySegment;
+import at.srfg.graphium.model.hd.IHDWaySegment;
 import gnu.trove.map.TLongObjectMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
 

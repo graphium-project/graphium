@@ -36,8 +36,8 @@ import at.srfg.graphium.lanelet2import.helper.LaneletHelper;
 import at.srfg.graphium.model.Access;
 import at.srfg.graphium.model.FormOfWay;
 import at.srfg.graphium.model.FuncRoadClass;
-import at.srfg.graphium.model.IHDWaySegment;
-import at.srfg.graphium.model.impl.HDWaySegment;
+import at.srfg.graphium.model.hd.IHDWaySegment;
+import at.srfg.graphium.model.hd.impl.HDWaySegment;
 import gnu.trove.map.hash.TLongObjectHashMap;
 
 /**

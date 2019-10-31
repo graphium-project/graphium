@@ -21,7 +21,8 @@ import java.sql.SQLException;
 import com.vividsolutions.jts.geom.LineString;
 
 import at.srfg.graphium.model.IBaseSegment;
-import at.srfg.graphium.model.IHDWaySegment;
+import at.srfg.graphium.model.hd.IHDWaySegment;
+import at.srfg.graphium.model.hd.impl.HDWaySegment;
 import at.srfg.graphium.postgis.persistence.rowmapper.ColumnFinder;
 
 /**
@@ -49,7 +50,7 @@ public class HDWaySegmentResultSetExtractor<S extends IBaseSegment, W extends IH
 		
 		ColumnFinder colFinder = new ColumnFinder(rs);
 		
-		waySegment.setLeftBoarderGeometry((LineString) bp.parse(rs.getBytes(QUERY_PREFIX + "_left_boarder_geometry")));
+		waySegment.setLeftBoarderGeometry((LineString) bp.parse(rs.getBytes(QUERY_PREFIX + "_left_boarder_geometry_ewkb")));
 		if (colFinder.getColumnIndex(QUERY_PREFIX + "_left_boarder_startnode_id") > -1) {
 			waySegment.setLeftBoarderStartNodeId(rs.getLong(QUERY_PREFIX + "_left_boarder_startnode_id"));
 		}
@@ -57,7 +58,7 @@ public class HDWaySegmentResultSetExtractor<S extends IBaseSegment, W extends IH
 			waySegment.setLeftBoarderEndNodeId(rs.getLong(QUERY_PREFIX + "_left_boarder_endnode_id"));
 		}
 		
-		waySegment.setRightBoarderGeometry((LineString) bp.parse(rs.getBytes(QUERY_PREFIX + "_right_boarder_geometry")));
+		waySegment.setRightBoarderGeometry((LineString) bp.parse(rs.getBytes(QUERY_PREFIX + "_right_boarder_geometry_ewkb")));
 		if (colFinder.getColumnIndex(QUERY_PREFIX + "_right_boarder_startnode_id") > -1) {
 			waySegment.setRightBoarderStartNodeId(rs.getLong(QUERY_PREFIX + "_right_boarder_startnode_id"));
 		}
@@ -66,4 +67,14 @@ public class HDWaySegmentResultSetExtractor<S extends IBaseSegment, W extends IH
 		}
 	}
 
+	protected W createSegment() {
+		return (W) new HDWaySegment();
+	}
+
+	@Override
+	public String getGeometryManipulationClause() {
+		return ", st_asewkb(wayseg_geometry) AS wayseg_geometry_ewkb, " +
+				 "st_asewkb(wayseg_left_boarder_geometry) AS wayseg_left_boarder_geometry_ewkb, " +
+				 "st_asewkb(wayseg_right_boarder_geometry) AS wayseg_right_boarder_geometry_ewkb";
+	}
 }

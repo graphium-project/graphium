@@ -15,23 +15,17 @@
         http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
 
     <!-- service -->    
-    <bean id="defaultQueuingGraphVersionImportService" class="at.srfg.graphium.core.service.impl.QueuingGraphVersionImportServiceImpl">
+    <bean id="postgisHDQueuingGraphVersionImportService" class="at.srfg.graphium.core.service.impl.QueuingGraphVersionImportServiceImpl">
     	<property name="metadataDao" ref="wayGraphVersionMetadataDao"/>
     	<property name="inputFormat" ref="jacksonQueuingGraphInputFormat"/>
     	<property name="segmentAdpaterRegistry" ref="autodetectingSegmentAdapterRegistry"/>
     	<property name="queueSize" value="${graphium.import.queueSize}"/>
     	<property name="batchSize" value="${graphium.import.batchSize}"/>
     	<property name="sourceDao" ref="wayGraphSourceDao"/>
-    	<property name="writeDao" ref="wayGraphWriteDao"/>
+    	<property name="writeDao" ref="postgisHDWayGraphWriteDao"/>
     	<property name="serverStatus" ref="serverStatus"/>
-    	<property name="viewDao" ref="wayGraphViewDao"/>
+    	<property name="viewDao" ref="postgisHDWayGraphViewDao"/>
     	<property name="validityPeriodValidator" ref="graphVersionValidityPeriodValidator"/>
     </bean>
- 
-    <bean id="postgisQueuingGraphVersionImportService" parent="defaultQueuingGraphVersionImportService"
-     	class="at.srfg.graphium.postgis.service.impl.PostgisQueuingGraphVersionImportServiceImpl" >
-     	<property name="importDao" ref="wayGraphImportDao"/>
-    </bean>
-    
  
 </beans>

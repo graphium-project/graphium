@@ -13,14 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.srfg.graphium.model.impl;
+package at.srfg.graphium.model.hd.impl;
 
 import java.util.Map;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-import at.srfg.graphium.model.HDRegulatoryElementType;
-import at.srfg.graphium.model.IHDRegulatoryElement;
+import at.srfg.graphium.model.hd.HDRegulatoryElementType;
+import at.srfg.graphium.model.hd.IHDRegulatoryElement;
+import at.srfg.graphium.model.impl.AbstractSegmentXInfo;
 
 public class HDRegulatoryElement extends AbstractSegmentXInfo implements IHDRegulatoryElement {
 
