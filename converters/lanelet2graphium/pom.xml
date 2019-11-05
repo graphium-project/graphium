@@ -23,7 +23,7 @@
 				<executions>
 					<execution>
 						<configuration>
-							<mainClass>at.srfg.graphium.osmimport.application.Lanelet2JSONConverter</mainClass>
+							<mainClass>at.srfg.graphium.lanelet2import.application.Lanelet2JSONConverter</mainClass>
 						</configuration>
 						<goals>
 							<goal>one-jar</goal>
@@ -46,6 +46,12 @@
 			<groupId>at.srfg.graphium</groupId>
 			<artifactId>graphium-hd</artifactId>
 			<version>${graphium.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>*</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>at.srfg.graphium</groupId>
