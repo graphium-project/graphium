@@ -249,7 +249,11 @@ public class LaneletHelper {
 		Coordinate[] coordsLeft = segment.getLeftBoarderGeometry().getCoordinates();
 		Coordinate[] coordsRight = segment.getRightBoarderGeometry().getCoordinates();
 		
-		if (GeometryUtils.distanceAndoyer(coordsLeft[0], coordsRight[0]) < GeometryUtils.distanceAndoyer(coordsLeft[0], coordsRight[coordsRight.length - 1])) {
+		Coordinate[] coords1 = new Coordinate[] {coordsLeft[0], coordsRight[0]};
+		Coordinate[] coords2 = new Coordinate[] {coordsLeft[coordsLeft.length-1], coordsRight[coordsRight.length-1]};
+		LineString line1 = GeometryUtils.createLineString(coords1, 4236);
+		LineString line2 = GeometryUtils.createLineString(coords2, 4236);
+		if (!line1.intersects(line2)) {
 			if (calculateOffset(segment.getLeftBoarderGeometry(), segment.getRightBoarderGeometry().getStartPoint()) > 0) {
 				return new boolean[] { true, true };
 			} else {
