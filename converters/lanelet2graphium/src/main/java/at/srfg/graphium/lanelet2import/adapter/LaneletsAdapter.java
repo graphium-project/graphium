@@ -140,7 +140,7 @@ public class LaneletsAdapter {
 		// see https://github.com/fzi-forschungszentrum-informatik/Lanelet2/blob/master/lanelet2_core/src/Attribute.cpp
 		String roadType = tags.get("subtype");
 		if (roadType == null) {
-			roadType = "lane"; // default
+			roadType = "road"; // default
 		}
 		String location = tags.get("location");
 		if (location == null) {

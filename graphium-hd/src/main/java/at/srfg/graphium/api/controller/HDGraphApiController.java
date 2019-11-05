@@ -17,7 +17,7 @@ package at.srfg.graphium.api.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import at.srfg.graphium.model.IWaySegment;
+import at.srfg.graphium.model.hd.IHDWaySegment;
 
 /**
  * @author mwimmer
@@ -25,6 +25,6 @@ import at.srfg.graphium.model.IWaySegment;
  */
 //@Controller
 @RequestMapping(value = "/hdwaysegments")
-public class HDGraphApiController extends AbstractGraphApiController<IWaySegment> { 
+public class HDGraphApiController extends AbstractGraphApiController<IHDWaySegment> { 
 
 }

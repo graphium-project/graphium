@@ -154,7 +154,6 @@ public class LaneletImporterService {
 	}
         
 	private void createConnections(List<IHDWaySegment> lanelets, LaneletContainer laneletContainer) {
-		// TODO
 		for (IHDWaySegment lanelet : lanelets) {
 			connectionsBuilder.build(lanelet, laneletContainer);
 		}
