@@ -115,9 +115,21 @@ public class LaneletsAdapter {
 //		setAccess(segment, tags);
 		setOptionalTags(segment, tags);
 		
+		validateTags(segment);
+		
 		calculateCenterLine(segment, boarderDirections);
 
 		return segment;
+	}
+
+	private void validateTags(IHDWaySegment segment) {
+		// null values are forbidden
+		for (String key : segment.getTags().keySet()) {
+			String value = segment.getTags().get(key);
+			if (value == null) {
+				segment.getTags().put(key, "");
+			}
+		}
 	}
 
 	private void calculateCenterLine(IHDWaySegment segment, boolean[] boarderDirections) {
