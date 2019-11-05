@@ -70,6 +70,7 @@ public class Constants {
 	public final static String CONNECTION_PARALLEL = "parallel";
 	public final static String CONNECTION_DIRECTION = "direction";
 	public final static String CONNECTION_REVERSE = "reverse";
+	public final static String CONNECTION_DIVERGING = "diverging";
 	
 	public final static String LEFT = "left";
 	public final static String RIGHT = "right";

@@ -84,6 +84,11 @@ public class ConnectionsBuilder {
 							connection.addTag(Constants.CONNECTION_DIRECTION, Constants.CONNECTION_REVERSE);
 						}
 						
+						if (lanelet.getRightBoarderStartNodeId() == neighbour.getLeftBoarderStartNodeId() &&
+							neighbour.getLeftBoarderStartNodeId() == neighbour.getRightBoarderStartNodeId()) {
+							connection.addTag(Constants.CONNECTION_DIVERGING, Boolean.TRUE.toString());
+						}
+						
 						ConnectionsHelper.addConnectionToSegment(lanelet, connection, -1L);
 	
 					} else
