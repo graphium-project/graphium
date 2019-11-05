@@ -19,7 +19,7 @@
 		<property name="graphReadService" ref="hdGraphReadService"/>
 		<property name="metadataService" ref="graphVersionMetadataService"/>
 		<property name="graphWriteService" ref="hdGraphWriteService"/>
-		<property name="importService" ref="postgisHDQueuingGraphVersionImportService"/>
+		<property name="importService" ref="queuingHDGraphVersionImportService"/>
 		<property name="graphOutputFormatFactory" ref="jacksonWayGraphOutputFormatFactory"/>
 		<property name="graphFileUploadDirectory" value="${graphium.import.uploadDir}"/>
 		<property name="xInfoDaoRegistry" ref="xInfoDaoRegistry"/>

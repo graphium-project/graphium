@@ -32,4 +32,8 @@
     	<property name="waySegmentRowMapper" ref="waySegmentResultSetExtractor"/>
     </bean>
     
+    <alias name="postgisWayGraphReadDao" alias="hdWayGraphReadDao"/>
+    <alias name="postgisWayGraphWriteDao" alias="hdWayGraphWriteDao"/>
+ 	<alias name="postgisQueuingHDGraphVersionImportService" alias="queuingHDGraphVersionImportService"/>
+
 </beans>

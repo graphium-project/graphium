@@ -14,16 +14,18 @@
         http://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
     	
+    <bean id="hdWayGraphModelFactory" class="at.srfg.graphium.model.hd.impl.HDWayGraphModelFactory" />
+    
 	<!-- services -->
 	<bean id="hdGraphReadService" 
 		class="at.srfg.graphium.core.service.impl.GraphReadServiceImpl">
-		<property name="readDao" ref="postgisHDWayGraphReadDao"/>
+		<property name="readDao" ref="hdWayGraphReadDao"/>
 	</bean>
 	
 	<bean id="hdGraphWriteService" 
 		class="at.srfg.graphium.core.service.impl.GraphWriteServiceImpl">
-		<property name="graphWriteDao" ref="postgisHDWayGraphWriteDao"/>
+		<property name="graphWriteDao" ref="hdWayGraphWriteDao"/>
 		<property name="metadataDao" ref="wayGraphVersionMetadataDao"/>
 	</bean>
-	
+
 </beans>
