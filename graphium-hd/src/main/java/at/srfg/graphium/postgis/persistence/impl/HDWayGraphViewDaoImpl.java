@@ -51,12 +51,12 @@ public class HDWayGraphViewDaoImpl<W extends IHDWaySegment, X extends ISegmentXI
 			"urban AS " + QUERY_PREFIX + "_urban", 
 			"timestamp AS " + QUERY_PREFIX + "_timestamp",
 			"tags AS " + QUERY_PREFIX + "_tags",
-			"left_boarder_geometry AS " + QUERY_PREFIX + "_left_boarder_geometry",
-			"left_boarder_startnode_id AS " + QUERY_PREFIX + "_left_boarder_startnode_id",
-			"left_boarder_endnode_id AS " + QUERY_PREFIX + "_left_boarder_endnode_id",
-			"right_boarder_geometry AS " + QUERY_PREFIX + "_right_boarder_geometry",
-			"right_boarder_startnode_id AS " + QUERY_PREFIX + "_right_boarder_startnode_id",
-			"right_boarder_endnode_id AS " + QUERY_PREFIX + "_right_boarder_endnode_id"
+			"left_border_geometry AS " + QUERY_PREFIX + "_left_border_geometry",
+			"left_border_startnode_id AS " + QUERY_PREFIX + "_left_border_startnode_id",
+			"left_border_endnode_id AS " + QUERY_PREFIX + "_left_border_endnode_id",
+			"right_border_geometry AS " + QUERY_PREFIX + "_right_border_geometry",
+			"right_border_startnode_id AS " + QUERY_PREFIX + "_right_border_startnode_id",
+			"right_border_endnode_id AS " + QUERY_PREFIX + "_right_border_endnode_id"
 		};
 
 	protected String[] getSegmentsAttributes() {

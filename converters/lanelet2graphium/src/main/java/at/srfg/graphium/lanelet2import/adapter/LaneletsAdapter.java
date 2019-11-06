@@ -47,7 +47,7 @@ import gnu.trove.map.hash.TLongObjectHashMap;
 public class LaneletsAdapter {
 	
 	
-	// TODO: Sollen wir die Boarder-Linestrings umdrehen, falls die Digitalisierungsrichtung nicht mit der Fahrtrichtung zusammenpasst?
+	// TODO: Sollen wir die Border-Linestrings umdrehen, falls die Digitalisierungsrichtung nicht mit der Fahrtrichtung zusammenpasst?
 	
 
 	private static Logger log = LoggerFactory.getLogger(LaneletsAdapter.class);
@@ -71,21 +71,21 @@ public class LaneletsAdapter {
 		IHDWaySegment segment = new HDWaySegment();
 		segment.setId(relation.getId());
 		
-		Way leftBoarder = null;
-		Way rightBoarder = null;
+		Way leftBorder = null;
+		Way rightBorder = null;
 		
 		for (RelationMember member : relation.getMembers()) {
 			if (member.getMemberType().equals(EntityType.Way)) {
 				String role = member.getMemberRole();
 				if (role.equals("left")) {
-					leftBoarder = ways.get(member.getMemberId());
-					if (leftBoarder == null) {
+					leftBorder = ways.get(member.getMemberId());
+					if (leftBorder == null) {
 						log.error("Way " + member.getMemberId() + " is null");
 						return null;
 					}
 				} else if (role.equals("right")) {
-					rightBoarder = ways.get(member.getMemberId());
-					if (rightBoarder == null) {
+					rightBorder = ways.get(member.getMemberId());
+					if (rightBorder == null) {
 						log.error("Way " + member.getMemberId() + " is null");
 						return null;
 					}
@@ -93,16 +93,16 @@ public class LaneletsAdapter {
 			}
 		}
 		
-		segment.setLeftBoarderGeometry(LaneletHelper.createLinestring(leftBoarder, nodes, Constants.SRID));
-		segment.setLeftBoarderStartNodeId(leftBoarder.getWayNodes().get(0).getNodeId());
-		segment.setLeftBoarderEndNodeId(leftBoarder.getWayNodes().get(leftBoarder.getWayNodes().size()-1).getNodeId());
-		segment.setRightBoarderGeometry(LaneletHelper.createLinestring(rightBoarder, nodes, Constants.SRID));
-		segment.setRightBoarderStartNodeId(rightBoarder.getWayNodes().get(0).getNodeId());
-		segment.setRightBoarderEndNodeId(rightBoarder.getWayNodes().get(rightBoarder.getWayNodes().size()-1).getNodeId());
+		segment.setLeftBorderGeometry(LaneletHelper.createLinestring(leftBorder, nodes, Constants.SRID));
+		segment.setLeftBorderStartNodeId(leftBorder.getWayNodes().get(0).getNodeId());
+		segment.setLeftBorderEndNodeId(leftBorder.getWayNodes().get(leftBorder.getWayNodes().size()-1).getNodeId());
+		segment.setRightBorderGeometry(LaneletHelper.createLinestring(rightBorder, nodes, Constants.SRID));
+		segment.setRightBorderStartNodeId(rightBorder.getWayNodes().get(0).getNodeId());
+		segment.setRightBorderEndNodeId(rightBorder.getWayNodes().get(rightBorder.getWayNodes().size()-1).getNodeId());
 
-		boolean[] boarderDirections = checkBoarderInversion(segment);
+		boolean[] borderDirections = checkBorderInversion(segment);
 		
-		determineLaneChanges(segment, boarderDirections, leftBoarder, rightBoarder);
+		determineLaneChanges(segment, borderDirections, leftBorder, rightBorder);
 		
 		// build tag map
 		Map<String, String> tags = new HashMap<>();
@@ -117,7 +117,7 @@ public class LaneletsAdapter {
 		
 		validateTags(segment);
 		
-		calculateCenterLine(segment, boarderDirections);
+		calculateCenterLine(segment, borderDirections);
 
 		return segment;
 	}
@@ -132,8 +132,8 @@ public class LaneletsAdapter {
 		}
 	}
 
-	private void calculateCenterLine(IHDWaySegment segment, boolean[] boarderDirections) {
-		segment.setGeometry(LaneletHelper.calculateCenterline(segment, boarderDirections));
+	private void calculateCenterLine(IHDWaySegment segment, boolean[] borderDirections) {
+		segment.setGeometry(LaneletHelper.calculateCenterline(segment, borderDirections));
 	}
 
 	private void setRoadCharacteristics(IHDWaySegment segment, Map<String, String> tags) {
@@ -323,61 +323,61 @@ public class LaneletsAdapter {
 		
 	}
 
-	private void determineLaneChanges(IHDWaySegment segment, boolean[] boarderDirections, Way leftBoarder, Way rightBoarder) {
-		// left boarder
-		SimpleEntry<String, String> typeEntry = LaneletHelper.parseLaneletBoarderType(leftBoarder);
+	private void determineLaneChanges(IHDWaySegment segment, boolean[] borderDirections, Way leftBorder, Way rightBorder) {
+		// left border
+		SimpleEntry<String, String> typeEntry = LaneletHelper.parseLaneletBorderType(leftBorder);
 		String laneChangePossible = "false";
 		if (typeEntry != null) {
 			segment.getTags().put("left:" + typeEntry.getKey(), typeEntry.getValue());
-			laneChangePossible = determineLaneChange(true, !boarderDirections[0], typeEntry.getKey(), typeEntry.getValue());
+			laneChangePossible = determineLaneChange(true, !borderDirections[0], typeEntry.getKey(), typeEntry.getValue());
 		}
 		segment.getTags().put(Constants.TAG_LANE_CHANGE + ":left", laneChangePossible);
 		
-		// right boarder
-		typeEntry = LaneletHelper.parseLaneletBoarderType(rightBoarder);
+		// right border
+		typeEntry = LaneletHelper.parseLaneletBorderType(rightBorder);
 		laneChangePossible = "false";
 		if (typeEntry != null) {
 			segment.getTags().put("right:" + typeEntry.getKey(), typeEntry.getValue());
-			laneChangePossible = determineLaneChange(true, !boarderDirections[0], typeEntry.getKey(), typeEntry.getValue());
+			laneChangePossible = determineLaneChange(true, !borderDirections[0], typeEntry.getKey(), typeEntry.getValue());
 		}
 		segment.getTags().put(Constants.TAG_LANE_CHANGE + ":right", laneChangePossible);
 	}
 	
-	private boolean[] checkBoarderInversion(IHDWaySegment segment) {
-		// Check if left and / or right boarder have to be inverted (linestring and nodeIds)
-		boolean[] boarderDirections = LaneletHelper.checkLineDirections(segment);
-		// if so put a flag into tags: "invertedBoarder=left/right/both")
-		if (!boarderDirections[0] && boarderDirections[1]) {
-			segment.getTags().put(Constants.BOARDER_INVERTED, "left");
-			invertLeftBoarderNodeIds(segment);
-		} else if (boarderDirections[0] && !boarderDirections[1]) {
-			segment.getTags().put(Constants.BOARDER_INVERTED, "right");
-			invertRightBoarderNodeIds(segment);
-		} else if (!boarderDirections[0] && !boarderDirections[1]) {
-			segment.getTags().put(Constants.BOARDER_INVERTED, "both");
-			invertLeftBoarderNodeIds(segment);
-			invertRightBoarderNodeIds(segment);
+	private boolean[] checkBorderInversion(IHDWaySegment segment) {
+		// Check if left and / or right border have to be inverted (linestring and nodeIds)
+		boolean[] borderDirections = LaneletHelper.checkLineDirections(segment);
+		// if so put a flag into tags: "invertedBorder=left/right/both")
+		if (!borderDirections[0] && borderDirections[1]) {
+			segment.getTags().put(Constants.BORDER_INVERTED, "left");
+			invertLeftBorderNodeIds(segment);
+		} else if (borderDirections[0] && !borderDirections[1]) {
+			segment.getTags().put(Constants.BORDER_INVERTED, "right");
+			invertRightBorderNodeIds(segment);
+		} else if (!borderDirections[0] && !borderDirections[1]) {
+			segment.getTags().put(Constants.BORDER_INVERTED, "both");
+			invertLeftBorderNodeIds(segment);
+			invertRightBorderNodeIds(segment);
 		}
 
-		// TODO: Sollen wir die Boarder-Linestrings umdrehen, falls die Digitalisierungsrichtung nicht mit der Fahrtrichtung zusammenpasst?
+		// TODO: Sollen wir die Border-Linestrings umdrehen, falls die Digitalisierungsrichtung nicht mit der Fahrtrichtung zusammenpasst?
 		// Zur Zeit wird der Linestring so belassen wie er im Original ist.
 		
-		return boarderDirections;
+		return borderDirections;
 	}
 	
-	private void invertLeftBoarderNodeIds(IHDWaySegment segment) {
-		long startNodeId = segment.getLeftBoarderStartNodeId();
-		segment.setLeftBoarderStartNodeId(segment.getLeftBoarderEndNodeId());
-		segment.setLeftBoarderEndNodeId(startNodeId);
+	private void invertLeftBorderNodeIds(IHDWaySegment segment) {
+		long startNodeId = segment.getLeftBorderStartNodeId();
+		segment.setLeftBorderStartNodeId(segment.getLeftBorderEndNodeId());
+		segment.setLeftBorderEndNodeId(startNodeId);
 	}
 
-	private void invertRightBoarderNodeIds(IHDWaySegment segment) {
-		long startNodeId = segment.getRightBoarderStartNodeId();
-		segment.setRightBoarderStartNodeId(segment.getRightBoarderEndNodeId());
-		segment.setRightBoarderEndNodeId(startNodeId);
+	private void invertRightBorderNodeIds(IHDWaySegment segment) {
+		long startNodeId = segment.getRightBorderStartNodeId();
+		segment.setRightBorderStartNodeId(segment.getRightBorderEndNodeId());
+		segment.setRightBorderEndNodeId(startNodeId);
 	}
 
-	private String determineLaneChange(boolean leftBoarder, boolean inverted, String type, String subType) {
+	private String determineLaneChange(boolean leftBorder, boolean inverted, String type, String subType) {
 		boolean laneChange = false; // default false
 		if (type.equals(Constants.LANELET_TYPE_LINE_THIN) || type.equals(Constants.LANELET_TYPE_LINE_THICK)) {
 			if (subType != null) {
@@ -394,7 +394,7 @@ public class LaneletsAdapter {
 	
 				case Constants.LANELET_SUBTYPE_DASHED_SOLID:
 					// lane change from left to right allowed
-					if (leftBoarder) {
+					if (leftBorder) {
 						if (inverted) {
 							laneChange = false;
 						} else {
@@ -412,7 +412,7 @@ public class LaneletsAdapter {
 	
 				case Constants.LANELET_SUBTYPE_SOLID_DASHED:
 					// lane change from right to left allowed
-					if (leftBoarder) {
+					if (leftBorder) {
 						if (inverted) {
 							laneChange = true;
 						} else {

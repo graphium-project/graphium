@@ -21,29 +21,29 @@ import at.srfg.graphium.model.IWaySegment;
 
 public interface IHDWaySegment extends IWaySegment {
 
-	LineString getLeftBoarderGeometry();
+	LineString getLeftBorderGeometry();
 	
-	void setLeftBoarderGeometry(LineString geometry);
+	void setLeftBorderGeometry(LineString geometry);
 
-	long getLeftBoarderStartNodeId();
+	long getLeftBorderStartNodeId();
 	
-	void setLeftBoarderStartNodeId(long startNodeId);
+	void setLeftBorderStartNodeId(long startNodeId);
 	
-	long getLeftBoarderEndNodeId();
+	long getLeftBorderEndNodeId();
 	
-	void setLeftBoarderEndNodeId(long endNodeId);
+	void setLeftBorderEndNodeId(long endNodeId);
 	
-	LineString getRightBoarderGeometry();
+	LineString getRightBorderGeometry();
 	
-	void setRightBoarderGeometry(LineString geometry);
+	void setRightBorderGeometry(LineString geometry);
 
-	long getRightBoarderStartNodeId();
+	long getRightBorderStartNodeId();
 	
-	void setRightBoarderStartNodeId(long startNodeId);
+	void setRightBorderStartNodeId(long startNodeId);
 	
-	long getRightBoarderEndNodeId();
+	long getRightBorderEndNodeId();
 	
-	void setRightBoarderEndNodeId(long endNodeId);
+	void setRightBorderEndNodeId(long endNodeId);
 
 //	vorerst nicht benötigt
 //	LaneletType getType();

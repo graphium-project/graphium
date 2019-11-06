@@ -29,88 +29,88 @@ import at.srfg.graphium.io.outputformat.impl.jackson.JacksonGeometrySerializer;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class HDWaySegmentDTO extends WaySegmentDTOImpl implements IHDWaySegmentDTO {
 	
-	private LineString leftBoarderGeometry;
-	private long leftBoarderStartNodeId;
-	private long leftBoarderEndNodeId;
-	private LineString rightBoarderGeometry;
-	private long rightBoarderStartNodeId;
-	private long rightBoarderEndNodeId;
+	private LineString leftBorderGeometry;
+	private long leftBorderStartNodeId;
+	private long leftBorderEndNodeId;
+	private LineString rightBorderGeometry;
+	private long rightBorderStartNodeId;
+	private long rightBorderEndNodeId;
 	
 	public HDWaySegmentDTO() {}
 	
-	public HDWaySegmentDTO(LineString leftBoarderGeometry, long leftBoarderStartNodeId, long leftBoarderEndNodeId,
-			LineString rightBoarderGeometry, long rightBoarderStartNodeId, long rightBoarderEndNodeId) {
+	public HDWaySegmentDTO(LineString leftBorderGeometry, long leftBorderStartNodeId, long leftBorderEndNodeId,
+			LineString rightBorderGeometry, long rightBorderStartNodeId, long rightBorderEndNodeId) {
 		super();
-		this.leftBoarderGeometry = leftBoarderGeometry;
-		this.leftBoarderStartNodeId = leftBoarderStartNodeId;
-		this.leftBoarderEndNodeId = leftBoarderEndNodeId;
-		this.rightBoarderGeometry = rightBoarderGeometry;
-		this.rightBoarderStartNodeId = rightBoarderStartNodeId;
-		this.rightBoarderEndNodeId = rightBoarderEndNodeId;
+		this.leftBorderGeometry = leftBorderGeometry;
+		this.leftBorderStartNodeId = leftBorderStartNodeId;
+		this.leftBorderEndNodeId = leftBorderEndNodeId;
+		this.rightBorderGeometry = rightBorderGeometry;
+		this.rightBorderStartNodeId = rightBorderStartNodeId;
+		this.rightBorderEndNodeId = rightBorderEndNodeId;
 	}
 
 	@Override
 	@JsonSerialize(using = JacksonGeometrySerializer.class)
 	@JsonDeserialize(using = JacksonLineStringDeserializer.class)
-	public LineString getLeftBoarderGeometry() {
-		return leftBoarderGeometry;
+	public LineString getLeftBorderGeometry() {
+		return leftBorderGeometry;
 	}
 	
 	@Override
-	public void setLeftBoarderGeometry(LineString geometry) {
-		leftBoarderGeometry = geometry;
+	public void setLeftBorderGeometry(LineString geometry) {
+		leftBorderGeometry = geometry;
 	}
 	
 	@Override
-	public long getLeftBoarderStartNodeId() {
-		return leftBoarderStartNodeId;
+	public long getLeftBorderStartNodeId() {
+		return leftBorderStartNodeId;
 	}
 	
 	@Override
-	public void setLeftBoarderStartNodeId(long startNodeId) {
-		leftBoarderStartNodeId = startNodeId;
+	public void setLeftBorderStartNodeId(long startNodeId) {
+		leftBorderStartNodeId = startNodeId;
 	}
 	
 	@Override
-	public long getLeftBoarderEndNodeId() {
-		return leftBoarderEndNodeId;
+	public long getLeftBorderEndNodeId() {
+		return leftBorderEndNodeId;
 	}
 	
 	@Override
-	public void setLeftBoarderEndNodeId(long endNodeId) {
-		leftBoarderEndNodeId = endNodeId;
+	public void setLeftBorderEndNodeId(long endNodeId) {
+		leftBorderEndNodeId = endNodeId;
 	}
 	
 	@Override
 	@JsonSerialize(using = JacksonGeometrySerializer.class)
 	@JsonDeserialize(using = JacksonLineStringDeserializer.class)
-	public LineString getRightBoarderGeometry() {
-		return rightBoarderGeometry;
+	public LineString getRightBorderGeometry() {
+		return rightBorderGeometry;
 	}
 	
 	@Override
-	public void setRightBoarderGeometry(LineString geometry) {
-		rightBoarderGeometry = geometry;
+	public void setRightBorderGeometry(LineString geometry) {
+		rightBorderGeometry = geometry;
 	}
 	
 	@Override
-	public long getRightBoarderStartNodeId() {
-		return rightBoarderStartNodeId;
+	public long getRightBorderStartNodeId() {
+		return rightBorderStartNodeId;
 	}
 	
 	@Override
-	public void setRightBoarderStartNodeId(long startNodeId) {
-		rightBoarderStartNodeId = startNodeId;
+	public void setRightBorderStartNodeId(long startNodeId) {
+		rightBorderStartNodeId = startNodeId;
 	}
 	
 	@Override
-	public long getRightBoarderEndNodeId() {
-		return rightBoarderEndNodeId;
+	public long getRightBorderEndNodeId() {
+		return rightBorderEndNodeId;
 	}
 	
 	@Override
-	public void setRightBoarderEndNodeId(long endNodeId) {
-		rightBoarderEndNodeId = endNodeId;
+	public void setRightBorderEndNodeId(long endNodeId) {
+		rightBorderEndNodeId = endNodeId;
 	}
 	
 }

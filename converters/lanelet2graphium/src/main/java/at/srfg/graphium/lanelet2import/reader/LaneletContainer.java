@@ -31,10 +31,10 @@ public class LaneletContainer {
 	private TLongObjectMap<Set<IHDWaySegment>> laneletNodeIds = new TLongObjectHashMap<>();
 	
 	public void addLanelet(IHDWaySegment lanelet) {
-		putLanelet(lanelet.getLeftBoarderStartNodeId(), lanelet);
-		putLanelet(lanelet.getLeftBoarderEndNodeId(), lanelet);
-		putLanelet(lanelet.getRightBoarderStartNodeId(), lanelet);
-		putLanelet(lanelet.getRightBoarderEndNodeId(), lanelet);
+		putLanelet(lanelet.getLeftBorderStartNodeId(), lanelet);
+		putLanelet(lanelet.getLeftBorderEndNodeId(), lanelet);
+		putLanelet(lanelet.getRightBorderStartNodeId(), lanelet);
+		putLanelet(lanelet.getRightBorderEndNodeId(), lanelet);
 	}
 	
 	private void putLanelet(Long nodeId, IHDWaySegment lanelet) {
@@ -46,17 +46,17 @@ public class LaneletContainer {
 
 	public Set<IHDWaySegment> getNeighbours(IHDWaySegment lanelet) {
 		Set<IHDWaySegment> neighbours = new HashSet<>();
-		if (laneletNodeIds.containsKey(lanelet.getLeftBoarderStartNodeId())) { 
-			neighbours.addAll(laneletNodeIds.get(lanelet.getLeftBoarderStartNodeId()));
+		if (laneletNodeIds.containsKey(lanelet.getLeftBorderStartNodeId())) { 
+			neighbours.addAll(laneletNodeIds.get(lanelet.getLeftBorderStartNodeId()));
 		}
-		if (laneletNodeIds.containsKey(lanelet.getLeftBoarderEndNodeId())) { 
-			neighbours.addAll(laneletNodeIds.get(lanelet.getLeftBoarderEndNodeId()));
+		if (laneletNodeIds.containsKey(lanelet.getLeftBorderEndNodeId())) { 
+			neighbours.addAll(laneletNodeIds.get(lanelet.getLeftBorderEndNodeId()));
 		}
-		if (laneletNodeIds.containsKey(lanelet.getRightBoarderStartNodeId())) { 
-			neighbours.addAll(laneletNodeIds.get(lanelet.getRightBoarderStartNodeId()));
+		if (laneletNodeIds.containsKey(lanelet.getRightBorderStartNodeId())) { 
+			neighbours.addAll(laneletNodeIds.get(lanelet.getRightBorderStartNodeId()));
 		}
-		if (laneletNodeIds.containsKey(lanelet.getRightBoarderEndNodeId())) { 
-			neighbours.addAll(laneletNodeIds.get(lanelet.getRightBoarderEndNodeId()));
+		if (laneletNodeIds.containsKey(lanelet.getRightBorderEndNodeId())) { 
+			neighbours.addAll(laneletNodeIds.get(lanelet.getRightBorderEndNodeId()));
 		}
 		return neighbours;
 	}

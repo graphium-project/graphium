@@ -76,11 +76,11 @@ public class LaneletHelper {
 	}
 	
 	/**
-	 * parses the type and optionally the subtype of a lanelet boarder 
+	 * parses the type and optionally the subtype of a lanelet border 
 	 * @param way
 	 * @return
 	 */
-	public static SimpleEntry<String, String> parseLaneletBoarderType(Way way) {
+	public static SimpleEntry<String, String> parseLaneletBorderType(Way way) {
 		String type = null;
 		String subType = null;
 		SimpleEntry<String, String> pair = null;
@@ -139,8 +139,8 @@ public class LaneletHelper {
 	 * @return
 	 */
 	public static LineString calculateCenterline(IHDWaySegment segment, boolean[] lineDirections) {
-		Coordinate[] coordsLeft = segment.getLeftBoarderGeometry().getCoordinates();
-		Coordinate[] coordsRight = segment.getRightBoarderGeometry().getCoordinates();
+		Coordinate[] coordsLeft = segment.getLeftBorderGeometry().getCoordinates();
+		Coordinate[] coordsRight = segment.getRightBorderGeometry().getCoordinates();
 		
 		if (!lineDirections[0]) {
 			coordsLeft = reverseCoordinates(coordsLeft);
@@ -238,29 +238,29 @@ public class LaneletHelper {
 	}
 
 	/**
-	 * determines the direction of a lanelet's boarders
+	 * determines the direction of a lanelet's borders
 	 * @param segment
-	 * @return boolean[]: 1st entry: true  if left boarders linestring direction is in driving direction
-	 * 								 false if left boarders linestring direction is against driving direction
-	 * 					  2nd entry: true  if right boarders linestring direction is in driving direction
-	 * 								 false if right boarders linestring direction is against driving direction
+	 * @return boolean[]: 1st entry: true  if left borders linestring direction is in driving direction
+	 * 								 false if left borders linestring direction is against driving direction
+	 * 					  2nd entry: true  if right borders linestring direction is in driving direction
+	 * 								 false if right borders linestring direction is against driving direction
 	 */
 	public static boolean[] checkLineDirections(IHDWaySegment segment) {
-		Coordinate[] coordsLeft = segment.getLeftBoarderGeometry().getCoordinates();
-		Coordinate[] coordsRight = segment.getRightBoarderGeometry().getCoordinates();
+		Coordinate[] coordsLeft = segment.getLeftBorderGeometry().getCoordinates();
+		Coordinate[] coordsRight = segment.getRightBorderGeometry().getCoordinates();
 		
 		Coordinate[] coords1 = new Coordinate[] {coordsLeft[0], coordsRight[0]};
 		Coordinate[] coords2 = new Coordinate[] {coordsLeft[coordsLeft.length-1], coordsRight[coordsRight.length-1]};
 		LineString line1 = GeometryUtils.createLineString(coords1, 4236);
 		LineString line2 = GeometryUtils.createLineString(coords2, 4236);
 		if (!line1.intersects(line2)) {
-			if (calculateOffset(segment.getLeftBoarderGeometry(), segment.getRightBoarderGeometry().getStartPoint()) > 0) {
+			if (calculateOffset(segment.getLeftBorderGeometry(), segment.getRightBorderGeometry().getStartPoint()) > 0) {
 				return new boolean[] { true, true };
 			} else {
 				return new boolean[] { false, false };
 			}
 		} else {
-			if (calculateOffset(segment.getLeftBoarderGeometry(), segment.getRightBoarderGeometry().getEndPoint()) > 0) {
+			if (calculateOffset(segment.getLeftBorderGeometry(), segment.getRightBorderGeometry().getEndPoint()) > 0) {
 				return new boolean[] { true, false };
 			} else {
 				return new boolean[] { false, true };

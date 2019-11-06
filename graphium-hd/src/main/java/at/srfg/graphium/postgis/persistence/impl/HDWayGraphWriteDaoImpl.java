@@ -44,12 +44,12 @@ public class HDWayGraphWriteDaoImpl<W extends IHDWaySegment> extends WayGraphWri
 	public MapSqlParameterSource getParamSource(W segment, Timestamp now) throws SQLException {
 				
 		MapSqlParameterSource args = super.getParamSource(segment, now);
-		args.addValue("leftBoarderGeometry","SRID=4326;"+wktWriter.write(segment.getLeftBoarderGeometry()));
-		args.addValue("leftBoarderStartNodeId", segment.getLeftBoarderStartNodeId());
-		args.addValue("leftBoarderEndNodeId", segment.getLeftBoarderEndNodeId());
-		args.addValue("rightBoarderGeometry","SRID=4326;"+wktWriter.write(segment.getRightBoarderGeometry()));
-		args.addValue("rightBoarderStartNodeId", segment.getRightBoarderStartNodeId());
-		args.addValue("rightBoarderEndNodeId", segment.getRightBoarderEndNodeId());
+		args.addValue("leftBorderGeometry","SRID=4326;"+wktWriter.write(segment.getLeftBorderGeometry()));
+		args.addValue("leftBorderStartNodeId", segment.getLeftBorderStartNodeId());
+		args.addValue("leftBorderEndNodeId", segment.getLeftBorderEndNodeId());
+		args.addValue("rightBorderGeometry","SRID=4326;"+wktWriter.write(segment.getRightBorderGeometry()));
+		args.addValue("rightBorderStartNodeId", segment.getRightBorderStartNodeId());
+		args.addValue("rightBorderEndNodeId", segment.getRightBorderEndNodeId());
 		
 		return args;
 	}
@@ -57,13 +57,13 @@ public class HDWayGraphWriteDaoImpl<W extends IHDWaySegment> extends WayGraphWri
 	protected String getInsertStatement(String graphVersionName) {
 		 return "INSERT INTO "+ schema + HDSEGMENT_TABLE_PREFIX + graphVersionName + " (id, graphversion_id, geometry, length, name, maxspeed_tow, maxspeed_bkw," +
 	 		" speed_calc_tow, speed_calc_bkw, lanes_tow, lanes_bkw, frc, formofway, streettype, way_id, startnode_id, startnode_index," +
-	 		" endnode_id, endnode_index, access_tow, access_bkw, tunnel, bridge, urban, timestamp, tags, left_boarder_geometry, left_boarder_startnode_id," +
-	 		" left_boarder_endnode_id, right_boarder_geometry, right_boarder_startnode_id, right_boarder_endnode_id)" +
+	 		" endnode_id, endnode_index, access_tow, access_bkw, tunnel, bridge, urban, timestamp, tags, left_border_geometry, left_border_startnode_id," +
+	 		" left_border_endnode_id, right_border_geometry, right_border_startnode_id, right_border_endnode_id)" +
 	 		" VALUES (:id, :graphVersionId, ST_GeomFromEWKT(:geometry), :length, " +
 	 		" :name, :maxSpeedTow, :maxSpeedBkw, :speedCalcTow, :speedCalcBkw, :lanesTow, :lanesBkw, :frc, :formOfWay, " +
 	 		" :streetType, :wayId, :startNodeId, :startNodeIndex, :endNodeId, :endNodeIndex, :accessTow, :accessBkw, :tunnel," +
-	 		" :bridge, :urban, :timestamp, :tags, ST_GeomFromEWKT(:leftBoarderGeometry), :leftBoarderStartNodeId, :leftBoarderEndNodeId," +
-	 		" ST_GeomFromEWKT(:rightBoarderGeometry), :rightBoarderStartNodeId, :rightBoarderEndNodeId)";
+	 		" :bridge, :urban, :timestamp, :tags, ST_GeomFromEWKT(:leftBorderGeometry), :leftBorderStartNodeId, :leftBorderEndNodeId," +
+	 		" ST_GeomFromEWKT(:rightBorderGeometry), :rightBorderStartNodeId, :rightBorderEndNodeId)";
 	}
 	
 	protected String getUpdateStatement(String graphVersionName) {
@@ -71,9 +71,9 @@ public class HDWayGraphWriteDaoImpl<W extends IHDWaySegment> extends WayGraphWri
 	 		" name=:name, maxspeed_tow=:maxSpeedTow, maxspeed_bkw=:maxSpeedBkw, speed_calc_tow=:speedCalcTow, speed_calc_bkw=:speedCalcBkw, lanesTow=:lanesTow," +
 	 		" lanesBkw=:lanesBkw, frc=:frc, formofway=:formOfWay, streettype=:streetType, way_id=:wayId, startnode_id=:startNodeId, startnode_index=:startNodeIndex, " + 
 	 		" endnode_id=endNodeId, endnode_index=endNodeIndex, access_tow=accessTow, access_bkw=accessBkw, tunnel=tunnel, bridge=bridge, urban=:urban," +
-	 		" timestamp=:timestamp, tags=:tags, left_boarder_geometry=ST_GeomFromEWKT(:leftBoarderGeometry), left_boarder_startnode_id=:leftBoarderStartNodeId," +
-	 		" left_boarder_endnode_id=:leftBoarderEndNodeId, right_boarder_geometry=ST_GeomFromEWKT(:rightBoarderGeometry), right_boarder_startnode_id=:rightBoarderStartNodeId," +
-	 		" right_boarder_endnode_id=:rightBoarderEndNodeId" +
+	 		" timestamp=:timestamp, tags=:tags, left_border_geometry=ST_GeomFromEWKT(:leftBorderGeometry), left_border_startnode_id=:leftBorderStartNodeId," +
+	 		" left_border_endnode_id=:leftBorderEndNodeId, right_border_geometry=ST_GeomFromEWKT(:rightBorderGeometry), right_border_startnode_id=:rightBorderStartNodeId," +
+	 		" right_border_endnode_id=:rightBorderEndNodeId" +
 	 		" WHERE id=:id";
 	}
 

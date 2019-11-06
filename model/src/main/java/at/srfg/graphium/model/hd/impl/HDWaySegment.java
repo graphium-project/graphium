@@ -15,19 +15,10 @@
  */
 package at.srfg.graphium.model.hd.impl;
 
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import com.vividsolutions.jts.geom.LineString;
 
-import at.srfg.graphium.model.Access;
-import at.srfg.graphium.model.FormOfWay;
-import at.srfg.graphium.model.FuncRoadClass;
-import at.srfg.graphium.model.ISegmentXInfo;
-import at.srfg.graphium.model.IWaySegmentConnection;
 import at.srfg.graphium.model.OneWay;
 import at.srfg.graphium.model.hd.IHDWaySegment;
 import at.srfg.graphium.model.impl.WaySegment;
@@ -36,86 +27,86 @@ public class HDWaySegment extends WaySegment implements IHDWaySegment {
 
 	private static final long serialVersionUID = 70164823153042629L;
 	
-	private LineString leftBoarderGeometry;
-	private long leftBoarderStartNodeId;
-	private long leftBoarderEndNodeId;
-	private LineString rightBoarderGeometry;
-	private long rightBoarderStartNodeId;
-	private long rightBoarderEndNodeId;
+	private LineString leftBorderGeometry;
+	private long leftBorderStartNodeId;
+	private long leftBorderEndNodeId;
+	private LineString rightBorderGeometry;
+	private long rightBorderStartNodeId;
+	private long rightBorderEndNodeId;
 	
 	public HDWaySegment() {
 		tags = new HashMap<>();
 	}
 	
-	public HDWaySegment(LineString leftBoarderGeometry, long leftBoarderStartNodeId, long leftBoarderEndNodeId,
-			LineString rightBoarderGeometry, long rightBoarderStartNodeId, long rightBoarderEndNodeId) {
+	public HDWaySegment(LineString leftBorderGeometry, long leftBorderStartNodeId, long leftBorderEndNodeId,
+			LineString rightBorderGeometry, long rightBorderStartNodeId, long rightBorderEndNodeId) {
 		super();
-		this.leftBoarderGeometry = leftBoarderGeometry;
-		this.leftBoarderStartNodeId = leftBoarderStartNodeId;
-		this.leftBoarderEndNodeId = leftBoarderEndNodeId;
-		this.rightBoarderGeometry = rightBoarderGeometry;
-		this.rightBoarderStartNodeId = rightBoarderStartNodeId;
-		this.rightBoarderEndNodeId = rightBoarderEndNodeId;
+		this.leftBorderGeometry = leftBorderGeometry;
+		this.leftBorderStartNodeId = leftBorderStartNodeId;
+		this.leftBorderEndNodeId = leftBorderEndNodeId;
+		this.rightBorderGeometry = rightBorderGeometry;
+		this.rightBorderStartNodeId = rightBorderStartNodeId;
+		this.rightBorderEndNodeId = rightBorderEndNodeId;
 	}
 
 	@Override
-	public LineString getLeftBoarderGeometry() {
-		return leftBoarderGeometry;
+	public LineString getLeftBorderGeometry() {
+		return leftBorderGeometry;
 	}
 	
 	@Override
-	public void setLeftBoarderGeometry(LineString geometry) {
-		leftBoarderGeometry = geometry;
+	public void setLeftBorderGeometry(LineString geometry) {
+		leftBorderGeometry = geometry;
 	}
 	
 	@Override
-	public long getLeftBoarderStartNodeId() {
-		return leftBoarderStartNodeId;
+	public long getLeftBorderStartNodeId() {
+		return leftBorderStartNodeId;
 	}
 	
 	@Override
-	public void setLeftBoarderStartNodeId(long startNodeId) {
-		leftBoarderStartNodeId = startNodeId;
+	public void setLeftBorderStartNodeId(long startNodeId) {
+		leftBorderStartNodeId = startNodeId;
 	}
 	
 	@Override
-	public long getLeftBoarderEndNodeId() {
-		return leftBoarderEndNodeId;
+	public long getLeftBorderEndNodeId() {
+		return leftBorderEndNodeId;
 	}
 	
 	@Override
-	public void setLeftBoarderEndNodeId(long endNodeId) {
-		leftBoarderEndNodeId = endNodeId;
+	public void setLeftBorderEndNodeId(long endNodeId) {
+		leftBorderEndNodeId = endNodeId;
 	}
 	
 	@Override
-	public LineString getRightBoarderGeometry() {
-		return rightBoarderGeometry;
+	public LineString getRightBorderGeometry() {
+		return rightBorderGeometry;
 	}
 	
 	@Override
-	public void setRightBoarderGeometry(LineString geometry) {
-		rightBoarderGeometry = geometry;
+	public void setRightBorderGeometry(LineString geometry) {
+		rightBorderGeometry = geometry;
 	}
 	
 	@Override
-	public long getRightBoarderStartNodeId() {
-		return rightBoarderStartNodeId;
+	public long getRightBorderStartNodeId() {
+		return rightBorderStartNodeId;
 	}
 	
 	@Override
-	public void setRightBoarderStartNodeId(long startNodeId) {
-		rightBoarderStartNodeId = startNodeId;
+	public void setRightBorderStartNodeId(long startNodeId) {
+		rightBorderStartNodeId = startNodeId;
 	}
 	
 	@Override
-	public long getRightBoarderEndNodeId() {
-		return rightBoarderEndNodeId;
+	public long getRightBorderEndNodeId() {
+		return rightBorderEndNodeId;
 	}
 	
 	@Override
-	public void setRightBoarderEndNodeId(long endNodeId) {
-		rightBoarderEndNodeId = endNodeId;
+	public void setRightBorderEndNodeId(long endNodeId) {
+		rightBorderEndNodeId = endNodeId;
 	}
 	
 	@Override
@@ -131,10 +122,10 @@ public class HDWaySegment extends WaySegment implements IHDWaySegment {
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + (int) (leftBoarderEndNodeId ^ (leftBoarderEndNodeId >>> 32));
-		result = prime * result + (int) (leftBoarderStartNodeId ^ (leftBoarderStartNodeId >>> 32));
-		result = prime * result + (int) (rightBoarderEndNodeId ^ (rightBoarderEndNodeId >>> 32));
-		result = prime * result + (int) (rightBoarderStartNodeId ^ (rightBoarderStartNodeId >>> 32));
+		result = prime * result + (int) (leftBorderEndNodeId ^ (leftBorderEndNodeId >>> 32));
+		result = prime * result + (int) (leftBorderStartNodeId ^ (leftBorderStartNodeId >>> 32));
+		result = prime * result + (int) (rightBorderEndNodeId ^ (rightBorderEndNodeId >>> 32));
+		result = prime * result + (int) (rightBorderStartNodeId ^ (rightBorderStartNodeId >>> 32));
 		return result;
 	}
 
@@ -147,23 +138,23 @@ public class HDWaySegment extends WaySegment implements IHDWaySegment {
 		if (getClass() != obj.getClass())
 			return false;
 		HDWaySegment other = (HDWaySegment) obj;
-		if (leftBoarderEndNodeId != other.leftBoarderEndNodeId)
+		if (leftBorderEndNodeId != other.leftBorderEndNodeId)
 			return false;
-		if (leftBoarderStartNodeId != other.leftBoarderStartNodeId)
+		if (leftBorderStartNodeId != other.leftBorderStartNodeId)
 			return false;
-		if (rightBoarderEndNodeId != other.rightBoarderEndNodeId)
+		if (rightBorderEndNodeId != other.rightBorderEndNodeId)
 			return false;
-		if (rightBoarderStartNodeId != other.rightBoarderStartNodeId)
+		if (rightBorderStartNodeId != other.rightBorderStartNodeId)
 			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "Lanelet [leftBoarderGeometry=" + leftBoarderGeometry + ", leftBoarderStartNodeId="
-				+ leftBoarderStartNodeId + ", leftBoarderEndNodeId=" + leftBoarderEndNodeId + ", rightBoarderGeometry="
-				+ rightBoarderGeometry + ", rightBoarderStartNodeId=" + rightBoarderStartNodeId
-				+ ", rightBoarderEndNodeId=" + rightBoarderEndNodeId + ", maxSpeedTow="
+		return "Lanelet [leftBorderGeometry=" + leftBorderGeometry + ", leftBorderStartNodeId="
+				+ leftBorderStartNodeId + ", leftBorderEndNodeId=" + leftBorderEndNodeId + ", rightBorderGeometry="
+				+ rightBorderGeometry + ", rightBorderStartNodeId=" + rightBorderStartNodeId
+				+ ", rightBorderEndNodeId=" + rightBorderEndNodeId + ", maxSpeedTow="
 				+ maxSpeedTow + ", maxSpeedBkw=" + maxSpeedBkw + ", speedCalcTow=" + speedCalcTow + ", speedCalcBkw="
 				+ speedCalcBkw + ", lanesTow=" + lanesTow + ", lanesBkw=" + lanesBkw + ", frc=" + frc + ", formOfWay="
 				+ formOfWay + ", accessTow=" + accessTow + ", accessBkw=" + accessBkw + ", tunnel=" + tunnel

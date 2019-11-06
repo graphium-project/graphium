@@ -32,12 +32,12 @@ import at.srfg.graphium.postgis.persistence.rowmapper.ColumnFinder;
 public class HDWaySegmentResultSetExtractor<S extends IBaseSegment, W extends IHDWaySegment> extends WaySegmentResultSetExtractor<S, W> {
 	
 	private static final String HD_ATTRIBUTES = ATTRIBUTES + 
-			"ST_AsEWKB(left_boarder_geometry) AS " + QUERY_PREFIX + "_left_boarder_geometry, " +
-			"left_boarder_startnode_id AS " + QUERY_PREFIX + "_left_boarder_startnode_id, " +
-			"left_boarder_endnode_id AS " + QUERY_PREFIX + "_left_boarder_endnode_id, " +
-			"ST_AsEWKB(right_boarder_geometry) AS " + QUERY_PREFIX + "_right_boarder_geometry, " +
-			"right_boarder_startnode_id AS " + QUERY_PREFIX + "_right_boarder_startnode_id, " +
-			"right_boarder_endnode_id AS " + QUERY_PREFIX + "_right_boarder_endnode_id, ";
+			"ST_AsEWKB(left_border_geometry) AS " + QUERY_PREFIX + "_left_border_geometry, " +
+			"left_border_startnode_id AS " + QUERY_PREFIX + "_left_border_startnode_id, " +
+			"left_border_endnode_id AS " + QUERY_PREFIX + "_left_border_endnode_id, " +
+			"ST_AsEWKB(right_border_geometry) AS " + QUERY_PREFIX + "_right_border_geometry, " +
+			"right_border_startnode_id AS " + QUERY_PREFIX + "_right_border_startnode_id, " +
+			"right_border_endnode_id AS " + QUERY_PREFIX + "_right_border_endnode_id, ";
 
 	/**
 	 * @param waySegment
@@ -50,20 +50,20 @@ public class HDWaySegmentResultSetExtractor<S extends IBaseSegment, W extends IH
 		
 		ColumnFinder colFinder = new ColumnFinder(rs);
 		
-		waySegment.setLeftBoarderGeometry((LineString) bp.parse(rs.getBytes(QUERY_PREFIX + "_left_boarder_geometry_ewkb")));
-		if (colFinder.getColumnIndex(QUERY_PREFIX + "_left_boarder_startnode_id") > -1) {
-			waySegment.setLeftBoarderStartNodeId(rs.getLong(QUERY_PREFIX + "_left_boarder_startnode_id"));
+		waySegment.setLeftBorderGeometry((LineString) bp.parse(rs.getBytes(QUERY_PREFIX + "_left_border_geometry_ewkb")));
+		if (colFinder.getColumnIndex(QUERY_PREFIX + "_left_border_startnode_id") > -1) {
+			waySegment.setLeftBorderStartNodeId(rs.getLong(QUERY_PREFIX + "_left_border_startnode_id"));
 		}
-		if (colFinder.getColumnIndex(QUERY_PREFIX + "_left_boarder_endnode_id") > -1) {
-			waySegment.setLeftBoarderEndNodeId(rs.getLong(QUERY_PREFIX + "_left_boarder_endnode_id"));
+		if (colFinder.getColumnIndex(QUERY_PREFIX + "_left_border_endnode_id") > -1) {
+			waySegment.setLeftBorderEndNodeId(rs.getLong(QUERY_PREFIX + "_left_border_endnode_id"));
 		}
 		
-		waySegment.setRightBoarderGeometry((LineString) bp.parse(rs.getBytes(QUERY_PREFIX + "_right_boarder_geometry_ewkb")));
-		if (colFinder.getColumnIndex(QUERY_PREFIX + "_right_boarder_startnode_id") > -1) {
-			waySegment.setRightBoarderStartNodeId(rs.getLong(QUERY_PREFIX + "_right_boarder_startnode_id"));
+		waySegment.setRightBorderGeometry((LineString) bp.parse(rs.getBytes(QUERY_PREFIX + "_right_border_geometry_ewkb")));
+		if (colFinder.getColumnIndex(QUERY_PREFIX + "_right_border_startnode_id") > -1) {
+			waySegment.setRightBorderStartNodeId(rs.getLong(QUERY_PREFIX + "_right_border_startnode_id"));
 		}
-		if (colFinder.getColumnIndex(QUERY_PREFIX + "_right_boarder_endnode_id") > -1) {
-			waySegment.setRightBoarderEndNodeId(rs.getLong(QUERY_PREFIX + "_right_boarder_endnode_id"));
+		if (colFinder.getColumnIndex(QUERY_PREFIX + "_right_border_endnode_id") > -1) {
+			waySegment.setRightBorderEndNodeId(rs.getLong(QUERY_PREFIX + "_right_border_endnode_id"));
 		}
 	}
 
@@ -74,7 +74,7 @@ public class HDWaySegmentResultSetExtractor<S extends IBaseSegment, W extends IH
 	@Override
 	public String getGeometryManipulationClause() {
 		return ", st_asewkb(wayseg_geometry) AS wayseg_geometry_ewkb, " +
-				 "st_asewkb(wayseg_left_boarder_geometry) AS wayseg_left_boarder_geometry_ewkb, " +
-				 "st_asewkb(wayseg_right_boarder_geometry) AS wayseg_right_boarder_geometry_ewkb";
+				 "st_asewkb(wayseg_left_border_geometry) AS wayseg_left_border_geometry_ewkb, " +
+				 "st_asewkb(wayseg_right_border_geometry) AS wayseg_right_border_geometry_ewkb";
 	}
 }

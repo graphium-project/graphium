@@ -39,10 +39,10 @@ public class ConnectionsBuilder {
 		if (neighbours != null) {
 			for (IHDWaySegment neighbour : neighbours) {
 				if (lanelet.getId() != neighbour.getId() ) {
-					if ((lanelet.getLeftBoarderStartNodeId() == neighbour.getRightBoarderStartNodeId() &&	// parallel lane
-						 lanelet.getLeftBoarderEndNodeId()   == neighbour.getRightBoarderEndNodeId()) ||
-						(lanelet.getLeftBoarderStartNodeId() == neighbour.getLeftBoarderEndNodeId() &&		// opposite lane
-						 lanelet.getLeftBoarderEndNodeId()   == neighbour.getLeftBoarderStartNodeId())) {
+					if ((lanelet.getLeftBorderStartNodeId() == neighbour.getRightBorderStartNodeId() &&	// parallel lane
+						 lanelet.getLeftBorderEndNodeId()   == neighbour.getRightBorderEndNodeId()) ||
+						(lanelet.getLeftBorderStartNodeId() == neighbour.getLeftBorderEndNodeId() &&		// opposite lane
+						 lanelet.getLeftBorderEndNodeId()   == neighbour.getLeftBorderStartNodeId())) {
 						// left side parallel lanelet
 						IWaySegmentConnection connection = ConnectionsHelper.createConnection(lanelet.getId(), 
 								  															  neighbour.getId(),
@@ -55,7 +55,7 @@ public class ConnectionsBuilder {
 						connection.addTag(Constants.CONNECTION_TYPE, type);
 						connection.addTag(Constants.CONNECTION_PARALLEL, Constants.LEFT);
 						
-						if (lanelet.getLeftBoarderStartNodeId() == neighbour.getLeftBoarderEndNodeId()) {
+						if (lanelet.getLeftBorderStartNodeId() == neighbour.getLeftBorderEndNodeId()) {
 							// opposite lane
 							connection.addTag(Constants.CONNECTION_DIRECTION, Constants.CONNECTION_REVERSE);
 						}
@@ -63,10 +63,10 @@ public class ConnectionsBuilder {
 						ConnectionsHelper.addConnectionToSegment(lanelet, connection, -1L);
 					} else
 	
-					if ((lanelet.getRightBoarderStartNodeId() == neighbour.getLeftBoarderStartNodeId() &&	// parallel lane
-						 lanelet.getRightBoarderEndNodeId()   == neighbour.getLeftBoarderEndNodeId()) ||
-						(lanelet.getRightBoarderStartNodeId() == neighbour.getRightBoarderEndNodeId() &&	// opposite lane
-						 lanelet.getRightBoarderEndNodeId()   == neighbour.getRightBoarderStartNodeId())) {
+					if ((lanelet.getRightBorderStartNodeId() == neighbour.getLeftBorderStartNodeId() &&	// parallel lane
+						 lanelet.getRightBorderEndNodeId()   == neighbour.getLeftBorderEndNodeId()) ||
+						(lanelet.getRightBorderStartNodeId() == neighbour.getRightBorderEndNodeId() &&	// opposite lane
+						 lanelet.getRightBorderEndNodeId()   == neighbour.getRightBorderStartNodeId())) {
 						// right side parallel lanelet
 						IWaySegmentConnection connection = ConnectionsHelper.createConnection(lanelet.getId(), 
 								  															  neighbour.getId(),
@@ -79,13 +79,13 @@ public class ConnectionsBuilder {
 						connection.addTag(Constants.CONNECTION_TYPE, type);
 						connection.addTag(Constants.CONNECTION_PARALLEL, Constants.RIGHT);
 						
-						if (lanelet.getRightBoarderStartNodeId() == neighbour.getRightBoarderEndNodeId()) {
+						if (lanelet.getRightBorderStartNodeId() == neighbour.getRightBorderEndNodeId()) {
 							// opposite lane
 							connection.addTag(Constants.CONNECTION_DIRECTION, Constants.CONNECTION_REVERSE);
 						}
 						
-						if (lanelet.getRightBoarderStartNodeId() == neighbour.getLeftBoarderStartNodeId() &&
-							neighbour.getLeftBoarderStartNodeId() == neighbour.getRightBoarderStartNodeId()) {
+						if (lanelet.getRightBorderStartNodeId() == neighbour.getLeftBorderStartNodeId() &&
+							neighbour.getLeftBorderStartNodeId() == neighbour.getRightBorderStartNodeId()) {
 							connection.addTag(Constants.CONNECTION_DIVERGING, Boolean.TRUE.toString());
 						}
 						
@@ -93,8 +93,8 @@ public class ConnectionsBuilder {
 	
 					} else
 	
-					if (lanelet.getLeftBoarderEndNodeId() == neighbour.getLeftBoarderStartNodeId() &&
-						lanelet.getRightBoarderEndNodeId() == neighbour.getRightBoarderStartNodeId()) {
+					if (lanelet.getLeftBorderEndNodeId() == neighbour.getLeftBorderStartNodeId() &&
+						lanelet.getRightBorderEndNodeId() == neighbour.getRightBorderStartNodeId()) {
 						// succeeding lanelet
 						IWaySegmentConnection connection = ConnectionsHelper.createConnection(lanelet.getId(), 
 								  															  neighbour.getId(),
@@ -108,10 +108,10 @@ public class ConnectionsBuilder {
 	
 					if (lanelet.isOneway().equals(OneWay.NO_ONEWAY)) {
 						if ((neighbour.isOneway().equals(OneWay.NO_ONEWAY) &&
-							 lanelet.getLeftBoarderStartNodeId()  == neighbour.getLeftBoarderEndNodeId() &&
-							 lanelet.getRightBoarderStartNodeId() == neighbour.getRightBoarderEndNodeId()) ||
-							(lanelet.getLeftBoarderStartNodeId()  == neighbour.getRightBoarderStartNodeId() &&	// preceding lanelet in reverse direction
-							 lanelet.getRightBoarderStartNodeId() == neighbour.getLeftBoarderStartNodeId())) {
+							 lanelet.getLeftBorderStartNodeId()  == neighbour.getLeftBorderEndNodeId() &&
+							 lanelet.getRightBorderStartNodeId() == neighbour.getRightBorderEndNodeId()) ||
+							(lanelet.getLeftBorderStartNodeId()  == neighbour.getRightBorderStartNodeId() &&	// preceding lanelet in reverse direction
+							 lanelet.getRightBorderStartNodeId() == neighbour.getLeftBorderStartNodeId())) {
 							// preceding lanelet
 							IWaySegmentConnection connection = ConnectionsHelper.createConnection(lanelet.getId(), 
 									  															  neighbour.getId(),

@@ -1,11 +1,11 @@
 CREATE TABLE graphs.hdwaysegments
 (
-  left_boarder_geometry geometry(LINESTRING, 4326),
-  left_boarder_startnode_id bigint NOT NULL,
-  left_boarder_endnode_id bigint NOT NULL,
-  right_boarder_geometry geometry(LINESTRING, 4326),
-  right_boarder_startnode_id bigint NOT NULL,
-  right_boarder_endnode_id bigint NOT NULL,
+  left_border_geometry geometry(LINESTRING, 4326),
+  left_border_startnode_id bigint NOT NULL,
+  left_border_endnode_id bigint NOT NULL,
+  right_border_geometry geometry(LINESTRING, 4326),
+  right_border_startnode_id bigint NOT NULL,
+  right_border_endnode_id bigint NOT NULL,
   CONSTRAINT graphs_hdwaysegments_pk PRIMARY KEY (id)
 ) INHERITS (graphs.waysegments)
 WITH (

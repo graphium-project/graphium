@@ -29,7 +29,7 @@ public class Constants {
 	public final static String LANELET_TYPE_LINE_THICK = "line_thick";
 	public final static String LANELET_TYPE_CURBSTONE = "curbstone";
 	public final static String LANELET_TYPE_VIRTUAL = "virtual";
-	public final static String LANELET_TYPE_ROAD_BOARDER = "road_boarder";
+	public final static String LANELET_TYPE_ROAD_BORDER = "road_border";
 
 	public final static String LANELET_SUBTYPE_SOLID = "solid";
 	public final static String LANELET_SUBTYPE_DASHED = "dashed";
@@ -56,7 +56,7 @@ public class Constants {
 	public final static String LANELET_PEDESTRIAN = "pedestrian";
 	public final static String LANELET_BYCICLE = "bycicle";
 
-	public final static String BOARDER_INVERTED = "invertedBoarder";
+	public final static String BORDER_INVERTED = "invertedBorder";
 	public final static String ROAD_TYPE = "roadType";
 	public final static String LOCATION = "location";
 	public final static String ROAD_SURFACE = "roadSurface";

@@ -39,29 +39,29 @@ public class LaneletHelperTests {
 		log.info("Segment 1: left bound in and right bound against driving direction (true/false)");
 		IHDWaySegment seg1 = new HDWaySegment();
 		seg1.setId(1L);
-		seg1.setLeftBoarderGeometry((LineString) wktReader.read("LINESTRING (8.42321254246 49.01109735218, 8.42330239646 49.01111582478)"));
-		seg1.setRightBoarderGeometry((LineString) wktReader.read("LINESTRING (8.42332586579 49.01106788397, 8.42330026263 49.01105327604)"));
+		seg1.setLeftBorderGeometry((LineString) wktReader.read("LINESTRING (8.42321254246 49.01109735218, 8.42330239646 49.01111582478)"));
+		seg1.setRightBorderGeometry((LineString) wktReader.read("LINESTRING (8.42332586579 49.01106788397, 8.42330026263 49.01105327604)"));
 		
 		// left and right bounds in driving direction
 		log.info("Segment 2: left and right bounds in driving direction (true/true)");
 		IHDWaySegment seg2 = new HDWaySegment();
 		seg2.setId(2L);
-		seg2.setLeftBoarderGeometry((LineString) wktReader.read("LINESTRING (8.42321254246 49.01109735218, 8.42330239646 49.01111582478)"));
-		seg2.setRightBoarderGeometry((LineString) wktReader.read("LINESTRING (8.42330026263 49.01105327604, 8.42332586579 49.01106788397)"));
+		seg2.setLeftBorderGeometry((LineString) wktReader.read("LINESTRING (8.42321254246 49.01109735218, 8.42330239646 49.01111582478)"));
+		seg2.setRightBorderGeometry((LineString) wktReader.read("LINESTRING (8.42330026263 49.01105327604, 8.42332586579 49.01106788397)"));
 		
 		// left and right bounds against driving direction
 		log.info("Segment 3: left and right bounds against driving direction (false/false)");
 		IHDWaySegment seg3 = new HDWaySegment();
 		seg3.setId(3L);
-		seg3.setLeftBoarderGeometry((LineString) wktReader.read("LINESTRING (8.42330239646 49.01111582478, 8.42321254246 49.01109735218)"));
-		seg3.setRightBoarderGeometry((LineString) wktReader.read("LINESTRING (8.42332586579 49.01106788397, 8.42330026263 49.01105327604)"));
+		seg3.setLeftBorderGeometry((LineString) wktReader.read("LINESTRING (8.42330239646 49.01111582478, 8.42321254246 49.01109735218)"));
+		seg3.setRightBorderGeometry((LineString) wktReader.read("LINESTRING (8.42332586579 49.01106788397, 8.42330026263 49.01105327604)"));
 		
 		// left bound against and right bound in driving direction
 		log.info("Segment 4: left bound against and right bound in driving direction (false/true)");
 		IHDWaySegment seg4 = new HDWaySegment();
 		seg4.setId(4L);
-		seg4.setLeftBoarderGeometry((LineString) wktReader.read("LINESTRING (8.42330239646 49.01111582478, 8.42321254246 49.01109735218)"));
-		seg4.setRightBoarderGeometry((LineString) wktReader.read("LINESTRING (8.42330026263 49.01105327604, 8.42332586579 49.01106788397)"));
+		seg4.setLeftBorderGeometry((LineString) wktReader.read("LINESTRING (8.42330239646 49.01111582478, 8.42321254246 49.01109735218)"));
+		seg4.setRightBorderGeometry((LineString) wktReader.read("LINESTRING (8.42330026263 49.01105327604, 8.42332586579 49.01106788397)"));
 		
 		List<IHDWaySegment> segments = new ArrayList<>();
 		segments.add(seg1);

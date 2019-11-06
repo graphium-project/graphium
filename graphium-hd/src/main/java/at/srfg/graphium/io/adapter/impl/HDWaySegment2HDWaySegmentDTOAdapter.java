@@ -43,22 +43,22 @@ public class HDWaySegment2HDWaySegmentDTOAdapter<O extends IHDWaySegmentDTO, I e
 	@Override
 	protected void setModelValues(I segment, O segmentDTO) {
 		super.setModelValues(segment, segmentDTO);
-		segment.setLeftBoarderGeometry(segmentDTO.getLeftBoarderGeometry());
-		segment.setLeftBoarderStartNodeId(segmentDTO.getLeftBoarderStartNodeId());
-		segment.setLeftBoarderEndNodeId(segmentDTO.getLeftBoarderEndNodeId());
-		segment.setRightBoarderGeometry(segmentDTO.getRightBoarderGeometry());
-		segment.setRightBoarderStartNodeId(segmentDTO.getRightBoarderStartNodeId());
-		segment.setRightBoarderEndNodeId(segmentDTO.getRightBoarderEndNodeId());
+		segment.setLeftBorderGeometry(segmentDTO.getLeftBorderGeometry());
+		segment.setLeftBorderStartNodeId(segmentDTO.getLeftBorderStartNodeId());
+		segment.setLeftBorderEndNodeId(segmentDTO.getLeftBorderEndNodeId());
+		segment.setRightBorderGeometry(segmentDTO.getRightBorderGeometry());
+		segment.setRightBorderStartNodeId(segmentDTO.getRightBorderStartNodeId());
+		segment.setRightBorderEndNodeId(segmentDTO.getRightBorderEndNodeId());
 	}
 
 	protected void setDtoValues(O segmentDTO, I segment) {
 		super.setDtoValues(segmentDTO, segment);
-		segmentDTO.setLeftBoarderGeometry(segment.getLeftBoarderGeometry());
-		segmentDTO.setLeftBoarderStartNodeId(segment.getLeftBoarderStartNodeId());
-		segmentDTO.setLeftBoarderEndNodeId(segment.getLeftBoarderEndNodeId());
-		segmentDTO.setRightBoarderGeometry(segment.getRightBoarderGeometry());
-		segmentDTO.setRightBoarderStartNodeId(segment.getRightBoarderStartNodeId());
-		segmentDTO.setRightBoarderEndNodeId(segment.getRightBoarderEndNodeId());
+		segmentDTO.setLeftBorderGeometry(segment.getLeftBorderGeometry());
+		segmentDTO.setLeftBorderStartNodeId(segment.getLeftBorderStartNodeId());
+		segmentDTO.setLeftBorderEndNodeId(segment.getLeftBorderEndNodeId());
+		segmentDTO.setRightBorderGeometry(segment.getRightBorderGeometry());
+		segmentDTO.setRightBorderStartNodeId(segment.getRightBorderStartNodeId());
+		segmentDTO.setRightBorderEndNodeId(segment.getRightBorderEndNodeId());
 	}
 	
 }
