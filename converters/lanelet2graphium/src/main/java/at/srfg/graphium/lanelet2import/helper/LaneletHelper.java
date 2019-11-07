@@ -248,26 +248,49 @@ public class LaneletHelper {
 	public static boolean[] checkLineDirections(IHDWaySegment segment) {
 		Coordinate[] coordsLeft = segment.getLeftBorderGeometry().getCoordinates();
 		Coordinate[] coordsRight = segment.getRightBorderGeometry().getCoordinates();
+
+		Coordinate[] coords0 = new Coordinate[] { coordsLeft[0], coordsRight[0] };
+		Coordinate[] coords1 = new Coordinate[] { coordsLeft[1], coordsRight[1] };
+		Coordinate[] coordsN = new Coordinate[] { coordsLeft[coordsLeft.length-1], coordsRight[coordsRight.length-1] };
 		
-		Coordinate[] coords1 = new Coordinate[] {coordsLeft[0], coordsRight[0]};
-		Coordinate[] coords2 = new Coordinate[] {coordsLeft[coordsLeft.length-1], coordsRight[coordsRight.length-1]};
-		LineString line1 = GeometryUtils.createLineString(coords1, 4236);
-		LineString line2 = GeometryUtils.createLineString(coords2, 4236);
-		if (!line1.intersects(line2)) {
-			if (calculateOffset(segment.getLeftBorderGeometry(), segment.getRightBorderGeometry().getStartPoint()) > 0) {
-				return new boolean[] { true, true };
-			} else {
-				return new boolean[] { false, false };
-			}
+		if (coords0[0].equals(coords0[1])) {
+			return new boolean[] { true, true };
+		} else if (coords0[0].equals(coordsN[1])) {
+			return new boolean[] { true, false };
+		} else if (coordsN[0].equals(coords0[1])) {
+			return new boolean[] { false, true };
+		} else if (coordsN[0].equals(coordsN[1])) {
+			return new boolean[] { false, false };
 		} else {
-			if (calculateOffset(segment.getLeftBorderGeometry(), segment.getRightBorderGeometry().getEndPoint()) > 0) {
-				return new boolean[] { true, false };
+			LineString line0 = GeometryUtils.createLineString(coords0, 4236);
+			LineString line1 = GeometryUtils.createLineString(coords1, 4236);
+			if (!line0.crosses(line1)
+					&& !line0.crosses(segment.getLeftBorderGeometry())
+					&& !line0.crosses(segment.getRightBorderGeometry())) {
+				if (calculateOffset(segment.getLeftBorderGeometry(), segment.getRightBorderGeometry().getStartPoint()) > 0) {
+					return new boolean[] { true, true };
+				} else {
+					return new boolean[] { false, false };
+				}
 			} else {
-				return new boolean[] { false, true };
+				if (calculateOffset(segment.getLeftBorderGeometry(), segment.getRightBorderGeometry().getEndPoint()) > 0) {
+					return new boolean[] { true, false };
+				} else {
+					return new boolean[] { false, true };
+				}
 			}
 		}
 	}
 	
+	/**
+	 * Calculates the distance between the linestring and the point
+	 * 
+	 * @param linestring
+	 * @param point
+	 * @return distance between the linestring and the point; negative value if
+	 *         point is left of linestring, positive value if point is right of
+	 *         linestring
+	 */
 	private static double calculateOffset(LineString linestring, Point point) {
 		LinearLocation locationClosestPoint = new LocationIndexedLine(linestring).project(point.getCoordinate());
 		Coordinate a = null;
