@@ -176,6 +176,34 @@ Example API call to generate a JSON file from GIP data:
    curl -X POST "http://localhost:8080/graphium-tutorial-central-server-1.0.0/api/segments/graphs/osm_at/versions/170929?overrideIfExists=true" -F "file=@/path/to/output/osm_at.json"
    ```
 
+## Docker
+
+1. Start Docker setup
+
+    ```shell script
+    docker-compose up -d
+    ```
+
+Application and database logs can be obtained via `docker-compose logs`.
+
+2. Download OSM File:
+
+    ```shell script
+    docker exec -it graphium curl http://download.geofabrik.de/europe/austria-latest.osm.pbf -o /austria-latest.osm.pbf
+    ```
+
+3. Convert OSM File into Graphium's JSON format:
+
+    ```shell script
+    docker exec -it graphium java -jar /osm2graphium.jar -i /austria-latest.osm.pbf -o / -n osm_at -v 170929 -q 20000 -t 5 -highwayTypes "motorway, motorway_link, primary, primary_link"
+    ```
+
+4. Import OSM into Graphium central server
+
+    ```shell script
+    docker exec -it graphium curl -X POST "http://localhost:8080/api/segments/graphs/osm_at/versions/170929?overrideIfExists=true" -F "file=@/osm_at_170929.json"
+    ```
+
 ## Tutorials
 
 ### How to define custom views
