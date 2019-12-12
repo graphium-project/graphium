@@ -31,6 +31,9 @@ import org.openstreetmap.osmosis.core.domain.v0_6.Way;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.LineString;
+
 import at.srfg.graphium.lanelet2import.helper.Constants;
 import at.srfg.graphium.lanelet2import.helper.LaneletHelper;
 import at.srfg.graphium.model.Access;
@@ -51,11 +54,18 @@ public class LaneletsAdapter {
 	
 
 	private static Logger log = LoggerFactory.getLogger(LaneletsAdapter.class);
+	
+	private long nodeIdCounter = -1;
+	//TODO replace maps with spatial index
+	private Map<Double, Map<Double, Long>> nodeIdRepository = null; // Map<Longitudes, Map<Latitudes, nodeId>>
 
 	private float miles2km = 1.60934f;
 	
 	public List<IHDWaySegment> adaptLanelets(List<Relation> relations, TLongObjectHashMap<Way> ways, TLongObjectHashMap<Node> nodes) {
 		List<IHDWaySegment> segments = new ArrayList<>();
+		
+		nodeIdCounter = -1;
+		nodeIdRepository = new HashMap<Double, Map<Double, Long>>();
 		
 		for (Relation rel : relations) {
 			String type = LaneletHelper.getType(rel);
@@ -133,7 +143,26 @@ public class LaneletsAdapter {
 	}
 
 	private void calculateCenterLine(IHDWaySegment segment, boolean[] borderDirections) {
-		segment.setGeometry(LaneletHelper.calculateCenterline(segment, borderDirections));
+		LineString centerline = LaneletHelper.calculateCenterline(segment, borderDirections);
+		segment.setGeometry(centerline);
+		segment.setStartNodeId(findOrCreateNodeId(centerline.getCoordinateN(0)));
+		segment.setEndNodeId(findOrCreateNodeId(centerline.getCoordinateN(centerline.getCoordinates().length - 1)));
+		segment.setStartNodeIndex(0);
+		segment.setEndNodeIndex(centerline.getCoordinates().length - 1);
+	}
+	
+	private long findOrCreateNodeId(Coordinate coordinate) {
+		Map<Double, Long> latitudes = nodeIdRepository.get(coordinate.x);
+		if (latitudes == null) {
+			latitudes = new HashMap<Double, Long>();
+			nodeIdRepository.put(coordinate.x, latitudes);
+		}
+		Long nodeId = latitudes.get(coordinate.y);
+		if (nodeId == null) {
+			nodeId = ++nodeIdCounter;
+			latitudes.put(coordinate.y, nodeId);
+		}
+		return nodeId.longValue();
 	}
 
 	private void setRoadCharacteristics(IHDWaySegment segment, Map<String, String> tags) {
@@ -338,7 +367,7 @@ public class LaneletsAdapter {
 		laneChangePossible = "false";
 		if (typeEntry != null) {
 			segment.getTags().put("right:" + typeEntry.getKey(), typeEntry.getValue());
-			laneChangePossible = determineLaneChange(true, !borderDirections[0], typeEntry.getKey(), typeEntry.getValue());
+			laneChangePossible = determineLaneChange(false, !borderDirections[1], typeEntry.getKey(), typeEntry.getValue());
 		}
 		segment.getTags().put(Constants.TAG_LANE_CHANGE + ":right", laneChangePossible);
 	}
