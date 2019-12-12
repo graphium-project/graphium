@@ -98,8 +98,9 @@ public class BaseSegment2SegmentDTOAdapter<O extends IBaseSegmentDTO,I extends I
         if (conn instanceof ISegmentConnectionDTO) {
             accessSet = ((ISegmentConnectionDTO) conn).getAccess();
         }
-        return new WaySegmentConnection(conn.getNodeId(),fromSegmentId,conn.getToSegmentId(),accessSet,connectionXInfos);
-    }
+		return new WaySegmentConnection(conn.getNodeId(), fromSegmentId, conn.getToSegmentId(), accessSet,
+				connectionXInfos, conn.getTags());
+	}
 
     /**
 	 * @param conn

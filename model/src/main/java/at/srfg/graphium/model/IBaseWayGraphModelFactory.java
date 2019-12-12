@@ -42,5 +42,7 @@ public interface IBaseWayGraphModelFactory<T extends IBaseWaySegment>
 	public IWaySegmentConnection newWaySegmentConnection(long nodeId, long fromSegmentId,
 			long toSegmentId, Set<Access> access);
 	
-	
+	public IWaySegmentConnection newWaySegmentConnection(long nodeId, long fromSegmentId,
+			long toSegmentId, Set<Access> access, Map<String, String> tags);
+
 }
