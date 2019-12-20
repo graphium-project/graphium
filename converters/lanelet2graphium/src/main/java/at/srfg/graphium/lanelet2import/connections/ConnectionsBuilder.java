@@ -60,6 +60,11 @@ public class ConnectionsBuilder {
 							connection.addTag(Constants.CONNECTION_DIRECTION, Constants.CONNECTION_REVERSE);
 						}
 						
+						if (lanelet.getLeftBorderStartNodeId() == neighbour.getRightBorderStartNodeId() && // TODO passt das?
+							neighbour.getRightBorderStartNodeId() == neighbour.getLeftBorderStartNodeId()) {
+							connection.addTag(Constants.CONNECTION_DIVERGING, Boolean.TRUE.toString());
+						}
+						
 						ConnectionsHelper.addConnectionToSegment(lanelet, connection, -1L);
 					} else
 	

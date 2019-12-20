@@ -27,7 +27,6 @@ import org.openstreetmap.osmosis.core.domain.v0_6.WayNode;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.linearref.LinearLocation;
 import com.vividsolutions.jts.linearref.LocationIndexedLine;
 
@@ -248,32 +247,46 @@ public class LaneletHelper {
 	public static boolean[] checkLineDirections(IHDWaySegment segment) {
 		Coordinate[] coordsLeft = segment.getLeftBorderGeometry().getCoordinates();
 		Coordinate[] coordsRight = segment.getRightBorderGeometry().getCoordinates();
-
-		Coordinate[] coords0 = new Coordinate[] { coordsLeft[0], coordsRight[0] };
-		Coordinate[] coords1 = new Coordinate[] { coordsLeft[1], coordsRight[1] };
-		Coordinate[] coordsN = new Coordinate[] { coordsLeft[coordsLeft.length-1], coordsRight[coordsRight.length-1] };
 		
-		if (coords0[0].equals(coords0[1])) {
-			return new boolean[] { true, true };
-		} else if (coords0[0].equals(coordsN[1])) {
-			return new boolean[] { true, false };
-		} else if (coordsN[0].equals(coords0[1])) {
-			return new boolean[] { false, true };
-		} else if (coordsN[0].equals(coordsN[1])) {
-			return new boolean[] { false, false };
+		if (coordsLeft[0].equals(coordsRight[0])) {
+			if (calculateOffset(segment.getLeftBorderGeometry(), coordsRight[1]) > 0) {
+				return new boolean[] { true, true };
+			} else {
+				return new boolean[] { false, false };
+			}
+		} else if (coordsLeft[0].equals(coordsRight[coordsRight.length-1])) {
+			if (calculateOffset(segment.getLeftBorderGeometry(), coordsRight[0]) > 0) {
+				return new boolean[] { true, false };
+			} else {
+				return new boolean[] { false, true };
+			}
+		} else if (coordsLeft[coordsLeft.length-1].equals(coordsRight[0])) {
+			if (calculateOffset(segment.getLeftBorderGeometry(), coordsRight[1]) > 0) {
+				return new boolean[] { true, false };
+			} else {
+				return new boolean[] { false, true };
+			}
+		} else if (coordsLeft[coordsLeft.length-1].equals(coordsRight[coordsRight.length-1])) {
+			if (calculateOffset(segment.getLeftBorderGeometry(), coordsRight[0]) > 0) {
+				return new boolean[] { true, true };
+			} else {
+				return new boolean[] { false, false };
+			}
 		} else {
+			Coordinate[] coords0 = new Coordinate[] { coordsLeft[0], coordsRight[0] };
+			Coordinate[] coords1 = new Coordinate[] { coordsLeft[1], coordsRight[1] };
 			LineString line0 = GeometryUtils.createLineString(coords0, 4236);
 			LineString line1 = GeometryUtils.createLineString(coords1, 4236);
 			if (!line0.crosses(line1)
 					&& !line0.crosses(segment.getLeftBorderGeometry())
 					&& !line0.crosses(segment.getRightBorderGeometry())) {
-				if (calculateOffset(segment.getLeftBorderGeometry(), segment.getRightBorderGeometry().getStartPoint()) > 0) {
+				if (calculateOffset(segment.getLeftBorderGeometry(), coordsRight[0]) > 0) {
 					return new boolean[] { true, true };
 				} else {
 					return new boolean[] { false, false };
 				}
 			} else {
-				if (calculateOffset(segment.getLeftBorderGeometry(), segment.getRightBorderGeometry().getEndPoint()) > 0) {
+				if (calculateOffset(segment.getLeftBorderGeometry(), coordsRight[coordsRight.length-1]) > 0) {
 					return new boolean[] { true, false };
 				} else {
 					return new boolean[] { false, true };
@@ -286,13 +299,13 @@ public class LaneletHelper {
 	 * Calculates the distance between the linestring and the point
 	 * 
 	 * @param linestring
-	 * @param point
-	 * @return distance between the linestring and the point; negative value if
-	 *         point is left of linestring, positive value if point is right of
+	 * @param coordinate
+	 * @return distance between the linestring and the coordinate; negative value if
+	 *         coordinate is left of linestring, positive value if coordinate is right of
 	 *         linestring
 	 */
-	private static double calculateOffset(LineString linestring, Point point) {
-		LinearLocation locationClosestPoint = new LocationIndexedLine(linestring).project(point.getCoordinate());
+	private static double calculateOffset(LineString linestring, Coordinate coordinate) {
+		LinearLocation locationClosestPoint = new LocationIndexedLine(linestring).project(coordinate);
 		Coordinate a = null;
 		Coordinate b = null;
 		if (locationClosestPoint.getSegmentIndex() < linestring.getCoordinates().length - 1) {
@@ -304,10 +317,9 @@ public class LaneletHelper {
 		}
 		
 		//https://math.stackexchange.com/a/274728
-		double direction = (point.getCoordinate().x - a.x) * (b.y - a.y) - (point.getCoordinate().y - a.y) * (b.x - a.x);
-		double distance = GeometryUtils.distanceMeters(linestring, point);
+		double direction = (coordinate.x - a.x) * (b.y - a.y) - (coordinate.y - a.y) * (b.x - a.x);
 		
-		return ((direction < 0) ? -1 : 1) * distance;
+		return (direction < 0) ? -1 : 1;
 	}
 
 }

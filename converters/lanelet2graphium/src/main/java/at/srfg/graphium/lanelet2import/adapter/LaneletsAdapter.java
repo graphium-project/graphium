@@ -496,6 +496,13 @@ public class LaneletsAdapter {
 				} catch (NumberFormatException e) {
 					log.error("Could not parse speed limit: " + speedLimitOriginStr, e);
 				}
+			} else {
+				speedLimitStr = speedLimitOriginStr.trim();
+				try {
+					segment.setMaxSpeedTow(Short.parseShort(speedLimitStr));
+				} catch (NumberFormatException e) {
+					log.error("Could not parse speed limit: " + speedLimitOriginStr, e);
+				}
 			}
 		}
 	}
