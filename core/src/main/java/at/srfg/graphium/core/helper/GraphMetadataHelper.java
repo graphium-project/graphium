@@ -35,7 +35,7 @@ public class GraphMetadataHelper<T extends IBaseSegment> {
 		ISegmentAdapter<IBaseSegmentDTO, T> adapter = adapterRegistry.getAdapterForType(metadata.getType());
 		boolean hdGraph = false;
 		if (adapter != null) {
-			hdGraph = adapter.getModelClass().isInstance(IHDWaySegment.class);
+			hdGraph = IHDWaySegment.class.isAssignableFrom(adapter.getModelClass());
 		}
 		return hdGraph;
 	}
