@@ -76,4 +76,9 @@
 		</property>
 	</bean>
 	
+	<bean id="graphMetadataHelper" 
+		class="at.srfg.graphium.core.helper.GraphMetadataHelper">
+		<property name="adapterRegistry" ref="autodetectingSegmentAdapterRegistry"/>
+	</bean>
+	
 </beans>
