@@ -37,6 +37,7 @@ import at.srfg.graphium.model.IWaySegment;
 import at.srfg.graphium.model.impl.WayGraphModelFactory;
 import at.srfg.graphium.osmimport.helper.WayHelper;
 import at.srfg.graphium.osmimport.model.impl.NodeCoord;
+import at.srfg.graphium.osmimport.model.impl.OsmTagAdaptionMode;
 import at.srfg.graphium.osmimport.segmentation.WaySegmenter;
 import gnu.trove.map.hash.TLongObjectHashMap;
 
@@ -48,13 +49,20 @@ public class Way2WaySegmentAdapter {
 	
 	private static Logger log = LoggerFactory.getLogger(Way2WaySegmentAdapter.class);
 
+	private final static String UNKOWN_STREET_TYPE = "unkown_street_type";
 	private IWayGraphModelFactory<IWaySegment> segmentFactory;
 	private int srid = 4326;
 	private Set<Access> defaultAccesses = null;
+	private OsmTagAdaptionMode tagAdaptionMode = OsmTagAdaptionMode.NONE;
 	
 	public Way2WaySegmentAdapter() {
 		segmentFactory = new WayGraphModelFactory();
 		defaultAccesses = Access.getAccessTypes(new int[]{3});
+	}
+	
+	public Way2WaySegmentAdapter(OsmTagAdaptionMode tagAdaptionMode) {
+		this();
+		this.tagAdaptionMode = tagAdaptionMode;
 	}
 	
 	public IWaySegment adapt(Way way, TLongObjectHashMap<NodeCoord> nodes) {
@@ -113,9 +121,13 @@ public class Way2WaySegmentAdapter {
 				null,
 				null);
 		
+		if(OsmTagAdaptionMode.ALL.equals(this.tagAdaptionMode)) {
+			segment.setTags(tags);
+		}
+		
 		setAccess(segment, tags);
 		setName(segment, tags);
-		setFrc(segment, tags);
+		setFrcAndStreetType(segment, tags);
 		setFormOfWay(segment, tags);
 		setSpeed(segment, tags);
 		setLanes(segment, tags);
@@ -180,7 +192,7 @@ public class Way2WaySegmentAdapter {
 		}
 	}
 
-	private void setFrc(IWaySegment segment, Map<String, String> tags) {
+	private void setFrcAndStreetType(IWaySegment segment, Map<String, String> tags) {
 		if (tags.containsKey("highway")) { 
 			String highway = tags.get("highway");
 			if (highway.equals("motorway") || highway.equals("motorway_link")) {
@@ -196,8 +208,10 @@ public class Way2WaySegmentAdapter {
 			} else {
 				segment.setFrc(FuncRoadClass.SONSTIGE_STRASSEN);
 			}
+			segment.setStreetType(highway);
 		} else {
 			segment.setFrc(FuncRoadClass.NOT_APPLICABLE);
+			segment.setStreetType(UNKOWN_STREET_TYPE);
 		}
 	}
 

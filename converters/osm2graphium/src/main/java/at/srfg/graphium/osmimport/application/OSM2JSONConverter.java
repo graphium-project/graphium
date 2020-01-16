@@ -34,6 +34,7 @@ import org.apache.log4j.Logger;
 
 import at.srfg.graphium.osmimport.model.IImportConfig;
 import at.srfg.graphium.osmimport.model.impl.ImportConfig;
+import at.srfg.graphium.osmimport.model.impl.OsmTagAdaptionMode;
 import at.srfg.graphium.osmimport.service.impl.OsmImporterServiceImpl;
 
 /**
@@ -64,8 +65,13 @@ public class OSM2JSONConverter {
         options.addOption(Option.builder("b").longOpt("bounds").hasArg().argName("bounds_file").desc("Name of bounds file for geographical filtering (format alá Osmosis)").build());
         options.addOption(Option.builder("q").longOpt("queueSize").hasArg().argName("queue_size").desc("Size of import queue").build());
         options.addOption(Option.builder("t").longOpt("threads").hasArg().argName("worker_threads").desc("Number of worker threads").build());
+        
+        options.addOption(Option.builder("T").longOpt("tags").hasArg().argName("tag_mode").desc("mode how osm tags of ways are stored on created segments, "
+        		+ "allowed modes 'none'|'all', defaults to 'none'").build());
+        
         options.addOption(Option.builder().longOpt("highwayTypes").hasArgs().valueSeparator(',').argName("highway_types")
                 .desc("Comma separated List of highway types, to be considered. If not set, all highway types will be considered").build());
+        
 //        options.addOption(Option.builder().longOpt("retrictions").hasArgs().valueSeparator(',').argName("restrictions")
 //                .desc("Comma separated List of retrictions, to be considered. If not set, all retrictions will be considered").build());
 
@@ -82,6 +88,7 @@ public class OSM2JSONConverter {
             String[] highwayTypesString = null;
             int threads = 1;
             int queueSize = 20000;
+            OsmTagAdaptionMode tagAdaptionMode = OsmTagAdaptionMode.NONE;
 
             if (cmd.hasOption('h')) {
                 HelpFormatter helpFormatter = new HelpFormatter();
@@ -95,6 +102,9 @@ public class OSM2JSONConverter {
             }
             if (cmd.hasOption("highwayTypes")) {
                 highwayTypesString = cmd.getOptionValues("highwayTypes");
+                for (int i = 0; i < highwayTypesString.length; i++) {
+                	highwayTypesString[i] = highwayTypesString[i].trim();
+                }
             }
             if (cmd.hasOption("n")) {
                 name = cmd.getOptionValue('n');
@@ -126,13 +136,21 @@ public class OSM2JSONConverter {
             	} catch (NumberFormatException e) {
             	}
             }
+            if (cmd.hasOption("T")) {
+            	try {
+            		tagAdaptionMode = OsmTagAdaptionMode.fromValue(cmd.getOptionValue("T"));
+            	} catch(IllegalArgumentException e) {
+            		throw new RuntimeException("wrong value for option T " + e.getMessage());
+            	}
+            }
             
             IImportConfig config = ImportConfig.getConfig(name, version, osmFile)
                     .outPutDir(outputDirectory)
 					.boundsFile(boundsFile)
 					.queueSize(queueSize)
 					.workerThreads(threads)
-					.highwayList(highwayTypesString);
+					.highwayList(highwayTypesString)
+					.tagAdaptionMode(tagAdaptionMode);
 
 
             Date now = new Date();
