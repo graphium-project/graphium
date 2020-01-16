@@ -106,6 +106,7 @@ Example API call to generate a JSON file from OSM data:
 | -q           | --queueSize    | Size of import queue                     |
 | -t           | --threads      | Number of worker threads                 |
 |              | --highwayTypes | Comma separated List of highway types, to be considered. If not set, all highway types will be considered |
+| -T			   | --tags			| mode how osm tags of ways are stored on created segments, allowed modes 'none','all', defaults to 'none'  |
 
 ### GIP
 
