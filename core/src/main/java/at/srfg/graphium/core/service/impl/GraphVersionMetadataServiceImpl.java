@@ -105,7 +105,6 @@ public class GraphVersionMetadataServiceImpl extends Observable implements IGrap
 		if (state.equals(State.ACTIVE)) {
 			IWayGraphVersionMetadata metadata = getWayGraphVersionMetadata(graphName, version);  //metadataDao.getWayGraphVersionMetadata(graphName, version);
 			// set valid_to attribute of graph version's predecessor
-			// CAUTION: sets valid_to to ALL but deleted predecessors!
 			metadataDao.setValidToTimestampOfPredecessorGraphVersion(metadata);
 						
 			// TODO: Überprüfen, ob mehr Logik nötig ist - z.B. wenn ein Graph zwischen zwei aktiven Graphen 
