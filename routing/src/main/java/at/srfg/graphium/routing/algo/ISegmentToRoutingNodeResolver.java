@@ -1,6 +1,6 @@
 package at.srfg.graphium.routing.algo;
 
-import at.srfg.graphium.model.IWaySegment;
+import at.srfg.graphium.model.IBaseWaySegment;
 
 /**
  * converter interface from graphium based segments to native object used in routing graph  
@@ -10,7 +10,7 @@ import at.srfg.graphium.model.IWaySegment;
  * @param <T> graphium based WaySegments
  * @param <N> object in routing graph representing the given graphium segment
  */
-public interface ISegmentToRoutingNodeResolver<T extends IWaySegment, N> {
+public interface ISegmentToRoutingNodeResolver<T extends IBaseWaySegment, N> {
 
 	/**
 	 * look up method to convert graphium based segment object of given graphName and graphVersion to 

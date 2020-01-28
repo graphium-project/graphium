@@ -1,6 +1,6 @@
 package at.srfg.graphium.routing.algo;
 
-import at.srfg.graphium.traveltimecalculation.model.IDirectedSegmentSet;
+import at.srfg.graphium.routing.model.IDirectedSegmentSet;
 
 public interface IRoutedPath<W> {
 

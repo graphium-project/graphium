@@ -1,39 +1,25 @@
-/**
- * Graphium Neo4j - Module of Graphium for routing services via Neo4j
- * Copyright © 2017 Salzburg Research Forschungsgesellschaft (graphium@salzburgresearch.at)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
 package at.srfg.graphium.routing.model;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import at.srfg.graphium.routing.model.impl.RoutingAlgorithms;
-import at.srfg.graphium.routing.model.impl.RoutingCriteria;
-import at.srfg.graphium.routing.model.impl.RoutingMode;
+import com.vividsolutions.jts.geom.Coordinate;
 
 public interface IRoutingOptions {
-
-	void setCriteria(RoutingCriteria criteria);
-
-	RoutingCriteria getCriteria();
 	
-	void setAlgorithm(RoutingAlgorithms algorithm);
+	List<Coordinate> getCoordinates();
 	
-	RoutingAlgorithms getAlgorithm();
+	void setCoordinates(List<Coordinate> coordinate);
+
+	void setCriteria(IRoutingCriteria criteria);
+
+	IRoutingCriteria getCriteria();
+	
+	void setAlgorithm(IRoutingAlgorithm algorithm);
+	
+	IRoutingAlgorithm getAlgorithm();
 
 	void setTimeout(int timeoutMs);
 	
@@ -55,17 +41,13 @@ public interface IRoutingOptions {
 	 * @param timestamp Timestamp for selecting the correct graph's version (e.g. timestamp will be in past for historical analysis).
 	 * Will be ignored if graphVersion is set.
 	 */
-	void setRoutingTimestamp(Date timestamp);
+	void setRoutingTimestamp(LocalDate timestamp);
 	
-	Date getRoutingTimestamp();
+	LocalDate getRoutingTimestamp();
 	
-	RoutingMode getMode();
+	IRoutingMode getMode();
 
-	void setMode(RoutingMode mode);
-	
-	int getTargetSrid();
-	
-	void setTargetSrid(int targetSrid);
+	void setMode(IRoutingMode mode);
 
 	void setTagValueFilters(Map<String, Set<Object>> tagValueFilters);
 

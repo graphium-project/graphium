@@ -26,7 +26,7 @@ public interface IRoutingAlgoFactory<O extends IRoutingOptions, N, W> {
 	 * 
 	 * @throws UnkownRoutingAlgoException in case the asked algo implementation can not be supplied by factory instance
 	 */
-	public IRoutingAlgo<IRoutingOptions, N, W> createInstance(O routeOptions, N startNode, 
+	public IRoutingAlgo<O, N, W> createInstance(O routeOptions, N startNode, 
 			Float percentageStartWeight, N endNode, Float percentageEndWeight) throws UnkownRoutingAlgoException;
 
 }

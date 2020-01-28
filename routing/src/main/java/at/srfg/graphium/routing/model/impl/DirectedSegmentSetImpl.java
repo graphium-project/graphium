@@ -14,7 +14,6 @@ public class DirectedSegmentSetImpl implements IDirectedSegmentSet {
 	private Coordinate startCoord;
 	private Coordinate endCoord;
 	private List<IDirectedSegment> segments = new ArrayList<>();
-	private double lengthSum;
 	
 	public DirectedSegmentSetImpl() {}
 	

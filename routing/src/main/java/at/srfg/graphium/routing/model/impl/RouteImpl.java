@@ -1,66 +1,52 @@
-/**
- * Graphium Neo4j - Module of Graphium for routing services via Neo4j
- * Copyright © 2017 Salzburg Research Forschungsgesellschaft (graphium@salzburgresearch.at)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
 package at.srfg.graphium.routing.model.impl;
 
 import java.io.Serializable;
 import java.util.List;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonProperty;
-
-import at.srfg.graphium.model.IWaySegment;
-import at.srfg.graphium.routing.model.IPathSegment;
+import at.srfg.graphium.model.IBaseWaySegment;
+import at.srfg.graphium.routing.model.IDirectedSegment;
 import at.srfg.graphium.routing.model.IRoute;
 
-public class RouteImpl<T extends IWaySegment> implements IRoute<T>, Serializable{
+public class RouteImpl<T extends IBaseWaySegment, W extends Object> implements IRoute<T, W>, Serializable {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	@JsonProperty(value="Path")
-	private List<IPathSegment> path;
-	@JsonProperty(value="Length")
+	private W weight;
+	private List<IDirectedSegment> path;
 	private float length;
-	@JsonProperty(value="Duration")
 	private int duration;
-	@JsonProperty(value="Error")
-	private String error;
-	@JsonProperty(value="Segments")
 	private List<T> segments;
-//	private List<IActivity> activities;
 	private int runtimeInMs  = -1;
-	@JsonProperty(value="GraphName")
 	private String graphName;
-	@JsonProperty(value="GraphVersion")
 	private String graphVersion;
 
 	public RouteImpl() {}
-	public RouteImpl(List<IPathSegment> path, float length, int duration, String error) {
+	public RouteImpl(W weight, List<IDirectedSegment> path, float length, int duration, List<T> segments, 
+			int runtimeInMs, String graphName, String graphVersion) {
+		this.weight = weight;
 		this.path = path;
 		this.length = length;
 		this.duration = duration;
-		this.error = error;
+		this.segments = segments;
+		this.runtimeInMs = runtimeInMs;
+		this.graphName = graphName;
+		this.graphVersion = graphVersion;
 	}
 	
 	@Override
-	public List<IPathSegment> getPath() {
+	public W getWeight() {
+		return weight;
+	}
+	@Override
+	public void setWeight(W weight) {
+		this.weight = weight;
+	}
+	
+	@Override
+	public List<IDirectedSegment> getPath() {
 		return path;
 	}
 
@@ -75,7 +61,7 @@ public class RouteImpl<T extends IWaySegment> implements IRoute<T>, Serializable
 	}
 
 	@Override
-	public void setPath(List<IPathSegment> path) {
+	public void setPath(List<IDirectedSegment> path) {
 		this.path = path;
 	}
 
@@ -90,25 +76,21 @@ public class RouteImpl<T extends IWaySegment> implements IRoute<T>, Serializable
 		this.duration = duration;
 	}
 	
-	@JsonIgnore
 	@Override
 	public List<T> getSegments() {
 		return segments;
 	}
 	
-	@JsonIgnore
 	@Override
 	public void setSegments(List<T> segments) {
 		this.segments = segments;
 	}
 	
-	@JsonIgnore
 	@Override
 	public int getRuntimeInMs() {
 		return runtimeInMs;
 	}
 	
-	@JsonIgnore
 	@Override
 	public void setRuntimeInMs(int runtimeInMs) {
 		this.runtimeInMs = runtimeInMs;
@@ -133,13 +115,5 @@ public class RouteImpl<T extends IWaySegment> implements IRoute<T>, Serializable
 	public void setGraphVersion(String graphVersion) {
 		this.graphVersion = graphVersion;
 	}
-	
-	public void setError(String error) {
-		this.error = error;
-	}
-	public String getError() {
-		return error;
-	}
-	
 
 }
