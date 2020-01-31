@@ -1,3 +1,18 @@
+/**
+ * Copyright © 2020 Salzburg Research Forschungsgesellschaft (graphium@salzburgresearch.at)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package at.srfg.graphium.routing.api.controller.impl;
 
 import javax.annotation.PostConstruct;
@@ -22,6 +37,7 @@ import at.srfg.graphium.routing.api.dto.IRouteDTO;
 import at.srfg.graphium.routing.api.dto.impl.RoutingErrorDtoImpl;
 import at.srfg.graphium.routing.exception.RoutingException;
 import at.srfg.graphium.routing.exception.RoutingParameterException;
+import at.srfg.graphium.routing.exception.UnkownRoutingAlgoException;
 import at.srfg.graphium.routing.model.IRoute;
 import at.srfg.graphium.routing.model.IRoutingOptions;
 import at.srfg.graphium.routing.model.IRoutingOptionsFactory;
@@ -45,7 +61,7 @@ public abstract class GenericRoutingApiController<T extends IBaseWaySegment, O e
 		// output --> overview, default / path?, details
 		// avoid --> bbox? 
 		// insgesamt, routing GET mit weniger Optionen, routing POST mit mehr?				
-	@RequestMapping(value = "/graphs/{graphName}/routing/route.do", method=RequestMethod.GET)
+	@RequestMapping(value = "/routing/graphs/{graphName}/route.do", method=RequestMethod.GET)
 	public ModelAndView route(
 			@PathVariable(value = "graphName") String graphName,
 			@RequestParam(value = "coords") String coords,
@@ -60,7 +76,7 @@ public abstract class GenericRoutingApiController<T extends IBaseWaySegment, O e
 //			@RequestParam(value = "routingMode", required = false, defaultValue = "CAR") String routingMode,
 //			@RequestParam(value = "routingCriteria", required = false, defaultValue = "LENGTH") String routingCriteria,
 //			@RequestParam(value = "routingAlgorithm", required = false, defaultValue = "DIJKSTRA") String routingAlgorithm
-			) throws RoutingException, RoutingParameterException {
+			) throws RoutingException, RoutingParameterException, UnkownRoutingAlgoException {
 		return doRoute(graphName, null, coords, output, allRequestParams);
 		
 		/*log.info("got routing request in graph " + graphName + " from "
@@ -84,19 +100,19 @@ public abstract class GenericRoutingApiController<T extends IBaseWaySegment, O e
 		return modelAndView;*/
 	}
 	
-	@RequestMapping(value = "/graphs/{graphName}/versions/{graphVersion}/routing/route.do", method=RequestMethod.GET)
+	@RequestMapping(value = "/routing/graphs/{graphName}/versions/{graphVersion}/route.do", method=RequestMethod.GET)
 	public ModelAndView routeForVersion(
 			@PathVariable(value = "graphName") String graphName,
 			@PathVariable(value = "graphVersion") String graphVersion,
 			@RequestParam(value = "coords") String coords,
 			@RequestParam(value = "output") String output,
-			@RequestParam MultiValueMap<String,String> allRequestParams) throws RoutingException, RoutingParameterException  {
+			@RequestParam MultiValueMap<String,String> allRequestParams) throws RoutingException, RoutingParameterException, UnkownRoutingAlgoException  {
 		return doRoute(graphName, graphVersion, coords, output, allRequestParams);
 	}
 	
 
 	protected ModelAndView doRoute(String graphName, String graphVersion, String coordString, 
-			String output, MultiValueMap<String, String> allRequestParams) throws RoutingParameterException {
+			String output, MultiValueMap<String, String> allRequestParams) throws RoutingParameterException, UnkownRoutingAlgoException {
 		IRouteOutputAdapter<IRouteDTO<W>, W, T> adapter = adapterRegistry.getAdapter(output);
 		if(adapter == null) {
 			throw new RoutingParameterException("no output format " + output + " available");
@@ -150,8 +166,29 @@ public abstract class GenericRoutingApiController<T extends IBaseWaySegment, O e
 	
 	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(RoutingException.class)
-	// TODO: handle other exceptions
 	public ModelAndView handleException(RoutingException exception) {
+		log.warn(exception.getMessage());
+		MappingJackson2JsonView view = new MappingJackson2JsonView();
+
+		ModelAndView modelAndView = new ModelAndView(view, "error",
+				new RoutingErrorDtoImpl(exception.getMessage()));
+		return modelAndView;
+	}
+
+	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(RoutingException.class)
+	public ModelAndView handleException(UnkownRoutingAlgoException exception) {
+		log.warn(exception.getMessage());
+		MappingJackson2JsonView view = new MappingJackson2JsonView();
+
+		ModelAndView modelAndView = new ModelAndView(view, "error",
+				new RoutingErrorDtoImpl(exception.getMessage()));
+		return modelAndView;
+	}
+
+	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(RoutingException.class)
+	public ModelAndView handleException(RoutingParameterException exception) {
 		log.warn(exception.getMessage());
 		MappingJackson2JsonView view = new MappingJackson2JsonView();
 

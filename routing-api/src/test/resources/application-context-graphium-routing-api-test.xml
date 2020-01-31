@@ -1,0 +1,64 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<import resource="classpath:/application-context-graphium-routing.xml"/>
+
+    <context:annotation-config />	
+	<mvc:annotation-driven />
+
+<!-- 	<bean id="importConfigurer" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+        <property name="location" value="#{environment.getProperty('graphium.conf.path','classpath:')}import.properties" />
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+	</bean>
+ -->
+ 
+ 	<!-- dummy DAO -->
+	<bean id="mockReadDao" class="at.srfg.graphium.persistence.impl.MockReadDaoImpl"/>
+	
+	<!-- services -->
+	<bean id="waySegmentsByIdLoader" class="at.srfg.graphium.routing.service.impl.WaySegmentsByIdLoaderImpl">
+		<constructor-arg name="graphDao" ref="mockReadDao"/>
+	</bean>
+	
+	<bean id="mockPointToRoutingNodeResolver" class="at.srfg.graphium.routing.algo.impl.MockPointToRoutingNodeResolverImpl"/>
+
+	<bean id="mockRoutingAlgoFactory" class="at.srfg.graphium.routing.algo.impl.MockRoutingAlgoFactoryImpl"/>
+	
+	<bean id="mockRoutingService" class="at.srfg.graphium.routing.service.impl.MockRoutingServiceImpl">
+		<property name="pointToRoutingNodeResolver" ref="mockPointToRoutingNodeResolver"/>
+		<property name="routingAlgoFactory" ref="mockRoutingAlgoFactory"/>
+		<property name="toRouteAdapter" ref="directedSegmentSetToRouteAdapterService"/>
+	</bean>
+	
+	<!-- adapters -->
+	<bean id="overviewRouteOutputAdapter" class="at.srfg.graphium.routing.api.adapter.impl.OverviewRouteOutputAdapterImpl"/>
+	<bean id="pathRouteOutputAdapter" class="at.srfg.graphium.routing.api.adapter.impl.PathRouteOutputAdapterImpl"/>
+	<bean id="routeOutputAdapterRegistry" class="at.srfg.graphium.routing.api.adapter.impl.RouteOutputAdapterRegistryImpl"/>
+
+	<!-- controllers -->
+	<!-- scan graphium api controllers -->
+	<context:component-scan base-package="at.srfg.graphium.api.controller" />
+	
+	<!-- define controllers -->
+	<bean id="graphVersionMetadataApiController" class="at.srfg.graphium.routing.api.controller.impl.WaySegmentRoutingApiController">
+		<property name="routingOptionsFactory" ref="routingOptionsFactory"/>
+		<property name="routeService" ref="mockRoutingService"/>
+		<property name="adapterRegistry" ref="routeOutputAdapterRegistry"/>
+	</bean>
+
+</beans>
