@@ -55,10 +55,9 @@ public class RoutingOptionsImpl implements IRoutingOptions, Serializable {
 	private int timeout;
 	private Map<String, Object> additionalOptions;
 
-	public RoutingOptionsImpl(String graphName, String graphVersion, List<Coordinate> coordinates) {
+	public RoutingOptionsImpl(String graphName, String graphVersion) {
 		this.graphName = graphName;
 		this.graphVersion = graphVersion;
-		this.coordinates = coordinates;
 		this.routingTimestamp = LocalDate.now();
 		this.algorithm = RoutingAlgorithms.BIDIRECTIONAL_DIJKSTRA;
 		this.criteria = RoutingCriteria.LENGTH;
@@ -68,6 +67,11 @@ public class RoutingOptionsImpl implements IRoutingOptions, Serializable {
 		this.tagValueFilters = new HashMap<>();
 		this.additionalOptions = new HashMap<>();		
 		this.searchDistance = DEFAULT_SEARCH_DISTANCE;
+	}
+	
+	public RoutingOptionsImpl(String graphName, String graphVersion, List<Coordinate> coordinates) {
+		this(graphName, graphVersion);
+		this.coordinates = coordinates;
 	}
 	
 	@Override

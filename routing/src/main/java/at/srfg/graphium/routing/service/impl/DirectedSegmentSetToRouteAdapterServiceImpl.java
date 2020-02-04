@@ -16,6 +16,7 @@
 package at.srfg.graphium.routing.service.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,6 +24,13 @@ import java.util.Set;
 import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.linearref.LinearLocation;
+import com.vividsolutions.jts.linearref.LocationIndexedLine;
+import com.vividsolutions.jts.operation.linemerge.LineMerger;
 
 import at.srfg.graphium.core.exception.GraphNotExistsException;
 import at.srfg.graphium.model.IBaseWaySegment;
@@ -147,8 +155,81 @@ public class DirectedSegmentSetToRouteAdapterServiceImpl<T extends IBaseWaySegme
 		route.setGraphVersion(options.getGraphVersion());
 		route.setSegments(segments);
 	
+		Coordinate startCoordinate = null;
+		Coordinate endCoordinate = null;
+		if (options.getCoordinates() != null) {
+			startCoordinate = options.getCoordinates().get(0);
+			endCoordinate = options.getCoordinates().get(options.getCoordinates().size()-1);
+		}
+		route.setGeometry(createRouteGeometry(route, startCoordinate, endCoordinate));
+		
 		timer.stop();
 		log.debug("adaption of routing algo result to Route Object took: " + timer.getTime() + " ms");
 		return route;
-	}	
+	}
+	
+	@SuppressWarnings("unchecked")
+	protected LineString createRouteGeometry(IRoute<T, W> route, Coordinate startCoord, Coordinate endCoord) {
+
+		Collection<LineString> lineStrings = null;
+//		List<Coordinate> coordinates = new ArrayList<>();
+//		Coordinate lastCoord = null;
+		if (route.getSegments() != null && !route.getSegments().isEmpty()) {
+			LineMerger lineMerger = new LineMerger();
+			int i = 0;
+			for (T segment : route.getSegments()) {
+				if (segment.getGeometry() != null) {
+//					for (Coordinate coord : segment.getGeometry().getCoordinates()) {
+//						if (lastCoord == null || !lastCoord.equals(coord)) {
+//							coordinates.add(coord);
+//						}
+//						lastCoord = coord;
+//					}
+					
+					LineString line = segment.getGeometry();
+					if (i == 0 && startCoord != null) {
+						line = cutSegment(segment, route.getPath().get(0).isTowards(), startCoord);
+					} else if (i == route.getSegments().size() - 1 && endCoord != null) {
+						line = cutSegment(segment, !route.getPath().get(route.getPath().size()-1).isTowards(), endCoord);
+					}
+					lineMerger.add(line);
+				}
+				i++;
+			}
+			lineStrings = lineMerger.getMergedLineStrings(); // creates MultiLineStrings!
+		}
+		
+		return lineStrings.iterator().next();
+		
+//		String geometryWkt = null;
+//		if (lineStrings != null) {
+//			geometryWkt = "";
+//			for (LineString ls : lineStrings) {
+//				geometryWkt += ls.toText();
+//			}
+//		}
+
+	}
+
+	protected LineString cutSegment(T segment, boolean directionTow, Coordinate coordinate) {
+		// refrence startpoint on segment
+		LocationIndexedLine indexedStartSeg = new LocationIndexedLine(segment.getGeometry());
+	
+		// location in line string
+		LinearLocation startLoc = indexedStartSeg.project(coordinate);
+		
+		Geometry cutGeom;
+		// depending on direction cut the segment on the correct end
+		if (!directionTow) {
+			cutGeom = indexedStartSeg.extractLine(indexedStartSeg.getStartIndex(), startLoc);
+		} 
+		else {
+			cutGeom = indexedStartSeg.extractLine(startLoc, indexedStartSeg.getEndIndex());			
+		}
+		cutGeom.setSRID(segment.getGeometry().getSRID());
+		
+		// set cut segment
+		return (LineString) cutGeom;
+	}
+
 }

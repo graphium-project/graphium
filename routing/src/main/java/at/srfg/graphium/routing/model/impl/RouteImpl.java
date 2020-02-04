@@ -18,6 +18,8 @@ package at.srfg.graphium.routing.model.impl;
 import java.io.Serializable;
 import java.util.List;
 
+import com.vividsolutions.jts.geom.LineString;
+
 import at.srfg.graphium.model.IBaseWaySegment;
 import at.srfg.graphium.routing.model.IDirectedSegment;
 import at.srfg.graphium.routing.model.IRoute;
@@ -34,18 +36,20 @@ public class RouteImpl<T extends IBaseWaySegment, W extends Object> implements I
 	private float length;
 	private int duration;
 	private List<T> segments;
+	private LineString lineString;
 	private int runtimeInMs  = -1;
 	private String graphName;
 	private String graphVersion;
 
 	public RouteImpl() {}
-	public RouteImpl(W weight, List<IDirectedSegment> path, float length, int duration, List<T> segments, 
+	public RouteImpl(W weight, List<IDirectedSegment> path, float length, int duration, List<T> segments, LineString lineString, 
 			int runtimeInMs, String graphName, String graphVersion) {
 		this.weight = weight;
 		this.path = path;
 		this.length = length;
 		this.duration = duration;
 		this.segments = segments;
+		this.lineString = lineString;
 		this.runtimeInMs = runtimeInMs;
 		this.graphName = graphName;
 		this.graphVersion = graphVersion;
@@ -99,6 +103,16 @@ public class RouteImpl<T extends IBaseWaySegment, W extends Object> implements I
 	@Override
 	public void setSegments(List<T> segments) {
 		this.segments = segments;
+	}
+	
+	@Override
+	public LineString getGeometry() {
+		return lineString;
+	}
+
+	@Override
+	public void setGeometry(LineString lineString) {
+		this.lineString = lineString;
 	}
 	
 	@Override

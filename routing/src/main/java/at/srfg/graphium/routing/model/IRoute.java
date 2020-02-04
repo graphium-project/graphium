@@ -17,6 +17,8 @@ package at.srfg.graphium.routing.model;
 
 import java.util.List;
 
+import com.vividsolutions.jts.geom.LineString;
+
 import at.srfg.graphium.model.IBaseWaySegment;
 
 public interface IRoute<T extends IBaseWaySegment, W extends Object> {
@@ -36,6 +38,9 @@ public interface IRoute<T extends IBaseWaySegment, W extends Object> {
 	public List<T> getSegments();
 	public void setSegments(List<T> segments);
 
+	public LineString getGeometry();
+	public void setGeometry(LineString lineString);
+	
 	public int getRuntimeInMs();
 	public void setRuntimeInMs(int runtimeInMs);
 	

@@ -28,6 +28,9 @@ import at.srfg.graphium.routing.algo.IPointToRoutingNodeResolver;
 import at.srfg.graphium.routing.algo.IRoutedPath;
 import at.srfg.graphium.routing.algo.IRoutingAlgo;
 import at.srfg.graphium.routing.algo.IRoutingAlgoFactory;
+import at.srfg.graphium.routing.algo.ISegmentIdToRoutingNodeResolver;
+import at.srfg.graphium.routing.algo.ISegmentToRoutingNodeResolver;
+import at.srfg.graphium.routing.exception.RoutingException;
 import at.srfg.graphium.routing.exception.UnkownRoutingAlgoException;
 import at.srfg.graphium.routing.model.IDirectedSegment;
 import at.srfg.graphium.routing.model.IRoute;
@@ -41,15 +44,14 @@ public abstract class GenericRoutingServiceImpl<T extends IBaseWaySegment, N ext
 	 // default behaviour: segment cutting is enabled
 //	private boolean defaultCutSegments = true;
 
-	private IPointToRoutingNodeResolver<N> pointToRoutingNodeResolver;
-//	private ISegmentToRoutingNodeResolver<T, N> segmentToRoutingNodeResolver;
-	private IRoutingAlgoFactory<O, N, W> routingAlgoFactory;
-	private IDirectedSegmentSetAdapterService<IRoute<T,W>, T, W> toRouteAdapter;
+	protected IPointToRoutingNodeResolver<N> pointToRoutingNodeResolver;
+	protected ISegmentToRoutingNodeResolver<T, N> segmentToRoutingNodeResolver;
+	protected ISegmentIdToRoutingNodeResolver<N> segmentIdToRoutingNodeResolver;
+	protected IRoutingAlgoFactory<O, N, W> routingAlgoFactory;
+	protected IDirectedSegmentSetAdapterService<IRoute<T,W>, T, W> toRouteAdapter;
 	
 	@Override
-	public IRoute<T, W> route(O options) throws UnkownRoutingAlgoException {
-		
-		IRoutingAlgo<O, N, W> algo;
+	public IRoute<T, W> route(O options) throws UnkownRoutingAlgoException, RoutingException {
 		Iterator<Coordinate> coordIt = options.getCoordinates().iterator();
 		
 		Coordinate current;
@@ -63,11 +65,7 @@ public abstract class GenericRoutingServiceImpl<T extends IBaseWaySegment, N ext
 		LineString endNodeGeometry = null;
 		List<IRoute<T, W>> routeFragments = new ArrayList<>();
 		IRoute<T,W> currentRoute;		
-		long timeStart = 0;
-		long timeEnd = 0;
 		while (coordIt.hasNext()) {
-			timeStart = System.currentTimeMillis();
-			
 			current = coordIt.next();
 			// resolve datasource specific start and end node
 			startNode = pointToRoutingNodeResolver.resolveSegment(GeometryUtils.createPoint(prev, options.getOutputSrid()),
@@ -83,33 +81,106 @@ public abstract class GenericRoutingServiceImpl<T extends IBaseWaySegment, N ext
 			startNodeGeometry = getNodeGeometry(startNode);
 			endNodeGeometry = getNodeGeometry(endNode);
 			
+			if (startNodeGeometry == null || endNodeGeometry == null) {
+				throw new RoutingException("Could not parse geometry for start or end node!");
+			}
+			
 			// calculate start and end weight percentages by linear referencing points on segment's linestrings
 			percentageStartWeight = calculateWeightPercentage(prev, startNodeGeometry);
 			percentageEndWeight = calculateWeightPercentage(current, endNodeGeometry);
 			
-			// TODO: integrate start/end Weights, only on first/last route or on all?
-			// mw: weights are necessary on each start and end segment
-			algo = routingAlgoFactory.createInstance(options, startNode, percentageStartWeight, endNode, percentageEndWeight);			
-//			algo =  routingAlgoFactory.createInstance(options, startNode, 1.0f, endNode, 1.0f);
-			
-			IRoute<T,W>	routeFragment = adapt(algo.bestRoute(options, startNode, percentageStartWeight, endNode, percentageEndWeight),
-										  options,
-										  percentageStartWeight,
-										  percentageEndWeight);
-			
-			timeEnd = System.currentTimeMillis();
-			routeFragment.setRuntimeInMs((int)(timeEnd - timeStart));
-			
-			routeFragments.add(routeFragment);
+			routeFragments.add(routeFragment(options, startNode, percentageStartWeight, endNode, percentageEndWeight));
 		}
 		
 		currentRoute = assembleRoute(routeFragments);
 		
-		// TODO Auto-generated method stub
 		return currentRoute;
 	}
 
-	private IRoute<T, W> adapt(IRoutedPath<W> currentPath, O options, float percentageStartWeight,
+	@Override
+	public IRoute<T, W> routePerSegments(O options, List<T> segments) throws UnkownRoutingAlgoException {
+		Iterator<T> segmentIt = segments.iterator();
+		
+		T current = null;
+		T prev = segmentIt.next();
+
+		N startNode;
+		N endNode;
+		float percentageStartWeight = 0;
+		float percentageEndWeight = 1;
+		List<IRoute<T, W>> routeFragments = new ArrayList<>();
+		IRoute<T,W> currentRoute;		
+		while (segmentIt.hasNext()) {
+			current = segmentIt.next();
+			// resolve datasource specific start and end node
+			startNode = segmentToRoutingNodeResolver.resolveSegment(prev, 
+																  options.getGraphName(), 
+																  options.getGraphVersion());
+			endNode = segmentToRoutingNodeResolver.resolveSegment(current, 
+																  options.getGraphName(), 
+																  options.getGraphVersion());
+			
+			routeFragments.add(routeFragment(options, startNode, percentageStartWeight, endNode, percentageEndWeight));
+		}
+		
+		currentRoute = assembleRoute(routeFragments);
+		
+		return currentRoute;
+	}
+
+	@Override
+	public IRoute<T, W> routePerSegmentIds(O options, List<Long> segmentIds) throws UnkownRoutingAlgoException {
+		Iterator<Long> segmentIt = segmentIds.iterator();
+		
+		Long current = null;
+		Long prev = segmentIt.next();
+
+		N startNode;
+		N endNode;
+		float percentageStartWeight = 0;
+		float percentageEndWeight = 1;
+		List<IRoute<T, W>> routeFragments = new ArrayList<>();
+		IRoute<T,W> currentRoute;		
+		while (segmentIt.hasNext()) {
+			current = segmentIt.next();
+			// resolve datasource specific start and end node
+			startNode = segmentIdToRoutingNodeResolver.resolveSegment(prev, 
+																  options.getGraphName(), 
+																  options.getGraphVersion());
+			endNode = segmentIdToRoutingNodeResolver.resolveSegment(current, 
+																  options.getGraphName(), 
+																  options.getGraphVersion());
+			
+			routeFragments.add(routeFragment(options, startNode, percentageStartWeight, endNode, percentageEndWeight));
+		}
+		
+		currentRoute = assembleRoute(routeFragments);
+		
+		return currentRoute;
+	}
+	
+	private IRoute<T, W> routeFragment(O options, N startNode, float percentageStartWeight, N endNode, float percentageEndWeight) 
+			throws UnkownRoutingAlgoException {
+		long timeStart = System.currentTimeMillis();
+		long timeEnd = 0;
+		
+		// TODO: integrate start/end Weights, only on first/last route or on all?
+		// mw: weights are necessary on each start and end segment
+		IRoutingAlgo<O, N, W> algo = routingAlgoFactory.createInstance(options, startNode, percentageStartWeight, endNode, percentageEndWeight);			
+//		algo =  routingAlgoFactory.createInstance(options, startNode, 1.0f, endNode, 1.0f);
+		
+		IRoute<T,W>	routeFragment = adapt(algo.bestRoute(options, startNode, percentageStartWeight, endNode, percentageEndWeight),
+									  options,
+									  percentageStartWeight,
+									  percentageEndWeight);
+		
+		timeEnd = System.currentTimeMillis();
+		routeFragment.setRuntimeInMs((int)(timeEnd - timeStart));
+
+		return routeFragment;
+	}
+
+	protected IRoute<T, W> adapt(IRoutedPath<W> currentPath, O options, float percentageStartWeight,
 			float percentageEndWeight) {
 		if (currentPath == null) {
 			return this.toRouteAdapter.createEmptyRoute();
@@ -119,13 +190,7 @@ public abstract class GenericRoutingServiceImpl<T extends IBaseWaySegment, N ext
 		}
 	}
 
-	@Override
-	public IRoute<T, W> route(O options, List<T> segments) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	private IRoute<T, W> assembleRoute(List<IRoute<T, W>> routeFragments) {
+	protected IRoute<T, W> assembleRoute(List<IRoute<T, W>> routeFragments) {
 		if (routeFragments == null || routeFragments.isEmpty()) {
 			return null;
 		}
@@ -174,7 +239,7 @@ public abstract class GenericRoutingServiceImpl<T extends IBaseWaySegment, N ext
 		}
 	}
 
-	private float calculateWeightPercentage(Coordinate coordinate, LineString geometry) {
+	protected float calculateWeightPercentage(Coordinate coordinate, LineString geometry) {
 		return (float) GeometryUtils.offsetOnLineString(coordinate, geometry);
 	}
 
@@ -204,6 +269,22 @@ public abstract class GenericRoutingServiceImpl<T extends IBaseWaySegment, N ext
 
 	public void setToRouteAdapter(IDirectedSegmentSetAdapterService<IRoute<T, W>, T, W> toRouteAdapter) {
 		this.toRouteAdapter = toRouteAdapter;
+	}
+
+	public ISegmentToRoutingNodeResolver<T, N> getSegmentToRoutingNodeResolver() {
+		return segmentToRoutingNodeResolver;
+	}
+
+	public void setSegmentToRoutingNodeResolver(ISegmentToRoutingNodeResolver<T, N> segmentToRoutingNodeResolver) {
+		this.segmentToRoutingNodeResolver = segmentToRoutingNodeResolver;
+	}
+
+	public ISegmentIdToRoutingNodeResolver<N> getSegmentIdToRoutingNodeResolver() {
+		return segmentIdToRoutingNodeResolver;
+	}
+
+	public void setSegmentIdToRoutingNodeResolver(ISegmentIdToRoutingNodeResolver<N> segmentIdToRoutingNodeResolver) {
+		this.segmentIdToRoutingNodeResolver = segmentIdToRoutingNodeResolver;
 	}
 
 }

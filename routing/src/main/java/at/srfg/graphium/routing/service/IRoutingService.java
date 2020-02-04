@@ -18,6 +18,7 @@ package at.srfg.graphium.routing.service;
 import java.util.List;
 
 import at.srfg.graphium.model.IBaseWaySegment;
+import at.srfg.graphium.routing.exception.RoutingException;
 import at.srfg.graphium.routing.exception.UnkownRoutingAlgoException;
 import at.srfg.graphium.routing.model.IRoute;
 import at.srfg.graphium.routing.model.IRoutingOptions;
@@ -41,23 +42,38 @@ public interface IRoutingService<T extends IBaseWaySegment, W extends Object, O 
 	 * @param options options for algorithm (e.q. cost criteria used to calcualate the best route (e.g. time or length))
 	 * @return the found route or null if no route could be found.
 	 * @throws UnkownRoutingAlgoException 
+	 * @throws RoutingException 
 	 */
-	IRoute<T, W> route(O options) throws UnkownRoutingAlgoException;
+	IRoute<T, W> route(O options) throws UnkownRoutingAlgoException, RoutingException;
 	
-
 	/**
 	 * TODO: überarbeiten
-	 * Route in the given graph and return a found route between the given in start and end segment 
+	 * Route in the given graph and return a found route between the given start and end segment.
 	 * Routing mode can be specified using the criteria to use, which graph the router should work on can be defined in 
 	 * graphName within IRoutingOptions.
 	 * 
 	 * @param options options for algorithm (e.q. cost criteria used to calcualate the best route (e.g. time or length))
 	 * @param segments the segment in the graph the route has to pass (in order given in list)
 	 * @return the found route or null if no route could be found.
+	 * @throws UnkownRoutingAlgoException 
 	 *
 	 */
-	IRoute<T, W> route(O options,
-			List<T> segments);
+	IRoute<T, W> routePerSegments(O options,
+			List<T> segments) throws UnkownRoutingAlgoException;
+
+	/**
+	 * TODO: überarbeiten
+	 * Route in the given graph and return a found route between the given start and end segment identified by their ID.
+	 * Routing mode can be specified using the criteria to use, which graph the router should work on can be defined in 
+	 * graphName within IRoutingOptions.
+	 * 
+	 * @param options options for algorithm (e.q. cost criteria used to calcualate the best route (e.g. time or length))
+	 * @param segments the segment in the graph the route has to pass (in order given in list)
+	 * @return the found route or null if no route could be found.
+	 * @throws UnkownRoutingAlgoException 
+	 *
+	 */
+	IRoute<T, W> routePerSegmentIds(O options, List<Long> segmentIds) throws UnkownRoutingAlgoException;
 
 
 }

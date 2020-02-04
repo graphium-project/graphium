@@ -15,11 +15,6 @@
  */
 package at.srfg.graphium.routing.api.adapter.impl;
 
-import java.util.Collection;
-
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.operation.linemerge.LineMerger;
-
 import at.srfg.graphium.model.IBaseWaySegment;
 import at.srfg.graphium.routing.api.adapter.IRouteOutput;
 import at.srfg.graphium.routing.api.adapter.IRouteOutputAdapter;
@@ -42,23 +37,9 @@ public class OverviewRouteOutputAdapterImpl<T extends IBaseWaySegment>
 
 	@Override
 	public OverviewRouteDTOImpl adapt(IRoute<T, Float> route) {
-		Collection<LineString> lineStrings = null;
-		if (route.getSegments() != null && !route.getSegments().isEmpty()) {
-			LineMerger lineMerger = new LineMerger();
-			for (T segment : route.getSegments()) {
-				if (segment.getGeometry() != null) {
-					lineMerger.add(segment.getGeometry());
-				}
-			}
-			lineStrings = lineMerger.getMergedLineStrings();
-		}
-		
 		String geometryWkt = null;
-		if (lineStrings != null) {
-			geometryWkt = "";
-			for (LineString ls : lineStrings) {
-				geometryWkt += ls.toText();
-			}
+		if (route.getGeometry() != null) {
+			geometryWkt = route.getGeometry().toText();
 		}
 		
 		return new OverviewRouteDTOImpl(route.getWeight(), route.getLength(), route.getDuration(), 
