@@ -30,8 +30,8 @@ public class MockRoutingServiceImpl//<T extends IBaseWaySegment, N extends LineS
 	implements IRoutingService<IWaySegment, Double, IRoutingOptions> {
 
 	@Override
-	protected LineString getNodeGeometry(LineString startNode) {
-		return startNode;
+	protected LineString getNodeGeometry(LineString node) {
+		return node;
 	}
 
 //	@SuppressWarnings("unchecked")

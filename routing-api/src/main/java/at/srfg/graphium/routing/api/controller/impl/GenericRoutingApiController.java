@@ -67,37 +67,8 @@ public abstract class GenericRoutingApiController<T extends IBaseWaySegment, O e
 			@RequestParam(value = "coords") String coords,
 			@RequestParam(value = "output", defaultValue = "overview") String output,
 			@RequestParam MultiValueMap<String,String> allRequestParams
-//			@RequestParam(value = "timestamp", required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date routingTimestamp,
-//			@RequestParam(value = "startX", required = true) double startX,
-//			@RequestParam(value = "startY", required = true) double startY,
-//			@RequestParam(value = "endX", required = true) double endX,
-//			@RequestParam(value = "endY", required = true) double endY,
-//			@RequestParam(value = "cutsegments", required = false, defaultValue = "true") boolean cutStartAndEndSegment,
-//			@RequestParam(value = "routingMode", required = false, defaultValue = "CAR") String routingMode,
-//			@RequestParam(value = "routingCriteria", required = false, defaultValue = "LENGTH") String routingCriteria,
-//			@RequestParam(value = "routingAlgorithm", required = false, defaultValue = "DIJKSTRA") String routingAlgorithm
 			) throws RoutingException, RoutingParameterException, UnkownRoutingAlgoException {
 		return doRoute(graphName, null, coords, output, allRequestParams);
-		
-		/*log.info("got routing request in graph " + graphName + " from "
-				+ startX + "," + startY + " to " + endX + "," + endY);
-		MappingJackson2JsonView view = new MappingJackson2JsonView();
-
-		IRoutingOptions options = routingOptionsFactory.createRoutingOptions(
-				graphName, null, routingTimestamp, routingMode, routingCriteria, routingAlgorithm);
-
-		IRoute<T> route = routeService.route(options, startX, startY, endX,
-				endY, cutStartAndEndSegment);
-		
-		RouteDtoImpl<T> routeDto = null;
-		
-		if (route != null) {
-			routeDto = routeAdapter.adapt(route);
-		}
-		
-		ModelAndView modelAndView = new ModelAndView(view, "route", routeDto);
-
-		return modelAndView;*/
 	}
 	
 	@RequestMapping(value = "/routing/graphs/{graphName}/versions/{graphVersion}/route.do", method=RequestMethod.GET)
@@ -112,7 +83,7 @@ public abstract class GenericRoutingApiController<T extends IBaseWaySegment, O e
 	
 
 	protected ModelAndView doRoute(String graphName, String graphVersion, String coordString, 
-			String output, MultiValueMap<String, String> allRequestParams) throws RoutingParameterException, UnkownRoutingAlgoException {
+			String output, MultiValueMap<String, String> allRequestParams) throws RoutingParameterException, UnkownRoutingAlgoException, RoutingException {
 		IRouteOutputAdapter<IRouteDTO<W>, W, T> adapter = adapterRegistry.getAdapter(output);
 		if(adapter == null) {
 			throw new RoutingParameterException("no output format " + output + " available");
@@ -125,44 +96,6 @@ public abstract class GenericRoutingApiController<T extends IBaseWaySegment, O e
 		ModelAndView modelAndView = new ModelAndView(view, "route", routeDto);
 		return modelAndView;
 	}
-	
-	// coordinates --> Array mit x/y Pairs
-	// output --> overview, default / path?, details
-	// avoid --> bbox? 
-	// insgesamt, routing GET mit weniger Optionen, routing POST mit mehr?
-/*	@RequestMapping(value = "/graphs/{graphName}/versions/{graphVersion}/routing/route.do", method=RequestMethod.GET)
-	public ModelAndView routeForVersion(
-			@PathVariable(value = "graphName") String graphName,
-			@PathVariable(value = "graphVersion") String graphVersion,
-			@RequestParam(value = "timestamp", required = true) @DateTimeFormat(pattern="yyyy-MM-dd") Date routingTimestamp,
-			@RequestParam(value = "startX", required = true) double startX,
-			@RequestParam(value = "startY", required = true) double startY,
-			@RequestParam(value = "endX", required = true) double endX,
-			@RequestParam(value = "endY", required = true) double endY,
-			@RequestParam(value = "cutsegments", required = false, defaultValue = "true") boolean cutStartAndEndSegment,
-			@RequestParam(value = "routingMode", required = false, defaultValue = "CAR") String routingMode,
-			@RequestParam(value = "routingCriteria", required = false, defaultValue = "LENGTH") String routingCriteria,
-			@RequestParam(value = "routingAlgorithm", required = false, defaultValue = "DIJKSTRA") String routingAlgorithm)
-			throws RoutingException {
-		log.info("got routing request in graph " + graphName + " from "
-				+ startX + "," + startY + " to " + endX + "," + endY + " / Options: cutSegments=" + cutStartAndEndSegment + 
-				", routingMode=" + routingMode + ", routingCriteria=" + routingCriteria);
-		MappingJackson2JsonView view = new MappingJackson2JsonView();
-
-		IRoutingOptions options = routingOptionsFactory.createRoutingOptions(
-				graphName, graphVersion, null, routingMode, routingCriteria, routingAlgorithm);
-
-		IRoute<T> route = routeService.route(options, startX, startY, endX,
-				endY, cutStartAndEndSegment);
-				
-		RouteDtoImpl<T> routeDto = routeAdapter.adapt(route);
-		
-		ModelAndView modelAndView = new ModelAndView(view, "route", routeDto);
-
-		return modelAndView;
-	}
-	*/
-
 	
 	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(RoutingException.class)
