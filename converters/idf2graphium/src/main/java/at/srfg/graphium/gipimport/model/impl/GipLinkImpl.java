@@ -49,6 +49,7 @@ public class GipLinkImpl implements IGipLink, Cloneable, Serializable {
 	private boolean bridge;
 	private boolean tunnel;
 	private boolean valid;
+	private long edgeId;
 	
 	@Override
 	public int getAccessBkw() {
@@ -265,6 +266,16 @@ public class GipLinkImpl implements IGipLink, Cloneable, Serializable {
 	@Override
 	public void setCoordinatesY(int[] coordinatesY) {
 		this.coordinatesY = coordinatesY;
+	}
+
+	@Override
+	public long getEdgeId() {
+		return edgeId;
+	}
+	
+	@Override
+	public void setEdgeId(long edgeId) {
+		this.edgeId = edgeId;
 	}
 
 	@Override
