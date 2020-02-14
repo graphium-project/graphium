@@ -99,6 +99,25 @@
 			</plugin>
 
 		</plugins>
+
+		<pluginManagement>
+	      <plugins>
+	        <plugin>
+	          <groupId>org.codehaus.mojo</groupId>
+	          <artifactId>license-maven-plugin</artifactId>
+	          <version>1.20</version>
+	          <executions>
+	            <execution>
+	              <id>add-third-party</id>
+	              <configuration>
+	              	<excludeTransitiveDependencies>true</excludeTransitiveDependencies>
+	              </configuration>
+	            </execution>
+	          </executions>
+	        </plugin>
+	      </plugins>
+	    </pluginManagement>
+
 	</build>
 
 	<properties>
@@ -181,6 +200,16 @@
 		<module>tutorial/model_extension</module>
 		<module>tutorial/central_server</module>
 	</modules>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>1.20</version>
+			</plugin>
+		</plugins>
+	</reporting>
 
 	<scm>
 		<connection>scm:git:https://github.com/graphium-project/graphium.git</connection>
