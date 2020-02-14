@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.springframework.util.MultiValueMap;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -49,9 +50,9 @@ public class RoutingOptionsFactoryImpl implements IRoutingOptionsFactory<IRoutin
 
 	@Override
 	public IRoutingOptions newRoutingOptions(String graphName, String graphVersion,
-			String coordsString,
-			MultiValueMap<String, String> allParams) throws RoutingParameterException {
-		IRoutingOptions options = new RoutingOptionsImpl(graphName, graphVersion, parseCoordsString(coordsString));
+			String coordsString, MultiValueMap<String, String> allParams, MutableBoolean cancellationObject) 
+					throws RoutingParameterException {
+		IRoutingOptions options = new RoutingOptionsImpl(graphName, graphVersion, parseCoordsString(coordsString), cancellationObject);
 		
 		if(allParams.containsKey(PARAM_ROUTING_MODE)) {
 			options.setMode(RoutingMode.fromValue(allParams.getFirst(PARAM_ROUTING_MODE)));
@@ -61,9 +62,6 @@ public class RoutingOptionsFactoryImpl implements IRoutingOptionsFactory<IRoutin
 		}
 		if(allParams.containsKey(PARAM_ROUTING_CRITERIA)) {
 			options.setCriteria(RoutingCriteria.fromValue(allParams.getFirst(PARAM_ROUTING_CRITERIA)));
-		}
-		if(allParams.containsKey(PARAM_TIMEOUT)) {
-			options.setTimeout(toTimeout(allParams.getFirst(PARAM_TIMEOUT)));
 		}
 		if(allParams.containsKey(PARAM_TIMESTAMP)) {
 			options.setRoutingTimestamp(toRoutingTimestamp(allParams.getFirst(PARAM_TIMESTAMP)));

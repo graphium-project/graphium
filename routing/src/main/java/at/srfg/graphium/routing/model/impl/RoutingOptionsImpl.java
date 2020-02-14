@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.mutable.MutableBoolean;
+
 import com.vividsolutions.jts.geom.Coordinate;
 
 import at.srfg.graphium.routing.model.IRoutingAlgorithm;
@@ -52,7 +54,7 @@ public class RoutingOptionsImpl implements IRoutingOptions, Serializable {
 	// TODO: Was war das nochmal
 	private Map<String, Set<Object>> tagValueFilters;
 	private double searchDistance;
-	private int timeout;
+	private MutableBoolean cancellationObject;
 	private Map<String, Object> additionalOptions;
 
 	public RoutingOptionsImpl(String graphName, String graphVersion) {
@@ -63,10 +65,19 @@ public class RoutingOptionsImpl implements IRoutingOptions, Serializable {
 		this.criteria = RoutingCriteria.LENGTH;
 		this.mode = RoutingMode.CAR;
 		this.outputSrid = DEFAULT_SRID;
-		this.timeout = -1;
 		this.tagValueFilters = new HashMap<>();
 		this.additionalOptions = new HashMap<>();		
 		this.searchDistance = DEFAULT_SEARCH_DISTANCE;
+	}
+
+	public RoutingOptionsImpl(String graphName, String graphVersion, MutableBoolean cancellationObject) {
+		this(graphName, graphVersion);
+		this.cancellationObject = cancellationObject;
+	}
+	
+	public RoutingOptionsImpl(String graphName, String graphVersion, List<Coordinate> coordinates, MutableBoolean cancellationObject) {
+		this(graphName, graphVersion, cancellationObject);
+		this.coordinates = coordinates;
 	}
 	
 	public RoutingOptionsImpl(String graphName, String graphVersion, List<Coordinate> coordinates) {
@@ -165,16 +176,6 @@ public class RoutingOptionsImpl implements IRoutingOptions, Serializable {
 	}
 
 	@Override
-	public void setTimeout(int timeoutMs) {
-		this.timeout = timeoutMs;
-	}
-
-	@Override
-	public int getTimeout() {
-		return timeout;
-	}
-
-	@Override
 	public void setAdditionalOptions(Map<String, Object> additionalOptions) {
 		this.additionalOptions = additionalOptions;
 	}
@@ -215,5 +216,23 @@ public class RoutingOptionsImpl implements IRoutingOptions, Serializable {
 				+ searchDistance + "]";
 	}
 
+	@Override
+	public boolean isCancelled() {
+		if (cancellationObject != null) {
+			return cancellationObject.booleanValue();
+		} else {
+			return false;
+		}
+	}
+	
+	@Override
+	public MutableBoolean getCancellationObject() {
+		return cancellationObject;
+	}
+
+	@Override
+	public void setCancellationObject(MutableBoolean cancellationObject) {
+		this.cancellationObject = cancellationObject;
+	}
 	
 }

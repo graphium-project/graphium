@@ -89,7 +89,7 @@ public abstract class GenericRoutingApiController<T extends IBaseWaySegment, O e
 			throw new RoutingParameterException("no output format " + output + " available");
 		}
 		MappingJackson2JsonView view = new MappingJackson2JsonView();		
-		O routingOptions = routingOptionsFactory.newRoutingOptions(graphName, graphVersion, coordString, allRequestParams);
+		O routingOptions = routingOptionsFactory.newRoutingOptions(graphName, graphVersion, coordString, allRequestParams, null);
 		IRoute<T, W> route = routeService.route(routingOptions);
 		
 		IRouteDTO<W> routeDto = adapter.adapt(route);

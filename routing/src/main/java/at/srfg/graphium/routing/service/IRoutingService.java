@@ -75,5 +75,4 @@ public interface IRoutingService<T extends IBaseWaySegment, W extends Object, O 
 	 */
 	IRoute<T, W> routePerSegmentIds(O options, List<Long> segmentIds) throws UnkownRoutingAlgoException;
 
-
 }

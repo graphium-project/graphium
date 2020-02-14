@@ -61,10 +61,4 @@ public class MockRoutingAlgoImpl implements IRoutingAlgo<IRoutingOptions, LineSt
 		return null;
 	}
 
-	@Override
-	public void cancel() {
-		// TODO Auto-generated method stub
-		
-	}
-
 }

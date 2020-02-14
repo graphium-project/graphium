@@ -57,10 +57,5 @@ public interface IRoutingAlgo<O extends IRoutingOptions, N, W> {
 	 */
 	public List<IRoutedPath<W>> bestRoutes(O routeOptions, N sourceNode, float precentageStartWeight, N targetNode,
 			float percentageEndWeight, short amount);
-
-	/**
-	 * Requests a cancellation of the algorithm execution
-	 */
-	public void cancel();
 	
 }

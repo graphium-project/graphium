@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.mutable.MutableBoolean;
+
 import com.vividsolutions.jts.geom.Coordinate;
 
 public interface IRoutingOptions {
@@ -36,10 +38,12 @@ public interface IRoutingOptions {
 	
 	IRoutingAlgorithm getAlgorithm();
 
-	void setTimeout(int timeoutMs);
+	boolean isCancelled();
 	
-	int getTimeout();
-
+	MutableBoolean getCancellationObject();
+	
+	void setCancellationObject(MutableBoolean cancellationObject);
+	
 	void setGraphName(String graphName);
 
 	String getGraphName();
