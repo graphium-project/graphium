@@ -108,7 +108,7 @@ public class WaySegmentResultSetExtractor<S extends IBaseSegment> implements ISe
 		}
 		
 		// map segment
-		S segment = segment= createSegment(rs, true);
+		S segment = createSegment(rs, true);
 		
 		if (segment == null) {
 			return null;
