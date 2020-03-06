@@ -190,24 +190,6 @@ public class RoutingOptionsImpl implements IRoutingOptions, Serializable {
 		return outputSrid;
 	}
 
-	/**
-	 * for use in spring caching with spring el for key generation 
-	 * @param options
-	 * @param startUri
-	 * @param endUri
-	 * @return
-	 */
-	// TODO: overwork
-	/*public static int generateCacheKey(IRoutingOptions options, String startUri, String endUri) {
-		HashCodeBuilder builder = new HashCodeBuilder();
-		builder.append(options.getGraphName());
-		builder.append(options.getMode());
-		builder.append(options.getCriteria());
-		builder.append(startUri);
-		builder.append(endUri);
-		return builder.hashCode();
-	}*/
-
 	@Override
 	public String toString() {
 		return "RoutingOptionsImpl [graphName=" + graphName + ", graphVersion=" + graphVersion + ", routingTimestamp="

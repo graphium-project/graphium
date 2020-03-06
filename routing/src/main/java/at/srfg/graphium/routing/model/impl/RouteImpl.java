@@ -26,9 +26,6 @@ import at.srfg.graphium.routing.model.IRoute;
 
 public class RouteImpl<T extends IBaseWaySegment, W extends Object> implements IRoute<T, W>, Serializable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	
 	private W weight;

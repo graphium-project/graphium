@@ -41,9 +41,6 @@ import at.srfg.graphium.routing.service.IRoutingService;
 public abstract class GenericRoutingServiceImpl<T extends IBaseWaySegment, N extends Object,
 	W extends Object, O extends IRoutingOptions> implements IRoutingService<T, W, O> {
 
-	 // default behaviour: segment cutting is enabled
-//	private boolean defaultCutSegments = true;
-
 	protected IPointToRoutingNodeResolver<N> pointToRoutingNodeResolver;
 	protected ISegmentToRoutingNodeResolver<T, N> segmentToRoutingNodeResolver;
 	protected ISegmentIdToRoutingNodeResolver<N> segmentIdToRoutingNodeResolver;

@@ -53,15 +53,12 @@ public class DirectedSegmentSetToRouteAdapterServiceImpl<T extends IBaseWaySegme
 	
 	private ISegmentCostEvaluatorFactory<T, Double> costEvaluatorFactory;
 	private IWaySegmentsByIdLoader<T> waySegmentsByIdLoader;
-//	private IRouteModelFactory<T, W> routeModelFactory;
 	
 	public DirectedSegmentSetToRouteAdapterServiceImpl(ISegmentCostEvaluatorFactory<T, Double> costEvaluatorFactory,
 			IWaySegmentsByIdLoader<T> waySegmentsByIdLoader
-//			,IRouteModelFactory<T> routeModelFactory
 			) {
 		this.costEvaluatorFactory = costEvaluatorFactory;
 		this.waySegmentsByIdLoader = waySegmentsByIdLoader;
-//		this.routeModelFactory = routeModelFactory;
 	}
 	
 	@Override
@@ -172,20 +169,11 @@ public class DirectedSegmentSetToRouteAdapterServiceImpl<T extends IBaseWaySegme
 	protected LineString createRouteGeometry(IRoute<T, W> route, Coordinate startCoord, Coordinate endCoord) {
 
 		Collection<LineString> lineStrings = null;
-//		List<Coordinate> coordinates = new ArrayList<>();
-//		Coordinate lastCoord = null;
 		if (route.getSegments() != null && !route.getSegments().isEmpty()) {
 			LineMerger lineMerger = new LineMerger();
 			int i = 0;
 			for (T segment : route.getSegments()) {
 				if (segment.getGeometry() != null) {
-//					for (Coordinate coord : segment.getGeometry().getCoordinates()) {
-//						if (lastCoord == null || !lastCoord.equals(coord)) {
-//							coordinates.add(coord);
-//						}
-//						lastCoord = coord;
-//					}
-					
 					LineString line = segment.getGeometry();
 					if (i == 0 && startCoord != null) {
 						line = cutSegment(segment, route.getPath().get(0).isTowards(), startCoord);
@@ -200,15 +188,6 @@ public class DirectedSegmentSetToRouteAdapterServiceImpl<T extends IBaseWaySegme
 		}
 		
 		return lineStrings.iterator().next();
-		
-//		String geometryWkt = null;
-//		if (lineStrings != null) {
-//			geometryWkt = "";
-//			for (LineString ls : lineStrings) {
-//				geometryWkt += ls.toText();
-//			}
-//		}
-
 	}
 
 	protected LineString cutSegment(T segment, boolean directionTow, Coordinate coordinate) {

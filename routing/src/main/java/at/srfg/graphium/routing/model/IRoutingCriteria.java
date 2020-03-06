@@ -20,6 +20,4 @@ public interface IRoutingCriteria {
 
 	String getValue();	
 
-//	IRoutingCriteria fromValue(String value);
-
 }

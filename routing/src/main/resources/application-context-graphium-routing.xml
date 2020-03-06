@@ -24,10 +24,6 @@
 	
 	<bean id="routingOptionsFactory" class="at.srfg.graphium.routing.model.impl.RoutingOptionsFactoryImpl"/>
 
-<!-- 	<bean id="waySegmentsByIdLoader" class="at.srfg.graphium.routing.service.impl.WaySegmentsByIdLoaderImpl">
-		<constructor-arg name="graphDao" ref="wayGraphReadDao"/>
-	</bean>
- -->	
 	<bean id="directedSegmentSetToRouteAdapterService" class="at.srfg.graphium.routing.service.impl.DirectedSegmentSetToRouteAdapterServiceImpl">
 		<constructor-arg name="costEvaluatorFactory" ref="segmentCostEvaluatorFactory"/>
 		<constructor-arg name="waySegmentsByIdLoader" ref="waySegmentsByIdLoader"/>
