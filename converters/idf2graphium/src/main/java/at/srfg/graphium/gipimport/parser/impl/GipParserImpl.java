@@ -394,7 +394,7 @@ public class GipParserImpl<T extends IBaseSegment> implements IGipParser<T> {
 				waySeg.setLanesBkw(link.getLanesBkw());
 				waySeg.setFrc(FuncRoadClass.getFuncRoadClassForValue(link.getFuncRoadClassValue()));
 				waySeg.setFormOfWay(FormOfWay.getFormOfWayForValue(link.getFormOfWay()));
-				waySeg.setWayId(link.getId());
+				waySeg.setWayId(link.getEdgeId());
 				waySeg.setStartNodeId(link.getFromNodeId());
 				waySeg.setStartNodeIndex(0);
 				waySeg.setEndNodeId(link.getToNodeId());

@@ -23,6 +23,9 @@ public interface IGipLink {
 	long getId();
 	void setId(long id);
 	
+	long getEdgeId();
+	void setEdgeId(long edgeId);
+	
 	String getName1();
 	void setName1(String name);
 	
