@@ -115,7 +115,7 @@ public class AsyncGipLinkParser implements Supplier<IGipLink> {
                 float lanesBkw = Short.parseShort(values[atrPos.get("LANES_BKW")]);	// input is decimal(2,1)!
                 link.setLanesTow((short) lanesTow);
                 link.setLanesBkw((short) lanesBkw);
-
+                link.setEdgeId(Long.parseLong(values[atrPos.get("EDGE_ID")]));
 
                 // TODO: Brauchen wir das?
                 link.setUTurn(Byte.parseByte(values[atrPos.get("U_TURN")]));

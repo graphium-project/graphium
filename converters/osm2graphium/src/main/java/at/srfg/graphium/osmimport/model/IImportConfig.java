@@ -18,6 +18,8 @@ package at.srfg.graphium.osmimport.model;
 import java.util.Date;
 import java.util.Set;
 
+import at.srfg.graphium.osmimport.model.impl.OsmTagAdaptionMode;
+
 public interface IImportConfig {
     IImportConfig outPutDir(String outputDirectory);
 
@@ -56,12 +58,18 @@ public interface IImportConfig {
     int getQueueSize();
 
     int getWorkerThreads();
+    
+    OsmTagAdaptionMode getTagAdaptionMode();
 
 	IImportConfig validTo(Date validTo);
 
 	IImportConfig validFrom(Date validFrom);
+	
+	IImportConfig tagAdaptionMode(OsmTagAdaptionMode tagAdaptionMode);
 
 	Date getValidFrom();
 
 	Date getValidTo();
+
+	
 }

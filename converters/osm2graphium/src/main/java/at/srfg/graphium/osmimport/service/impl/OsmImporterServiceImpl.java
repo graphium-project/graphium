@@ -139,7 +139,7 @@ public class OsmImporterServiceImpl {
 	        startTime = System.currentTimeMillis();
 	
 	        ArrayBlockingQueue<IWaySegment> waysQueue = new ArrayBlockingQueue<>(config.getQueueSize());
-	        SegmentationWaySink segmentationWaySink = new SegmentationWaySink(wayRefs, relations, waysQueue);
+	        SegmentationWaySink segmentationWaySink = new SegmentationWaySink(wayRefs, relations, waysQueue, config.getTagAdaptionMode());
 	        Thread segmentationThread = readOsm(segmentationWaySink, wayTagFilter, config, true);
 
 	        IWaySegment segment;
@@ -176,7 +176,7 @@ public class OsmImporterServiceImpl {
 	        log.info("Start reading PBF for building non-segmented ways...");
 	        startTime = System.currentTimeMillis();
 
-	        WaySink waySink = new WaySink(wayRefs, nodes, segmentedWaySegments, relations, waysQueue);
+	        WaySink waySink = new WaySink(wayRefs, nodes, segmentedWaySegments, relations, waysQueue, config.getTagAdaptionMode());
 	        Thread wayThread = readOsm(waySink, wayTagFilter, config, true);
 
 	        // retrieve ways and process them

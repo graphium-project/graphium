@@ -180,6 +180,8 @@
 		<module>tutorial/central_server</module>
 		<module>graphium-hd</module>
 		<module>converters/lanelet2graphium</module>
+		<module>routing</module>
+		<module>routing-api</module>
 	</modules>
 
 	<scm>

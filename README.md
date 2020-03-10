@@ -106,6 +106,7 @@ Example API call to generate a JSON file from OSM data:
 | -q           | --queueSize    | Size of import queue                     |
 | -t           | --threads      | Number of worker threads                 |
 |              | --highwayTypes | Comma separated List of highway types, to be considered. If not set, all highway types will be considered |
+| -T			   | --tags			| mode how osm tags of ways are stored on created segments, allowed modes 'none','all', defaults to 'none'  |
 
 ### GIP
 
@@ -193,13 +194,15 @@ Look at the tutorial package.
 - jackson-databind, Apache License, Version 2.0 (http://github.com/FasterXML/jackson)
 - JTS Topology Suite, LGPL (http://sourceforge.net/projects/jts-topo-suite)
 - Apache Commons Codec, Apache License, Version 2.0 (http://commons.apache.org/proper/commons-codec/)
-- Commons Logging, Apache License, Version 2.0 (http://commons.apache.org/logging)
 - JUnit, Eclipse Public License 1.0 (http://junit.org)
 - Apache Extras™ for Apache log4j™, Apache License, Version 2.0 (http://logging.apache.org/log4j/extras)
 - Apache Log4j, Apache License, Version 2.0 (http://logging.apache.org/log4j/1.2/)
 - Apache Commons Lang, Apache License, Version 2.0 (http://commons.apache.org/proper/commons-lang/)
+- Apache Commons CLI, Apache License, Version 2.0 (http://commons.apache.org/proper/commons-cli/)
+- Apache Commons FileUpload, Apache License, Version 2.0 (http://commons.apache.org/proper/commons-fileupload/)
 - Apache HttpClient, Apache License, Version 2.0 (http://hc.apache.org/httpcomponents-client)
 - Apache HttpCore, Apache License, Version 2.0 (http://hc.apache.org/httpcomponents-core-ga)
+- Apache Commons IO, Apache License, Version 2.0 (http://commons.apache.org/proper/commons-io/)
 - Jackson, Apache License, Version 2.0(http://jackson.codehaus.org)
 - Data Mapper for Jackson, Apache License, Version 2.0 (http://jackson.codehaus.org)
 - Hamcrest Core, New BSD License (https://github.com/hamcrest/JavaHamcrest/hamcrest-core)
@@ -214,3 +217,20 @@ Look at the tutorial package.
 - Spring Transaction, Apache License, Version 2.0 (https://github.com/spring-projects/spring-framework)
 - Spring Web, Apache License, Version 2.0 (https://github.com/spring-projects/spring-framework)
 - Spring Web MVC, Apache License, Version 2.0 (https://github.com/spring-projects/spring-framework)
+- spring-security-config, Apache License, Version 2.0 (http://spring.io/spring-security)
+- spring-security-core, Apache License, Version 2.0 (http://spring.io/spring-security)
+- spring-security-web, Apache License, Version 2.0 (http://spring.io/spring-security)
+- Spring TestContext Framework, Apache License, Version 2.0 (https://github.com/spring-projects/spring-framewor)
+- Wiremock, Apache License, Version 2.0 (http://wiremock.org)
+- HikariCP, Apache License, Version 2.0 (https://github.com/brettwooldridge/HikariCP)
+- fastutil, Apache License, Version 2.0 (http://fastutil.di.unimi.it/)
+- Java Servlet API, CDDL + GPLv2 with classpath exception(http://servlet-spec.java.net)
+- Postgis JDBC Driver, GNU Lesser General Public License (http://postgis.net/postgis-jdbc)
+- Postgis JDBC Driver JTS Parser, GNU Lesser General Public License (http://postgis.net/postgis-jdbc-jtsparser)
+- PostgreSQL JDBC Driver - JDBC 4.2, BSD-2-Clause (https://github.com/pgjdbc/pgjdbc)
+- opencsv, Apache License, Version 2.0 (http://opencsv.sf.net)
+- GNU Trove, GNU Lesser General Public License 2.1, (http://trove4j.sf.net)
+- mockito-core, The MIT License (https://github.com/mockito/mockito)
+- osmosis-pbf2, Public Domain (http://wiki.openstreetmap.org/wiki/Osmosis)
+- osmosis-tagfilter, Public Domain (http://wiki.openstreetmap.org/wiki/Osmosis)
+- osmosis-areafilter, Public Domain (http://wiki.openstreetmap.org/wiki/Osmosis)
