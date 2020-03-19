@@ -15,8 +15,44 @@
  */
 package at.srfg.graphium.routing.api.adapter.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import at.srfg.graphium.model.IBaseWaySegment;
+import at.srfg.graphium.routing.api.adapter.IRouteOutput;
+import at.srfg.graphium.routing.api.adapter.IRouteOutputAdapter;
+import at.srfg.graphium.routing.api.dto.IDirectedSegmentDTO;
+import at.srfg.graphium.routing.api.dto.impl.DirectedSegmentDTOImpl;
+import at.srfg.graphium.routing.api.dto.impl.PathRouteDTOImpl;
+import at.srfg.graphium.routing.model.IDirectedSegment;
+import at.srfg.graphium.routing.model.IRoute;
 
-public class PathRouteOutputAdapterImpl<T extends IBaseWaySegment> extends OverviewRouteOutputAdapterImpl<T> {
+public class PathRouteOutputAdapterImpl<T extends IBaseWaySegment>
+	implements IRouteOutputAdapter<PathRouteDTOImpl, Float, T> {
 
+	private IRouteOutput<PathRouteDTOImpl, Float> output;
+	
+	public PathRouteOutputAdapterImpl() {
+		this.output = new PathRouteOutputImpl();
+	}
+	
+	@Override
+	public IRouteOutput<PathRouteDTOImpl, Float> adaptsTo() {
+		return output;
+	}
+
+	@Override
+	public PathRouteDTOImpl adapt(IRoute<T, Float> route) {
+		String geometryWkt = null;
+		if (route.getGeometry() != null) {
+			geometryWkt = route.getGeometry().toText();
+		}
+		List<IDirectedSegmentDTO> segments = new ArrayList<IDirectedSegmentDTO>();
+		for (IDirectedSegment segment : route.getPath()) {
+			segments.add(new DirectedSegmentDTOImpl(segment.getId(), segment.isTowards()));
+		}
+		
+		return new PathRouteDTOImpl(route.getWeight(), route.getLength(), route.getDuration(), 
+				route.getRuntimeInMs(), route.getGraphName(), route.getGraphVersion(), geometryWkt, segments);
+	}
 }

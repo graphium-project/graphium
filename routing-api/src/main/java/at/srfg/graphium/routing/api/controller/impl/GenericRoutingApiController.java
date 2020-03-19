@@ -109,7 +109,7 @@ public abstract class GenericRoutingApiController<T extends IBaseWaySegment, O e
 	}
 
 	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
-	@ExceptionHandler(RoutingException.class)
+	@ExceptionHandler(UnkownRoutingAlgoException.class)
 	public ModelAndView handleException(UnkownRoutingAlgoException exception) {
 		log.warn(exception.getMessage());
 		MappingJackson2JsonView view = new MappingJackson2JsonView();
@@ -120,7 +120,7 @@ public abstract class GenericRoutingApiController<T extends IBaseWaySegment, O e
 	}
 
 	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
-	@ExceptionHandler(RoutingException.class)
+	@ExceptionHandler(RoutingParameterException.class)
 	public ModelAndView handleException(RoutingParameterException exception) {
 		log.warn(exception.getMessage());
 		MappingJackson2JsonView view = new MappingJackson2JsonView();
