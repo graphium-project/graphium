@@ -529,8 +529,8 @@ public class GipParserImpl<T extends IBaseSegment> implements IGipParser<T> {
 		Set<IWaySegmentConnection> startNodeCons = new HashSet<>();
 		Set<IWaySegmentConnection> endNodeCons = new HashSet<>();
 
-		if (turnEdges.containsKey(current.getWayId())) {
-			for (IGipTurnEdge turnEdge : turnEdges.get(current.getWayId())) {
+		if (turnEdges.containsKey(current.getId())) {
+			for (IGipTurnEdge turnEdge : turnEdges.get(current.getId())) {
 				if (turnEdge.getViaNodeId() == current.getStartNodeId()) {
 					startNodeCons.add(new WaySegmentConnection(turnEdge.getViaNodeId(), turnEdge.getFromLinkId(),
 							turnEdge.getToLinkId(), ParserHelper.adaptAccess(turnEdge.getVehicleType())));
