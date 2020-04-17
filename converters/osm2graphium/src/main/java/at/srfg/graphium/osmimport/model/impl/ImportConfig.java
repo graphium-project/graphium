@@ -37,6 +37,7 @@ public class ImportConfig implements IImportConfig {
     private String outputDir;
     private int queueSize;
     private int workerThreads;
+    private OsmTagAdaptionMode tagAdaptionMode;
 
     public static IImportConfig getConfig(String graphName, String version,
                                          String inputOSMFile) {
@@ -115,6 +116,13 @@ public class ImportConfig implements IImportConfig {
 		return this;
 	}
 	
+	@Override
+	public IImportConfig tagAdaptionMode(OsmTagAdaptionMode tagAdaptionMode) {
+		this.tagAdaptionMode = tagAdaptionMode;
+		return this;
+	}
+
+	
     @Override
     public Set<String> getHighwayList() {
         return highwayList;
@@ -178,6 +186,11 @@ public class ImportConfig implements IImportConfig {
     @Override
     public int getWorkerThreads() {
         return workerThreads;
+    }
+    
+    @Override
+    public OsmTagAdaptionMode getTagAdaptionMode() {
+        return tagAdaptionMode;
     }
 
 	@Override

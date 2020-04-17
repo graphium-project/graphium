@@ -39,6 +39,7 @@ import at.srfg.graphium.osmimport.adapter.Way2WaySegmentAdapter;
 import at.srfg.graphium.osmimport.connections.ConnectionsBuilder;
 import at.srfg.graphium.osmimport.helper.WayHelper;
 import at.srfg.graphium.osmimport.model.impl.NodeCoord;
+import at.srfg.graphium.osmimport.model.impl.OsmTagAdaptionMode;
 import gnu.trove.list.array.TLongArrayList;
 import gnu.trove.map.hash.TLongObjectHashMap;
 
@@ -56,13 +57,13 @@ public class WaySink implements Sink, EntityProcessor {
 	private TLongObjectHashMap<NodeCoord> nodes = new TLongObjectHashMap<>();
 	private TLongObjectHashMap<List<IWaySegment>> segmentedWaySegments = new TLongObjectHashMap<>();
 	private BlockingQueue<IWaySegment> waysQueue;
-    private Way2WaySegmentAdapter wayAdapter = new Way2WaySegmentAdapter();
+    private Way2WaySegmentAdapter wayAdapter;
     private Set<Access> defaultAccesses = null;
     private ConnectionsBuilder connectionsBuilder;
 	
 	public WaySink(TLongObjectHashMap<List<WayRef>> wayRefs, TLongObjectHashMap<NodeCoord> nodes, 
 			TLongObjectHashMap<List<IWaySegment>> segmentedWaySegments, TLongObjectHashMap<List<Relation>> wayRelations,
-			BlockingQueue<IWaySegment> waysQueue) {
+			BlockingQueue<IWaySegment> waysQueue, OsmTagAdaptionMode tagAdaptionMode) {
 		this.wayRefs = wayRefs;
 		this.nodes = nodes;
 		this.wayRelations = wayRelations;
@@ -79,7 +80,7 @@ public class WaySink implements Sink, EntityProcessor {
 				}
 			}
 		}
-		
+		this.wayAdapter = new Way2WaySegmentAdapter(tagAdaptionMode);
 		this.waysQueue = waysQueue;
 		this.connectionsBuilder = new ConnectionsBuilder();
 	}
