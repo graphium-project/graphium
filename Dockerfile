@@ -10,6 +10,6 @@ RUN mvn -f /usr/src/graphium/pom.xml clean package -DskipTests
 FROM tomcat:9-jdk8
 RUN rm -rf $CATALINA_HOME/webapps/ROOT
 COPY --from=builder /usr/src/graphium/converters/osm2graphium/target/osm2graphium_1.1.0-SNAPSHOT.one-jar.jar /osm2graphium.jar
-COPY --from=builder /usr/src/graphium/converters/osm2graphium/target/idf2graphium_1.1.0-SNAPSHOT.one-jar.jar /idf2graphium.jar
+COPY --from=builder /usr/src/graphium/converters/idf2graphium/target/idf2graphium_1.1.0-SNAPSHOT.one-jar.jar /idf2graphium.jar
 COPY --from=builder /usr/src/graphium/tutorial/central_server/target/graphium-tutorial-central-server-1.1.0-SNAPSHOT.war $CATALINA_HOME/webapps/ROOT.war
 EXPOSE 8080
