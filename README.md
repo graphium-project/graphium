@@ -67,15 +67,29 @@ The base model is easy to expand if storage of additional data is needed. The en
 
 ### Views
 
-The concept of views in a DBMS means to filter only relevant data needed for further processing. Graphium uses the same concept to allow different views on transport graphs. For example a fine granulated tranport graph is stored in database but for one specific analysis only cycle ways are necessary. Then you have to define a custom view returning only waysegments having the access type "BIKE".
+The concept of views in a DBMS means to filter only relevant data needed for further processing. Graphium uses the same concept to allow different views on transport graphs. For example a fine granulated transport graph is stored in database but for one specific analysis only cycle ways are necessary. Then you have to define a custom view returning only waysegments having the access type "BIKE".
 
 To access those views over the API the graph name can be replaced with each view name. So graph name and view name will be treated similarly at the API.
 
 Find out how to define [custom views](doc/CustomViews.md).
 
+### States
+
+A graph version is time restricted version of a single graph. Each graph version could assume a type of state. Those types of state are shown here:
+
+| state          | description                                                  |
+| -------------- | ------------------------------------------------------------ |
+| INITIAL        | graph version is imported into the database; graph versions having this state are meant to be a pre-version, non productive-ready |
+| PUBLISH        | graph version is being published to subscribed satellite servers |
+| SYNCHRONIZED   | graph version is published to subscribed satellite servers (publish completed) |
+| PUBLISH_FAILED | publishing of graph version failed on one or more subscribed satellite servers |
+| ACTIVATING     | graph version is being activated on all subscribed satellite servers and the central server itself |
+| ACTIVE         | graph version is activated on the central server and all subscribed satellite servers; graph version can be used for productive use cases; activating a graph version could trigger post processes and restricts the previous active version of the same graph with the current timestamp; |
+| DELETED        | graph version is deleted                                     |
+
 ### Publish / Subscribe
 
-Graphium is designed for use as a server in standalone mode or for deployment in distributed systems. The main use case in distributed systems is to deploy one Graphium central server storing all transport graph data needed within the whole system. One or more worker servers, so called Graphium satellite server, could be deployed to process data based on specific transport graph data. This architecture supports horizontal scaling of Graphium satellite servers. All Graphium satellite servers will be automatically informed by the Graphium central server as soon as a new graph version is available to always process consistently on the newest transport graph version.
+Graphium is designed for use as a server in standalone mode or for deployment in distributed systems. The main use case in distributed systems is to deploy one Graphium central server storing all transport graph data needed within the whole system. One or more worker servers, so called Graphium satellite servers, could be deployed to process data based on specific transport graph data. This architecture supports horizontal scaling of Graphium satellite servers. All Graphium satellite servers will be automatically informed by the Graphium central server as soon as a new graph version is available to always process consistently on the newest transport graph version.
 
 Detailed information about the publish / subscribe process can be found [here](doc/PublishSubscribe.md).
 
@@ -91,7 +105,7 @@ To import transport graph data into Graphium data has to be converted into Graph
 
 Example API call to generate a JSON file from OSM data:
 
-`java osm2graphium_1.0.0.one-jar.jar -i /path/to/osm-at-latest.osm.pbf -o /path/to/output -n osm_at -v 170701 -q 20000 -t 5 –highwayTypes "motorway, motorway_link, primary, primary_link"`
+`java osm2graphium.one-jar.jar -i /path/to/osm-at-latest.osm.pbf -o /path/to/output -n osm_at -v 170701 -q 20000 -t 5 –highwayTypes "motorway, motorway_link, primary, primary_link"`
 
 | short option | long option    | description                              |
 | :----------- | :------------- | ---------------------------------------- |
@@ -112,7 +126,7 @@ Example API call to generate a JSON file from OSM data:
 
 Example API call to generate a JSON file from GIP data:
 
-`java idf2graphium_1.0.0.one-jar.jar -i /path/to/gip-at.txt -o /path/to/output -n gip_at_frc_0_8 -v 16_02_161111 --skip-pixel-cut -import-frcs "0,1,2,3,4,5,6,7,8"`
+`java idf2graphium.one-jar.jar -i /path/to/gip-at.txt -o /path/to/output -n gip_at_frc_0_8 -v 16_02_161111 --skip-pixel-cut -import-frcs "0,1,2,3,4,5,6,7,8"`
 
 | short option | long option                   | Beschreibung                                                 |
 | ------------ | ----------------------------- | ------------------------------------------------------------ |
@@ -157,25 +171,37 @@ Example API call to generate a JSON file from GIP data:
 
    `mvn clean install`
 
-6. Deploy tutorial's Graphium central server (*graphium-tutorial-central-server-1.0.0.war*) on Apache Tomcat and start
+6. Deploy tutorial's Graphium central server (*graphium-server.war*) on Apache Tomcat and start
 
 7. Download OSM File:
 
-   ```
-   curl http://download.geofabrik.de/europe/austria-latest.osm.pbf -o /data/osm/austria-latest.osm.pbf
+   ```shell script
+   curl http://download.geofabrik.de/europe/andorra-latest.osm.pbf -o /data/osm/andorra-latest.osm.pbf
    ```
 
 8. Convert OSM File into Graphium's JSON format:
 
-   ```
-   java -jar osm2graphium_1.0.0.one-jar.jar -i /data/osm/austria-latest.osm.pbf -o /path/to/output -n osm_at -v 170929 -q 20000 -t 5 -highwayTypes "motorway, motorway_link, primary, primary_link"
+   ```shell script
+   java -jar converters/target/osm2graphium.one-jar.jar -i /data/osm/andorra-latest.osm.pbf -o /path/to/output -n osm_andorra -v 200603 -q 20000 -t 5 -highwayTypes "motorway, motorway_link, primary, primary_link"
    ```
 
 9. Import OSM into Graphium central server
 
+   ```shell script
+   curl -X POST "http://localhost:8080/graphium-server/api/segments/graphs/osm_andorra/versions/200603?overrideIfExists=true" -F "file=@/path/to/output/osm_andorra.json"
    ```
-   curl -X POST "http://localhost:8080/graphium-tutorial-central-server-1.0.0/api/segments/graphs/osm_at/versions/170929?overrideIfExists=true" -F "file=@/path/to/output/osm_at.json"
-   ```
+   
+10. Activate imported graph version
+
+    ```shell script
+    curl -X PUT "http://localhost:8080/graphium-server/api/metadata/graphs/osm_andorra/versions/200603/state/ACTIVE"
+    ```
+    
+11. Check server state
+
+    ```shell script
+    curl -X GET "http://localhost:8080/graphium-server/api/status"
+    ```
 
 ## Docker
 
@@ -190,19 +216,31 @@ Application and database logs can be obtained via `docker-compose logs`.
 2. Download OSM File:
 
     ```shell script
-    docker exec -it graphium curl http://download.geofabrik.de/europe/austria-latest.osm.pbf -o /austria-latest.osm.pbf
+    docker exec -it graphium-server curl http://download.geofabrik.de/europe/andorra-latest.osm.pbf -o /andorra-latest.osm.pbf
     ```
 
 3. Convert OSM File into Graphium's JSON format:
 
     ```shell script
-    docker exec -it graphium java -jar /osm2graphium.jar -i /austria-latest.osm.pbf -o / -n osm_at -v 170929 -q 20000 -t 5 -highwayTypes "motorway, motorway_link, primary, primary_link"
+    docker exec -it graphium-server java -jar /osm2graphium.one-jar.jar -i /andorra-latest.osm.pbf -o / -n osm_andorra -v 200603 -q 20000 -t 5 -highwayTypes "motorway, motorway_link, primary, primary_link"
     ```
 
 4. Import OSM into Graphium central server
 
     ```shell script
-    docker exec -it graphium curl -X POST "http://localhost:8080/api/segments/graphs/osm_at/versions/170929?overrideIfExists=true" -F "file=@/osm_at_170929.json"
+    docker exec -it graphium-server curl -X POST "http://localhost:8080/graphium-server/api/segments/graphs/osm_andorra/versions/200603?overrideIfExists=true" -F "file=@/osm_andorra_200603.json"
+    ```
+
+5. Activate imported graph version
+
+    ```shell script
+    docker exec -it graphium-server curl -X PUT "http://localhost:8080/graphium-server/api/metadata/graphs/osm_andorra/versions/200603/state/ACTIVE"
+    ```
+    
+6. Check server state
+
+    ```shell script
+    docker exec -it graphium-server curl -X GET "http://localhost:8080/graphium-server/api/status"
     ```
 
 ## Tutorials

@@ -15,7 +15,7 @@
 	</parent>
 
 	<build>
-		<finalName>${project.artifactId}_${project.version}</finalName>
+		<finalName>${project.artifactId}</finalName>
 		<plugins>
 			<plugin>
 				<groupId>com.jolira</groupId>
@@ -25,6 +25,7 @@
 					<execution>
 						<configuration>
 							<mainClass>at.srfg.graphium.osmimport.application.OSM2JSONConverter</mainClass>
+							<filename></filename>
 						</configuration>
 						<goals>
 							<goal>one-jar</goal>

@@ -60,13 +60,13 @@ No parameters.
 
 ## Parameters
 
-| **Attribut** | **Datentyp** | **Beschreibung**             |
-| ------------ | ------------ | ---------------------------- |
-| **graph**    | String       | unique graph name (optional) |
+| attribute | type   | description                  |
+| --------- | ------ | ---------------------------- |
+| **graph** | String | unique graph name (optional) |
 
 ## Example URL
 
-`http://localhost:8080/graphium-central-server/api/graphs/osm_at/subscriptions`
+`http://localhost:8080/graphium-server/api/graphs/osm_at/subscriptions`
 
 ## Example Response
 
