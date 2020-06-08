@@ -12,4 +12,7 @@ RUN rm -rf $CATALINA_HOME/webapps/ROOT
 COPY --from=builder /usr/src/graphium/converters/osm2graphium/target/osm2graphium.one-jar.jar /osm2graphium.one-jar.jar
 COPY --from=builder /usr/src/graphium/converters/idf2graphium/target/idf2graphium.one-jar.jar /idf2graphium-SNAPSHOT.one-jar.jar
 COPY --from=builder /usr/src/graphium/tutorial/central_server/target/graphium-server.war $CATALINA_HOME/webapps/graphium-server.war
+
+ENV CATALINA_OPTS -Xms512m -Xmx2048m
+
 EXPOSE 8080
