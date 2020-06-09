@@ -8,7 +8,6 @@ services:
       - "db.url=jdbc:postgresql://database:5432/graphium"
       - "db.username=graphium"
       - "db.password=graphium"
-      - "CATALINA_OPTS=-Xms512m -Xmx2048m"
     ports:
       - "8080:8080"
     depends_on:
