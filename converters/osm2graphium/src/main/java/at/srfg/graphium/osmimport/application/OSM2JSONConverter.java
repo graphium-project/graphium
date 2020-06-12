@@ -92,7 +92,7 @@ public class OSM2JSONConverter {
 
             if (cmd.hasOption('h')) {
                 HelpFormatter helpFormatter = new HelpFormatter();
-                helpFormatter.printHelp("java -jar osm2graphium-X.X.X.one-jar.jar [OPTION]...", options);
+                helpFormatter.printHelp("java -jar osm2graphium.one-jar.jar [OPTION]...", options);
                 return;
             }
             if (cmd.hasOption('o')) {

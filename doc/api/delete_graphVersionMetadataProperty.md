@@ -17,7 +17,7 @@
 
 ## Example URL
 
-`http://localhost:8080/graphium-server/api/metadata/graphs/osm_at/versions/200603/description`
+`http://localhost:8080/graphium/api/metadata/graphs/osm_at/versions/200603/description`
 
 ## Example Response
 

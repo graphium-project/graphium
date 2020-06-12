@@ -93,10 +93,6 @@ Graphium is designed for use as a server in standalone mode or for deployment in
 
 Detailed information about the publish / subscribe process can be found [here](doc/PublishSubscribe.md).
 
-## API
-
-[API Reference Documentation](doc/apiReferenceDocumentation.md)
-
 ## Graph Data Conversion
 
 To import transport graph data into Graphium data has to be converted into Graphium's input format (JSON). Data converters already exist for OSM or GIP, custom converters have to be implemented for other data sources.
@@ -147,6 +143,9 @@ Example API call to generate a JSON file from GIP data:
 | -fc            | --full-connectivity | Creates a full connected network ignoring one ways (default = false) |
 |  | --xinfo-csv | Defines optional CSV file to convert into XInfo object; pattern: <FILENAME>=<XInfoFactoryClass><br />Therefore a jar is needed containing all necessary classes for creating and processing the custom XInfo objects (see graphium-pixelcuts). This jar has to linked via `java -cp executable.jar;libs/*;. at.srfg....IDFConverter`. The <XInfoFactoryClass> has to be a class implementing the interface ICsvXInfoFactory. All XInfo objects will be written to the output JSON file as xInfo array entries. |
 
+## API
+
+[API Reference Documentation](doc/apiReferenceDocumentation.md)
 
 ## Quickstart
 
@@ -171,7 +170,7 @@ Example API call to generate a JSON file from GIP data:
 
    `mvn clean install`
 
-6. Deploy tutorial's Graphium central server (*graphium-server.war*) on Apache Tomcat and start
+6. Deploy tutorial's Graphium central server (*graphium.war*) on Apache Tomcat and start
 
 7. Download OSM File:
 
@@ -188,19 +187,19 @@ Example API call to generate a JSON file from GIP data:
 9. Import OSM into Graphium central server
 
    ```shell script
-   curl -X POST "http://localhost:8080/graphium-server/api/segments/graphs/osm_andorra/versions/200603?overrideIfExists=true" -F "file=@/path/to/output/osm_andorra.json"
+   curl -X POST "http://localhost:8080/graphium/api/segments/graphs/osm_andorra/versions/200603?overrideIfExists=true" -F "file=@/path/to/output/osm_andorra.json"
    ```
    
 10. Activate imported graph version
 
     ```shell script
-    curl -X PUT "http://localhost:8080/graphium-server/api/metadata/graphs/osm_andorra/versions/200603/state/ACTIVE"
+    curl -X PUT "http://localhost:8080/graphium/api/metadata/graphs/osm_andorra/versions/200603/state/ACTIVE"
     ```
     
 11. Check server state
 
     ```shell script
-    curl -X GET "http://localhost:8080/graphium-server/api/status"
+    curl -X GET "http://localhost:8080/graphium/api/status"
     ```
 
 ## Docker
@@ -219,6 +218,8 @@ Application and database logs can be obtained via `docker-compose logs`.
     docker exec -it graphium-server curl http://download.geofabrik.de/europe/andorra-latest.osm.pbf -o /andorra-latest.osm.pbf
     ```
 
+If any of the following steps crashes because of a Java heap exception you have configure memory definition of Docker.
+
 3. Convert OSM File into Graphium's JSON format:
 
     ```shell script
@@ -228,19 +229,19 @@ Application and database logs can be obtained via `docker-compose logs`.
 4. Import OSM into Graphium central server
 
     ```shell script
-    docker exec -it graphium-server curl -X POST "http://localhost:8080/graphium-server/api/segments/graphs/osm_andorra/versions/200603?overrideIfExists=true" -F "file=@/osm_andorra_200603.json"
+    docker exec -it graphium-server curl -X POST "http://localhost:8080/graphium/api/segments/graphs/osm_andorra/versions/200603?overrideIfExists=true" -F "file=@/osm_andorra_200603.json"
     ```
 
 5. Activate imported graph version
 
     ```shell script
-    docker exec -it graphium-server curl -X PUT "http://localhost:8080/graphium-server/api/metadata/graphs/osm_andorra/versions/200603/state/ACTIVE"
+    docker exec -it graphium-server curl -X PUT "http://localhost:8080/graphium/api/metadata/graphs/osm_andorra/versions/200603/state/ACTIVE"
     ```
-    
+
 6. Check server state
 
     ```shell script
-    docker exec -it graphium-server curl -X GET "http://localhost:8080/graphium-server/api/status"
+    docker exec -it graphium-server curl -X GET "http://localhost:8080/graphium/api/status"
     ```
 
 ## Tutorials

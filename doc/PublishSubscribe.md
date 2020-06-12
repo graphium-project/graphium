@@ -30,7 +30,7 @@ The user has to trigger the subscription on the Graphium satellite server.
 
 Example URL:
 
-`http://localhost:8081/graphium-satellite-server/api/graphs/osm_at/subscriptions?servername=central_server&url=http://localhost:8080/graphium-server/api&groupname=group_osm_at&user=satellite&password=satellite`
+`http://localhost:8081/graphium-satellite-server/api/graphs/osm_at/subscriptions?servername=central_server&url=http://localhost:8080/graphium/api&groupname=group_osm_at&user=satellite&password=satellite`
 
 This HTTP POST means that the satellite server subscribes to the graph *osm_at* provided by the central server. Each subscription regards to a group. Graphs can be published either to all subscribers or only to a specific group. There could be more than one group defined to a graph.
 
@@ -44,13 +44,13 @@ Graph version files have to be imported by the user into the Graphium central se
 
 Example URL to trigger the publishing process:
 
-`http://localhost:8080/graphium-server/api/metadata/graphs/osm_at/versions/200603/state/PUBLISH`
+`http://localhost:8080/graphium/api/metadata/graphs/osm_at/versions/200603/state/PUBLISH`
 
 For using the new graph version for further data processing the graph version has to be activated. The activation has to be performed on Graphium central server and guarantees a consistent state of the graph version over all subscribers.
 
 Example URL to activate the new graph version:
 
-`http://localhost:8080/graphium-server/api/metadata/graphs/osm_at/versions/200603/state/ACTIVE`
+`http://localhost:8080/graphium/api/metadata/graphs/osm_at/versions/200603/state/ACTIVE`
 
 See also [PUT graph version metadata's property](api/put_graphVersionMetadataProperty.md).
 

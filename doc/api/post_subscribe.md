@@ -16,7 +16,7 @@
 | **password**   | String | optional password for authentication   |
 ## Example URL
 
-`http://localhost:8081/graphium-satellite-server/api/graphs/osm_at/subscriptions?servername=central_server&url=http://localhost:8080/graphium-server/api&groupname=group_osm_at&user=satellite&password=satellite`
+`http://localhost:8081/graphium-satellite-server/api/graphs/osm_at/subscriptions?servername=central_server&url=http://localhost:8080/graphium/api&groupname=group_osm_at&user=satellite&password=satellite`
 
 ## Example Response
 

@@ -15,7 +15,7 @@
 
 ## Example URL
 
-`http://localhost:8080/graphium-server/api/segments/graphs/osm_at/versions/200603/xinfos/default`
+`http://localhost:8080/graphium/api/segments/graphs/osm_at/versions/200603/xinfos/default`
 
 ## Example Response
 

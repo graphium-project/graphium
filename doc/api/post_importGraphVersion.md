@@ -15,7 +15,7 @@
 
 ## Example URL
 
-`curl -X POST "http://localhost:8080/graphium-server/api/segments/graphs/osm_at/versions/200603?overrideIfExists=true" -F "file=@D:/graphium/json/osm_at.json"`
+`curl -X POST "http://localhost:8080/graphium/api/segments/graphs/osm_at/versions/200603?overrideIfExists=true" -F "file=@D:/graphium/json/osm_at.json"`
 
 ## Example Response
 

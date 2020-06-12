@@ -66,7 +66,7 @@ No parameters.
 
 ## Example URL
 
-`http://localhost:8080/graphium-server/api/graphs/osm_at/subscriptions`
+`http://localhost:8080/graphium/api/graphs/osm_at/subscriptions`
 
 ## Example Response
 

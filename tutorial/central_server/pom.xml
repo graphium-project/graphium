@@ -16,7 +16,7 @@
 	</parent>
 		
 	<build>
-		<finalName>graphium-server</finalName>
+		<finalName>graphium</finalName>
 	</build>
 	
 	<dependencies>

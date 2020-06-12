@@ -21,7 +21,7 @@ List versions within a time period:
 
 ## Example URL
 
-`http://localhost:8080/graphium-server/api/metadata/graphs/osm_at/versions`
+`http://localhost:8080/graphium/api/metadata/graphs/osm_at/versions`
 
 ## Example Response
 

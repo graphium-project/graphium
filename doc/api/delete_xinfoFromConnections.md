@@ -14,7 +14,7 @@
 
 ## Example URL
 
-`http://localhost:8080/graphium-server/api/connections/graphs/osm_at/versions/200603/xinfos/turnprobs`
+`http://localhost:8080/graphium/api/connections/graphs/osm_at/versions/200603/xinfos/turnprobs`
 
 ## ``Response
 

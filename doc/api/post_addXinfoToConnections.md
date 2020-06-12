@@ -14,7 +14,7 @@
 
 ## Example URL
 
-`curl -X POST "http://localhost:8080/graphium-server/api/connections/graphs/osm_at/versions/200603/xinfos" -F "file=@D:/graphium/json/osm_at_connections_xinfo.json"`
+`curl -X POST "http://localhost:8080/graphium/api/connections/graphs/osm_at/versions/200603/xinfos" -F "file=@D:/graphium/json/osm_at_connections_xinfo.json"`
 
 ## Response
 
