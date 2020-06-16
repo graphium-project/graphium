@@ -15,7 +15,7 @@
  */
 package at.srfg.graphium.routing.model;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -60,9 +60,9 @@ public interface IRoutingOptions {
 	 * @param timestamp Timestamp for selecting the correct graph's version (e.g. timestamp will be in past for historical analysis).
 	 * Will be ignored if graphVersion is set.
 	 */
-	void setRoutingTimestamp(LocalDate timestamp);
+	void setRoutingTimestamp(LocalDateTime timestamp);
 	
-	LocalDate getRoutingTimestamp();
+	LocalDateTime getRoutingTimestamp();
 	
 	IRoutingMode getMode();
 
