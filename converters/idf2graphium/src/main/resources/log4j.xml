@@ -20,12 +20,18 @@
 	<!-- <category name="at.srfg.graphium.gipimport">
 		<priority value="INFO"/>
 	</category> -->
-	<!-- <category name="at.srfg.graphium.gipimport.application">
-		<priority value="INFO"/>
-	</category> -->
-	<category name="at.srfg.graphium">
+	<category name="at.srfg.graphium.gipimport.application">
 		<priority value="INFO"/>
 	</category>
+	<category name="at.srfg.graphium.ioutils">
+		<priority value="INFO"/>
+	</category>
+	<category name="at.srfg.graphium.gipimport.service">
+		<priority value="INFO"/>
+	</category>
+	<!-- <category name="at.srfg.graphium">
+		<priority value="INFO"/>
+	</category> -->
 	<root>
 		<priority value="ERROR" />
 		<appender-ref ref="CONSOLE" />
