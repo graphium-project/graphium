@@ -142,8 +142,8 @@ Example API call to generate a JSON file from GIP data:
 |              | –skip-pixel-cut               | skip the calculation of the turn offset factors. The options -m and -M are ignored; optional |
 | -m           | --pixel-cut-min-frc           | minimum frc value to be considered for offset calculations; optional |
 | -M           | --pixel-cut-max-frc           | maximum frc value to be considered for offset calculations; optional |
-|              | -import-frcs                  | Comma separated List of FRC values to be included for IDF import. If not set (default) all frc values are considered; optional |
-|              | -access-types                 | Comma separated List of Access Types, to be considered. If not set, all access types will be considered; optional |
+|              | --import-frcs                 | Comma separated List of FRC values to be included for IDF import. If not set (default) all frc values are considered; optional |
+|              | --access-types                | Comma separated List of Access Types, to be considered. If not set, all access types will be considered; optional |
 | -e           | --pixel-cut-enable-short-conn | By default short connections below 3.5 meter with frc 0 are ignored. This is to filter the connections between highways and streets. If this option is set all gip links are considered; optional |
 | -fc            | --full-connectivity | Creates a full connected network ignoring one ways (default = false) |
 |  | --xinfo-csv | Defines optional CSV file to convert into XInfo object; pattern: <FILENAME>=<XInfoFactoryClass><br />Therefore a jar is needed containing all necessary classes for creating and processing the custom XInfo objects (see graphium-pixelcuts). This jar has to linked via `java -cp executable.jar;libs/*;. at.srfg....IDFConverter`. The <XInfoFactoryClass> has to be a class implementing the interface ICsvXInfoFactory. All XInfo objects will be written to the output JSON file as xInfo array entries. Optional |
