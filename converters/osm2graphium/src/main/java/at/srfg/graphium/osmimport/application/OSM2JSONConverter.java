@@ -65,7 +65,7 @@ public class OSM2JSONConverter {
         options.addOption(Option.builder("t").longOpt("threads").hasArg().argName("worker_threads").desc("Number of worker threads").build());
         options.addOption(Option.builder("d").longOpt("downloadDir").hasArg().argName("download_dir").desc("directory to store download files").build());
         options.addOption(Option.builder("df").longOpt("keepDownloadFile").hasArg().argName("keep_download_file").desc("false: downloaded file from URL will be deleted afterwards; default = true").build());
-        options.addOption(Option.builder("fd").longOpt("forceDownload").hasArg().argName("force_download").desc("true: downloaded file from URL even if it has been already downloaded / false: if file exists in download directory this one will be used; default = false").build());
+        options.addOption(Option.builder("fd").longOpt("forceDownload").hasArg().argName("force_download").desc("true: download file from URL even if it has been already downloaded / false: if file exists in download directory this one will be used; default = false").build());
         options.addOption(Option.builder("cf").longOpt("keepConvertedFile").hasArg().argName("keep_converted_file").desc("false: converted file will be deleted afterwards; default = true").build());
         options.addOption(Option.builder("u").longOpt("importUrl").hasArg().argName("import_url").desc("server URL to import the converted graph file").build());
         
