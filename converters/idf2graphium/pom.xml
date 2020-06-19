@@ -44,6 +44,12 @@
 		
 		<dependency>
 			<groupId>at.srfg.graphium</groupId>
+			<artifactId>graphium-converter-commons</artifactId>
+			<version>${graphium.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>at.srfg.graphium</groupId>
 			<artifactId>graphium-pixelcuts</artifactId>
 			<version>${graphium.version}</version>
 		</dependency>

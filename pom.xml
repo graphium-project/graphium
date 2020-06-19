@@ -195,6 +195,7 @@
 		<module>utils</module>
 		<module>routing</module>
 		<module>routing-api</module>
+		<module>converters/converter-commons</module>
 		<module>converters/idf2graphium</module>
 		<module>converters/osm2graphium</module>
 		<module>tutorial/model_extension</module>

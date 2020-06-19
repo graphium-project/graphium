@@ -18,8 +18,6 @@ package at.srfg.graphium.osmimport.service.impl;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,7 +27,6 @@ import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.io.FilenameUtils;
 import org.openstreetmap.osmosis.areafilter.v0_6.PolygonFilter;
 import org.openstreetmap.osmosis.core.domain.v0_6.Relation;
 import org.openstreetmap.osmosis.core.filter.common.IdTrackerType;
@@ -40,6 +37,7 @@ import org.openstreetmap.osmosis.tagfilter.v0_6.TagFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.srfg.graphium.converter.commons.service.impl.AbstractImporterService;
 import at.srfg.graphium.io.adapter.IAdapter;
 import at.srfg.graphium.io.adapter.ISegmentAdapter;
 import at.srfg.graphium.io.adapter.impl.GraphVersionMetadata2GraphVersionMetadataDTOAdapter;
@@ -53,10 +51,8 @@ import at.srfg.graphium.io.outputformat.IWayGraphOutputFormat;
 import at.srfg.graphium.io.outputformat.IWayGraphOutputFormatFactory;
 import at.srfg.graphium.io.outputformat.impl.jackson.GenericJacksonSegmentOutputFormatFactoryImpl;
 import at.srfg.graphium.io.outputformat.impl.jackson.GenericJacksonWayGraphOutputFormatFactoryImpl;
-import at.srfg.graphium.ioutils.FileTransferUtils;
 import at.srfg.graphium.model.IWayGraphVersionMetadata;
 import at.srfg.graphium.model.IWaySegment;
-import at.srfg.graphium.model.config.IImportConfig;
 import at.srfg.graphium.model.impl.WayGraphVersionMetadata;
 import at.srfg.graphium.model.management.impl.Source;
 import at.srfg.graphium.osmimport.model.IImportConfigOsm;
@@ -72,13 +68,11 @@ import gnu.trove.map.hash.TLongObjectHashMap;
  * @author mwimmer
  *
  */
-public class OsmImporterServiceImpl {
+public class OsmImporterServiceImpl extends AbstractImporterService {
 
 	private static Logger log = LoggerFactory.getLogger(OsmImporterServiceImpl.class);
 	
     private IWayGraphOutputFormatFactory<IWaySegment> outputFormatFactory;
-    
-    private String downloadFile = null;
     
     public OsmImporterServiceImpl() {
     	
@@ -250,35 +244,6 @@ public class OsmImporterServiceImpl {
 		return config.getOutputDir() + "/" + config.getGraphName() + "_" + config.getVersion() + ".json";
 	}
 
-	private void importGraphFile(IImportConfigOsm config, String outputFileName) {
-		FileTransferUtils fileTransferHelper = new FileTransferUtils();
-		try {
-			fileTransferHelper.uploadZipped(new URL(config.getImportUrl()), new File(outputFileName));
-		} catch (MalformedURLException e) {
-			log.error("upload failed", e);
-		}
-	}
-
-	private void cleanup(IImportConfigOsm config, String convertedFileName) {
-		if (downloadFile != null && !config.isKeepDownloadFile()) {
-			File file = new File(downloadFile);
-			if (file.exists()) {
-				file.delete();
-			}
-			file = new File(downloadFile + ".zip");
-			if (file.exists()) {
-				file.delete();
-			}
-		}
-		
-		if (!config.isKeepConvertedFile()) {
-			File file = new File(convertedFileName);
-			if (file.exists()) {
-				file.delete();
-			}
-		}
-	}
-
 	private SinkSource createWayTagFilter(IImportConfigOsm config) {
         Set<String> keys = new HashSet<>();
         Map<String, Set<String>> keyValues = new HashMap<>();
@@ -343,44 +308,17 @@ public class OsmImporterServiceImpl {
         }
 	}
 	
-    private void download(IImportConfigOsm config) throws IOException {
-    	URL url = new URL(config.getInputFile());
-    	
-    	String outputFilename = createDownloadFilename(config);
-    	
-    	File downloadedFile = new File(outputFilename);
-    	
-    	if (downloadFile == null && (!downloadedFile.exists() || config.isForceDownload())) {
-    		FileTransferUtils fileDownloader = new FileTransferUtils();
-	    	long bytes = fileDownloader.download(url, outputFilename);
-	    	
-	    	if (bytes <= 0) {
-	    		throw new RuntimeException("No file downloaded!");
-	    	}
-    	}
-	}
-
-	private String createDownloadFilename(IImportConfig config) {
-		String filename = FilenameUtils.getName(config.getInputFile());
-		String outputDirectory = config.getDownloadDir();
-		if (outputDirectory == null) {
-			outputDirectory = config.getOutputDir();
-		}
-		return FilenameUtils.concat(outputDirectory, filename);
-	}
-
 	private IWayGraphVersionMetadata getVersionMetadata(IImportConfigOsm config) {
-        IWayGraphVersionMetadata metadata = new WayGraphVersionMetadata();
-        metadata.setGraphName(config.getGraphName());
-        metadata.setVersion(config.getVersion());
-        metadata.setOriginGraphName(config.getOriginalGraphName());
-        metadata.setOriginVersion(config.getOriginalVersion());
-        metadata.setValidFrom(config.getValidFrom());
-        metadata.setValidTo(config.getValidTo());
-        metadata.setSource(new Source(2, "OSM"));
-        metadata.setSegmentsCount(-1);
-        metadata.setConnectionsCount(-1);
-        return metadata;
-    }
-
+		IWayGraphVersionMetadata metadata = new WayGraphVersionMetadata();
+		metadata.setGraphName(config.getGraphName());
+		metadata.setVersion(config.getVersion());
+		metadata.setOriginGraphName(config.getOriginalGraphName());
+		metadata.setOriginVersion(config.getOriginalVersion());
+		metadata.setValidFrom(config.getValidFrom());
+		metadata.setValidTo(config.getValidTo());
+		metadata.setSource(new Source(2, "OSM"));
+		metadata.setSegmentsCount(-1);
+		metadata.setConnectionsCount(-1);
+		return metadata;
+	}
 }

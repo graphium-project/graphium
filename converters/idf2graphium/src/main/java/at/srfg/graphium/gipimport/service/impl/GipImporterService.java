@@ -15,12 +15,9 @@
  */
 package at.srfg.graphium.gipimport.service.impl;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
@@ -28,9 +25,9 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 
+import at.srfg.graphium.converter.commons.service.impl.AbstractImporterService;
 import at.srfg.graphium.gipimport.model.IDFMetadata;
 import at.srfg.graphium.gipimport.model.IImportConfigIdf;
 import at.srfg.graphium.gipimport.parser.IGipParser;
@@ -63,7 +60,6 @@ import at.srfg.graphium.io.outputformat.IWayGraphOutputFormat;
 import at.srfg.graphium.io.outputformat.IWayGraphOutputFormatFactory;
 import at.srfg.graphium.io.outputformat.impl.jackson.GenericJacksonSegmentOutputFormatFactoryImpl;
 import at.srfg.graphium.io.outputformat.impl.jackson.GenericJacksonWayGraphOutputFormatFactoryImpl;
-import at.srfg.graphium.ioutils.FileTransferUtils;
 import at.srfg.graphium.model.IBaseSegment;
 import at.srfg.graphium.model.ISegmentXInfo;
 import at.srfg.graphium.model.IWayGraphVersionMetadata;
@@ -86,12 +82,10 @@ import at.srfg.graphium.pixelcuts.model.impl.PixelCut;
  * It is splittet in a Producer and Consumer. The Consumer takes all gip Links and serialiazes them to the
  * {@link IWayGraphOutputFormatFactory}.
  */
-public class GipImporterService<T extends IBaseSegment, D extends IBaseSegmentDTO> {
+public class GipImporterService<T extends IBaseSegment, D extends IBaseSegmentDTO> extends AbstractImporterService {
 
     private static Logger log = Logger.getLogger(GipImporterService.class);
 
-    private String downloadFile = null;
-    
     public GipImporterService() {}
 
     private IWayGraphVersionMetadata getVersionMetadata(IImportConfigIdf config, IDFMetadata idfMetaData) {
@@ -289,61 +283,6 @@ public class GipImporterService<T extends IBaseSegment, D extends IBaseSegmentDT
     
 	private String createOutputFileName(IImportConfigIdf config) {
 		return config.getOutputDir() + "/" + config.getGraphName() + "_" + config.getVersion();
-	}
-
-	private void download(IImportConfigIdf config) throws IOException {
-    	URL url = new URL(config.getInputFile());
-    	
-    	String outputFilename = createDownloadFilename(config);
-    	
-    	File downloadedFile = new File(outputFilename);
-    	
-    	if (downloadFile == null && (!downloadedFile.exists() || config.isForceDownload())) {
-    		FileTransferUtils fileDownloader = new FileTransferUtils();
-	    	long bytes = fileDownloader.download(url, outputFilename);
-	    	
-	    	if (bytes <= 0) {
-	    		throw new RuntimeException("No file downloaded!");
-	    	}
-    	}
-	}
-
-	private String createDownloadFilename(IImportConfigIdf config) {
-		String filename = FilenameUtils.getName(config.getInputFile());
-		String outputDirectory = config.getDownloadDir();
-		if (outputDirectory == null) {
-			outputDirectory = config.getOutputDir();
-		}
-		return FilenameUtils.concat(outputDirectory, filename);
-	}
-
-	private void importGraphFile(IImportConfigIdf config, String outputFileName) {
-		FileTransferUtils fileTransferHelper = new FileTransferUtils();
-		try {
-			fileTransferHelper.uploadZipped(new URL(config.getImportUrl()), new File(outputFileName));
-		} catch (MalformedURLException e) {
-			log.error("upload failed", e);
-		}
-	}
-
-	private void cleanup(IImportConfigIdf config, String convertedFileName) {
-		if (downloadFile != null && !config.isKeepDownloadFile()) {
-			File file = new File(downloadFile);
-			if (file.exists()) {
-				file.delete();
-			}
-			file = new File(downloadFile + ".zip");
-			if (file.exists()) {
-				file.delete();
-			}
-		}
-		
-		if (!config.isKeepConvertedFile()) {
-			File file = new File(convertedFileName);
-			if (file.exists()) {
-				file.delete();
-			}
-		}
 	}
 
 }
