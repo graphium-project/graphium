@@ -170,14 +170,20 @@ public class OSM2JSONConverter {
             
             if (cmd.hasOption("df")) {
             	config.setKeepDownloadFile(Boolean.parseBoolean(cmd.getOptionValue("df")));
+            } else {
+            	config.setKeepDownloadFile(true);
             }
 
             if (cmd.hasOption("fd")) {
             	config.setForceDownload(Boolean.parseBoolean(cmd.getOptionValue("fd")));
+            } else {
+            	config.setForceDownload(false);
             }
 
             if (cmd.hasOption("cf")) {
             	config.setKeepConvertedFile(Boolean.parseBoolean(cmd.getOptionValue("cf")));
+            } else {
+            	config.setKeepConvertedFile(true);
             }
             
             if (cmd.hasOption("u")) {
