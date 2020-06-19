@@ -15,9 +15,12 @@
  */
 package at.srfg.graphium.gipimport.service.impl;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
@@ -25,10 +28,11 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 
 import at.srfg.graphium.gipimport.model.IDFMetadata;
-import at.srfg.graphium.gipimport.model.IImportConfig;
+import at.srfg.graphium.gipimport.model.IImportConfigIdf;
 import at.srfg.graphium.gipimport.parser.IGipParser;
 import at.srfg.graphium.gipimport.parser.impl.GipParserImpl;
 import at.srfg.graphium.gipimport.producer.IGipLinkProducer;
@@ -59,6 +63,7 @@ import at.srfg.graphium.io.outputformat.IWayGraphOutputFormat;
 import at.srfg.graphium.io.outputformat.IWayGraphOutputFormatFactory;
 import at.srfg.graphium.io.outputformat.impl.jackson.GenericJacksonSegmentOutputFormatFactoryImpl;
 import at.srfg.graphium.io.outputformat.impl.jackson.GenericJacksonWayGraphOutputFormatFactoryImpl;
+import at.srfg.graphium.ioutils.FileTransferUtils;
 import at.srfg.graphium.model.IBaseSegment;
 import at.srfg.graphium.model.ISegmentXInfo;
 import at.srfg.graphium.model.IWayGraphVersionMetadata;
@@ -85,10 +90,11 @@ public class GipImporterService<T extends IBaseSegment, D extends IBaseSegmentDT
 
     private static Logger log = Logger.getLogger(GipImporterService.class);
 
+    private String downloadFile = null;
+    
     public GipImporterService() {}
 
-
-    private IWayGraphVersionMetadata getVersionMetadata(IImportConfig config, IDFMetadata idfMetaData) {
+    private IWayGraphVersionMetadata getVersionMetadata(IImportConfigIdf config, IDFMetadata idfMetaData) {
         IWayGraphVersionMetadata metadata = new WayGraphVersionMetadata();
         metadata.setGraphName(config.getGraphName());
         metadata.setVersion(config.getVersion());
@@ -104,7 +110,7 @@ public class GipImporterService<T extends IBaseSegment, D extends IBaseSegmentDT
     }
 
     protected ISegmentOutputFormat<T> getSegmentOutputFormat(
-    		IImportConfig config, OutputStream outStream) throws IOException {    	
+    		IImportConfigIdf config, OutputStream outStream) throws IOException {    	
     	ISegmentAdapterRegistry<D, T> adapterRegistry = 
     			new SegmentAdapterRegistryImpl<D, T>();
     	
@@ -171,7 +177,7 @@ public class GipImporterService<T extends IBaseSegment, D extends IBaseSegmentDT
      * Imports GIP into File with the given Config. This file can also be used as Singleton. It Uses a new
      * parser instance for every new producer.
      */
-    public void importGip(IImportConfig config) throws Exception {
+    public void importGip(IImportConfigIdf config) throws Exception {
     	 
         IGipLinkProducer<T> producer;
         IGipParser<T> gipParser;
@@ -187,15 +193,30 @@ public class GipImporterService<T extends IBaseSegment, D extends IBaseSegmentDT
     	FileOutputStream stream = null;
     	ISegmentOutputFormat<T> outputFormat = null;
     	
+    	String fileName = createOutputFileName(config);
+    	
         try {
             log.info("GIP import job started");
-            IDFMetadata idfMetaData = gipParser.parseHeader(config.getInputFile());
-            String fileName = config.getOutputDir() + "/" + config.getGraphName() + "_" + config.getVersion();
+            
+            String inputFile = config.getInputFile();
+            
+            // if input file is comes from an URL => download first
+            if (inputFile.startsWith("http")) {
+            	// download + create pathname regarding download directory
+            	inputFile = createDownloadFilename(config);
+            	download(config);
+            	downloadFile = inputFile;
+            }
+
+            IDFMetadata idfMetaData = gipParser.parseHeader(inputFile);
+            
             if(!config.isImportGip()) {
             	fileName = fileName + "_xinfos_only";
             }
             
-            stream = new FileOutputStream(fileName + ".json");
+            fileName += ".json";
+            
+            stream = new FileOutputStream(fileName);
             outputFormat = getSegmentOutputFormat(config, stream);
 
             BlockingQueue<T> queue = new ArrayBlockingQueue<>(config.getQueueSize());
@@ -257,6 +278,72 @@ public class GipImporterService<T extends IBaseSegment, D extends IBaseSegmentDT
         	}
         }
 
+        if (config.getImportUrl() != null) {
+        	importGraphFile(config, fileName);
+        }
+        
+        cleanup(config, fileName);
+        
         log.info("IDF to Graphium conversion finished");
     }
+    
+	private String createOutputFileName(IImportConfigIdf config) {
+		return config.getOutputDir() + "/" + config.getGraphName() + "_" + config.getVersion();
+	}
+
+	private void download(IImportConfigIdf config) throws IOException {
+    	URL url = new URL(config.getInputFile());
+    	
+    	String outputFilename = createDownloadFilename(config);
+    	
+    	File downloadedFile = new File(outputFilename);
+    	
+    	if (downloadFile == null && (!downloadedFile.exists() || config.isForceDownload())) {
+    		FileTransferUtils fileDownloader = new FileTransferUtils();
+	    	long bytes = fileDownloader.download(url, outputFilename);
+	    	
+	    	if (bytes <= 0) {
+	    		throw new RuntimeException("No file downloaded!");
+	    	}
+    	}
+	}
+
+	private String createDownloadFilename(IImportConfigIdf config) {
+		String filename = FilenameUtils.getName(config.getInputFile());
+		String outputDirectory = config.getDownloadDir();
+		if (outputDirectory == null) {
+			outputDirectory = config.getOutputDir();
+		}
+		return FilenameUtils.concat(outputDirectory, filename);
+	}
+
+	private void importGraphFile(IImportConfigIdf config, String outputFileName) {
+		FileTransferUtils fileTransferHelper = new FileTransferUtils();
+		try {
+			fileTransferHelper.uploadZipped(new URL(config.getImportUrl()), new File(outputFileName));
+		} catch (MalformedURLException e) {
+			log.error("upload failed", e);
+		}
+	}
+
+	private void cleanup(IImportConfigIdf config, String convertedFileName) {
+		if (downloadFile != null && !config.isKeepDownloadFile()) {
+			File file = new File(downloadFile);
+			if (file.exists()) {
+				file.delete();
+			}
+			file = new File(downloadFile + ".zip");
+			if (file.exists()) {
+				file.delete();
+			}
+		}
+		
+		if (!config.isKeepConvertedFile()) {
+			File file = new File(convertedFileName);
+			if (file.exists()) {
+				file.delete();
+			}
+		}
+	}
+
 }

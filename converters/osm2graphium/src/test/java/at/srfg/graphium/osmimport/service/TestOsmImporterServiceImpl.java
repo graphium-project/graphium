@@ -25,8 +25,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.srfg.graphium.osmimport.model.IImportConfig;
-import at.srfg.graphium.osmimport.model.impl.ImportConfig;
+import at.srfg.graphium.osmimport.model.IImportConfigOsm;
+import at.srfg.graphium.osmimport.model.impl.ImportConfigOsm;
 import at.srfg.graphium.osmimport.service.impl.OsmImporterServiceImpl;
 
 /**
@@ -55,12 +55,12 @@ public class TestOsmImporterServiceImpl {
 	public void testImportOsm() {
 		importService = new OsmImporterServiceImpl();
 
-		IImportConfig config = ImportConfig.getConfig("osm-" + country, "test", osmFileName)
-											.outPutDir(outputDirectory)
-											.boundsFile(boundsFile)
-											.queueSize(queueSize)
-											.workerThreads(workerThreads)
-											.highwayList("motorway", "motorway_link", "trunk", "trunk_link", "primary", "primary_link", 
+		IImportConfigOsm config = ImportConfigOsm.getConfig("osm-" + country, "test", osmFileName);
+		config.setOutPutDir(outputDirectory);
+		config.setBoundsFile(boundsFile);
+		config.setQueueSize(queueSize);
+		config.setWorkerThreads(workerThreads);
+		config.setHighwayList("motorway", "motorway_link", "trunk", "trunk_link", "primary", "primary_link",
 														 "secondary", "secondary_link", "tertiary", "tertiary_link");
 		try {
 			importService.importOsm(config);

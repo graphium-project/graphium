@@ -20,7 +20,10 @@
 	<!-- <category name="at.srfg.graphium.gipimport">
 		<priority value="INFO"/>
 	</category> -->
-	<category name="at.srfg.graphium.gipimport.application">
+	<!-- <category name="at.srfg.graphium.gipimport.application">
+		<priority value="INFO"/>
+	</category> -->
+	<category name="at.srfg.graphium">
 		<priority value="INFO"/>
 	</category>
 	<root>

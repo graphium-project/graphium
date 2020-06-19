@@ -27,7 +27,7 @@ import java.util.concurrent.Executors;
 import at.srfg.graphium.gipimport.helper.ParserHelper;
 import at.srfg.graphium.gipimport.model.IGipLink;
 import at.srfg.graphium.gipimport.model.IGipNode;
-import at.srfg.graphium.gipimport.model.IImportConfig;
+import at.srfg.graphium.gipimport.model.IImportConfigIdf;
 import at.srfg.graphium.gipimport.parser.IGipParser;
 import at.srfg.graphium.gipimport.parser.IGipSectionParser;
 import at.srfg.graphium.model.Access;
@@ -51,7 +51,7 @@ public class GipLinkSectionParser extends AbstractSectionParser<TLongObjectMap<I
 
     public GipLinkSectionParser(IGipParser parserReference,
                                 IGipSectionParser<TLongObjectMap<IGipNode>> nodeParser,
-                                IImportConfig config,
+                                IImportConfigIdf config,
                                 ImportStatistics statistics) {
         super(parserReference);
         this.links = new TSynchronizedLongObjectMap<>(new TLongObjectHashMap<>());

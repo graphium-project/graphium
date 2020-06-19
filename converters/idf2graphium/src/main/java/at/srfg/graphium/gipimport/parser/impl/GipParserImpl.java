@@ -50,7 +50,7 @@ import at.srfg.graphium.gipimport.model.IGipLink;
 import at.srfg.graphium.gipimport.model.IGipModelFactory;
 import at.srfg.graphium.gipimport.model.IGipNode;
 import at.srfg.graphium.gipimport.model.IGipTurnEdge;
-import at.srfg.graphium.gipimport.model.IImportConfig;
+import at.srfg.graphium.gipimport.model.IImportConfigIdf;
 import at.srfg.graphium.gipimport.model.impl.GipModelFactory;
 import at.srfg.graphium.gipimport.model.impl.IDFMetadataImpl;
 import at.srfg.graphium.gipimport.parser.IGipParser;
@@ -111,7 +111,7 @@ public class GipParserImpl<T extends IBaseSegment> implements IGipParser<T> {
 
 	@Override
 	public void parseGip(BlockingQueue<T> queue,
-			 IImportConfig config,
+			 IImportConfigIdf config,
 			 IDFMetadata metadata) {
 		this.active = true;
 		statistics.resetInstance();
@@ -275,7 +275,7 @@ public class GipParserImpl<T extends IBaseSegment> implements IGipParser<T> {
 		optionalXInfos.get(segmentId).addAll(xinfoList);
 	}
 
-	private TLongObjectMap<IPixelCut> calculatePixelCutOffset(IImportConfig config,
+	private TLongObjectMap<IPixelCut> calculatePixelCutOffset(IImportConfigIdf config,
 																  TLongSet linkIdsEnqueued,
 																  TLongObjectMap<IGipLink> links){
 		log.info("phase pixel cut calculation ....");
@@ -331,7 +331,7 @@ public class GipParserImpl<T extends IBaseSegment> implements IGipParser<T> {
 								   TLongObjectMap<List<ISegmentXInfo>> optionalXInfos,
 								   final TLongObjectMap<Map<String, Object>> defaultTags,
 								   final BlockingQueue<T> queue,
-								   final IImportConfig config) {
+								   final IImportConfigIdf config) {
 //		if (rendering != null) {
 //			log.info("Rendering Table" + rendering.size());
 //		}
