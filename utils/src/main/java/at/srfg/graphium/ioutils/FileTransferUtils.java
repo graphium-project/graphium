@@ -54,11 +54,14 @@ public class FileTransferUtils {
 		long bytes = fileOutputStream.getChannel().transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
 		fileOutputStream.close();
 		log.info("File downloaded: " + outputFilename);
+		if (bytes <= 0) {
+			log.warn("File has a size of " + bytes + " bytes. Really ok?");
+		}
 		return bytes;
 	}
 	
 	public boolean upload(URI url, File file) {
-		log.info("downloading file...");
+		log.info("uploading file...");
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 		MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
