@@ -101,7 +101,15 @@ To import transport graph data into Graphium data has to be converted into Graph
 
 Example API call to generate a JSON file from OSM data:
 
-`java osm2graphium.one-jar.jar -i /path/to/osm-at-latest.osm.pbf -o /path/to/output -n osm_at -v 170701 -q 20000 -t 5 –highwayTypes "motorway, motorway_link, primary, primary_link"`
+`java osm2graphium.one-jar.jar -i /path/to/osm-andorra-latest.osm.pbf -o /path/to/output -n osm_at -v 200603 -q 20000 -t 5 –highwayTypes "motorway, motorway_link, primary, primary_link"`
+
+Example API call to generate a JSON file from OSM data and import into a Graphium server:
+
+`java osm2graphium.one-jar.jar -i /path/to/osm-andorra-latest.osm.pbf -o /path/to/output -n osm_at -v 200603 -q 20000 -t 5 –highwayTypes "motorway, motorway_link, primary, primary_link" -u "http://localhost:8080/graphium/api/segments/graphs/osm_andorra/versions/200603?overrideIfExists=true"`
+
+Example API call to download a OSM file, generate a JSON file and import into a Graphium server:
+
+`java osm2graphium.one-jar.jar -i http://download.geofabrik.de/europe/andorra-latest.osm.pbf -o /path/to/output -n osm_at -v 200603 -q 20000 -t 5 –highwayTypes "motorway, motorway_link, primary, primary_link" -u "http://localhost:8080/graphium/api/segments/graphs/osm_andorra/versions/200603?overrideIfExists=true"`
 
 | short option | long option    | description                              |
 | :----------- | :------------- | ---------------------------------------- |
@@ -127,7 +135,15 @@ Example API call to generate a JSON file from OSM data:
 
 Example API call to generate a JSON file from GIP data:
 
-`java idf2graphium.one-jar.jar -i /path/to/gip-at.txt -o /path/to/output -n gip_at_frc_0_8 -v 16_02_161111 --skip-pixel-cut -import-frcs "0,1,2,3,4,5,6,7,8"`
+`java idf2graphium.one-jar.jar -i /path/to/gip-at.txt -o /path/to/output -n gip_at_frc_0_8 -v 20_04_200603 --skip-pixel-cut -import-frcs "0,1,2,3,4,5,6,7,8"`
+
+Example API call to generate a JSON file from GIP data and import into a Graphium server:
+
+`java idf2graphium.one-jar.jar -i /path/to/gip-at.txt -o /path/to/output -n gip_at_frc_0_8 -v 20_04_200603 --skip-pixel-cut -import-frcs "0,1,2,3,4,5,6,7,8" -u "http://localhost:8080/graphium/api/segments/graphs/gip_at/versions/200603?overrideIfExists=true"`
+
+Example API call to download a GIP file, generate a JSON file and import into a Graphium server:
+
+`java idf2graphium.one-jar.jar -i http://open.gip.gv.at/ogd/A_routingexport_ogd.zip -o /path/to/output -n gip_at_frc_0_8 -v 20_04_200603 --skip-pixel-cut -import-frcs "0,1,2,3,4,5,6,7,8" -u "http://localhost:8080/graphium/api/segments/graphs/osm_andorra/versions/200603?overrideIfExists=true"`
 
 | short option | long option                   | Beschreibung                                                 |
 | ------------ | ----------------------------- | ------------------------------------------------------------ |
@@ -182,31 +198,19 @@ Example API call to generate a JSON file from GIP data:
 
 6. Deploy tutorial's Graphium central server (*graphium.war*) on Apache Tomcat and start
 
-7. Download OSM File:
+7. Download and convert OSM File into Graphium's JSON format, import into Graphium central server:
 
    ```shell script
-   curl http://download.geofabrik.de/europe/andorra-latest.osm.pbf -o /data/osm/andorra-latest.osm.pbf
-   ```
-
-8. Convert OSM File into Graphium's JSON format:
-
-   ```shell script
-   java -jar converters/target/osm2graphium.one-jar.jar -i /data/osm/andorra-latest.osm.pbf -o /path/to/output -n osm_andorra -v 200603 -q 20000 -t 5 -highwayTypes "motorway, motorway_link, primary, primary_link"
-   ```
-
-9. Import OSM into Graphium central server
-
-   ```shell script
-   curl -X POST "http://localhost:8080/graphium/api/segments/graphs/osm_andorra/versions/200603?overrideIfExists=true" -F "file=@/path/to/output/osm_andorra.json"
+   docker exec -it graphium-neo4j-server java -jar /osm2graphium.one-jar.jar -i http://download.geofabrik.de/europe/andorra-latest.osm.pbf -o / -n osm_andorra -fd true -v 200603 -q 20000 -t 5 -highwayTypes "motorway, motorway_link, primary, primary_link" -u "http://localhost:8080/graphium/api/segments/graphs/osm_andorra/versions/200603?overrideIfExists=true"
    ```
    
-10. Activate imported graph version
+8. Activate imported graph version
 
     ```shell script
     curl -X PUT "http://localhost:8080/graphium/api/metadata/graphs/osm_andorra/versions/200603/state/ACTIVE"
     ```
     
-11. Check server state
+9. Check server state
 
     ```shell script
     curl -X GET "http://localhost:8080/graphium/api/status"
@@ -222,33 +226,21 @@ Example API call to generate a JSON file from GIP data:
 
 Application and database logs can be obtained via `docker-compose logs`.
 
-2. Download OSM File:
-
-    ```shell script
-    docker exec -it graphium-server curl http://download.geofabrik.de/europe/andorra-latest.osm.pbf -o /andorra-latest.osm.pbf
-    ```
-
 If any of the following steps crashes because of a Java heap exception you have configure memory definition of Docker.
 
-3. Convert OSM File into Graphium's JSON format:
+2. Download and convert OSM File into Graphium's JSON format, import into Graphium central server:
 
-    ```shell script
-    docker exec -it graphium-server java -jar /osm2graphium.one-jar.jar -i /andorra-latest.osm.pbf -o / -n osm_andorra -v 200603 -q 20000 -t 5 -highwayTypes "motorway, motorway_link, primary, primary_link"
-    ```
+   ```shell script
+   docker exec -it graphium-neo4j-server java -jar /osm2graphium.one-jar.jar -i http://download.geofabrik.de/europe/andorra-latest.osm.pbf -o / -n osm_andorra -fd true -v 200603 -q 20000 -t 5 -highwayTypes "motorway, motorway_link, primary, primary_link" -u "http://localhost:8080/graphium/api/segments/graphs/osm_andorra/versions/200603?overrideIfExists=true"
+   ```
 
-4. Import OSM into Graphium central server
-
-    ```shell script
-    docker exec -it graphium-server curl -X POST "http://localhost:8080/graphium/api/segments/graphs/osm_andorra/versions/200603?overrideIfExists=true" -F "file=@/osm_andorra_200603.json"
-    ```
-
-5. Activate imported graph version
+3. Activate imported graph version
 
     ```shell script
     docker exec -it graphium-server curl -X PUT "http://localhost:8080/graphium/api/metadata/graphs/osm_andorra/versions/200603/state/ACTIVE"
     ```
 
-6. Check server state
+4. Check server state
 
     ```shell script
     docker exec -it graphium-server curl -X GET "http://localhost:8080/graphium/api/status"
