@@ -155,7 +155,7 @@ Example API call to download a GIP file, generate a JSON file and import into a 
 | -vf          | --valid-from                  | start timestamp of graph version's validity (format 'yyyy-MM-dd HH:mm'); optional |
 | -vt          | --valid-to                    | end timestamp of graph version's validity (format 'yyyy-MM-dd HH:mm'); optional |
 |              | --skip-gip-import             | skip the import process of the GIP, only pixel cuts will be generated. The options -o and --import-frcs are ignored; optional |
-|              | –skip-pixel-cut               | skip the calculation of the turn offset factors. The options -m and -M are ignored; optional |
+|              | --skip-pixel-cut            | skip the calculation of the turn offset factors. The options -m and -M are ignored; optional |
 | -m           | --pixel-cut-min-frc           | minimum frc value to be considered for offset calculations; optional |
 | -M           | --pixel-cut-max-frc           | maximum frc value to be considered for offset calculations; optional |
 |              | --import-frcs                 | Comma separated List of FRC values to be included for IDF import. If not set (default) all frc values are considered; optional |
@@ -198,10 +198,10 @@ Example API call to download a GIP file, generate a JSON file and import into a 
 
 6. Deploy tutorial's Graphium central server (*graphium.war*) on Apache Tomcat and start
 
-7. Download and convert OSM File into Graphium's JSON format, import into Graphium central server:
+7. Download and convert OSM File into Graphium's JSON format, import into Graphium central server *):
 
    ```shell script
-   docker exec -it graphium-neo4j-server java -jar /osm2graphium.one-jar.jar -i http://download.geofabrik.de/europe/andorra-latest.osm.pbf -o / -n osm_andorra -fd true -v 200603 -q 20000 -t 5 -highwayTypes "motorway, motorway_link, primary, primary_link" -u "http://localhost:8080/graphium/api/segments/graphs/osm_andorra/versions/200603?overrideIfExists=true"
+   docker exec -it graphium-neo4j-server java -jar /osm2graphium.one-jar.jar -i http://download.geofabrik.de/europe/andorra-latest.osm.pbf -o / -n osm_andorra -fd true -v 200603 -q 20000 -t 5 --highwayTypes "motorway, motorway_link, primary, primary_link" -u "http://localhost:8080/graphium/api/segments/graphs/osm_andorra/versions/200603?overrideIfExists=true"
    ```
    
 8. Activate imported graph version
@@ -228,10 +228,10 @@ Application and database logs can be obtained via `docker-compose logs`.
 
 If any of the following steps crashes because of a Java heap exception you have configure memory definition of Docker.
 
-2. Download and convert OSM File into Graphium's JSON format, import into Graphium central server:
+2. Download and convert OSM File into Graphium's JSON format, import into Graphium central server *):
 
    ```shell script
-   docker exec -it graphium-neo4j-server java -jar /osm2graphium.one-jar.jar -i http://download.geofabrik.de/europe/andorra-latest.osm.pbf -o / -n osm_andorra -fd true -v 200603 -q 20000 -t 5 -highwayTypes "motorway, motorway_link, primary, primary_link" -u "http://localhost:8080/graphium/api/segments/graphs/osm_andorra/versions/200603?overrideIfExists=true"
+   docker exec -it graphium-neo4j-server java -jar /osm2graphium.one-jar.jar -i http://download.geofabrik.de/europe/andorra-latest.osm.pbf -o / -n osm_andorra -fd true -v 200603 -q 20000 -t 5 --highwayTypes "motorway, motorway_link, primary, primary_link" -u "http://localhost:8080/graphium/api/segments/graphs/osm_andorra/versions/200603?overrideIfExists=true"
    ```
 
 3. Activate imported graph version
@@ -245,6 +245,8 @@ If any of the following steps crashes because of a Java heap exception you have 
     ```shell script
     docker exec -it graphium-server curl -X GET "http://localhost:8080/graphium/api/status"
     ```
+
+*) Notice parameter *highwayTypes*: only high level streets will be imported; adapt if needed (see OSM highway types).
 
 ## Tutorials
 

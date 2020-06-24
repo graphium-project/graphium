@@ -1,4 +1,4 @@
-# DELETEt graph version
+# DELETE graph version
 
 ## Resource URL
 
