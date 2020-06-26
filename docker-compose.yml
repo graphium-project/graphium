@@ -1,4 +1,4 @@
-version: '3.7'
+version: '3.8'
 
 services:
   graphium:
@@ -10,6 +10,8 @@ services:
       - "db.password=graphium"
     ports:
       - "8080:8080"
+    volumes:
+      - db-init:/db-init/
     depends_on:
       - database
   database:
@@ -22,7 +24,12 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./postgis/db/composite/create_graphium_database.sql:/docker-entrypoint-initdb.d/create_graphium_database.sql
+      - type: volume
+        source: db-init
+        target: /docker-entrypoint-initdb.d/
+        volume:
+          nocopy: false
       - postgres_data:/var/lib/postgresql/data
 volumes:
+  db-init:
   postgres_data:
