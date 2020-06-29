@@ -6,14 +6,14 @@
 
 ## Parameters
 
-| **Attribut**            | **Datentyp** | **Beschreibung**                    |
-| ----------------------- | ------------ | ----------------------------------- |
-| **graph**               | String       | unique graph name                   |
-| **lastImportedVersion** | String       | name of last imported graph version |
+| attribute               | type   | description                         |
+| ----------------------- | ------ | ----------------------------------- |
+| **graph**               | String | unique graph name                   |
+| **lastImportedVersion** | String | name of last imported graph version |
 
 ## Example URL
 
-`http://localhost:8080/graphium-central-server/api/metadata/graphs/osm_at/checkupdate?lastImportedVersion=170828`
+`http://localhost:8080/graphium/api/metadata/graphs/osm_at/checkupdate?lastImportedVersion=200603`
 
 ## Example Response
 

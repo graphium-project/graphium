@@ -27,8 +27,8 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.log4j.Logger;
 
-import at.srfg.graphium.gipimport.model.IImportConfig;
-import at.srfg.graphium.gipimport.model.impl.ImportConfig;
+import at.srfg.graphium.gipimport.model.IImportConfigIdf;
+import at.srfg.graphium.gipimport.model.impl.ImportConfigIdf;
 import at.srfg.graphium.gipimport.service.impl.GipImporterService;
 import at.srfg.graphium.io.dto.IBaseSegmentDTO;
 import at.srfg.graphium.io.dto.IWaySegmentDTO;
@@ -69,6 +69,11 @@ public class IDF2JSONConverter {
                 .desc("Comma separated List of FRC values to be included for IDF import. If not set (default) all frc values are considered. ").build());
         options.addOption(Option.builder().longOpt("access-types").hasArgs().valueSeparator(',').argName("access_types")
                 .desc("Comma separated List of Access Types, to be considered. If not set, all access types will be considered").build());
+        options.addOption(Option.builder("d").longOpt("downloadDir").hasArg().argName("download_dir").desc("directory to store download files").build());
+        options.addOption(Option.builder("df").longOpt("keepDownloadFile").hasArg().argName("keep_download_file").desc("false: downloaded file from URL will be deleted afterwards; default = true").build());
+        options.addOption(Option.builder("fd").longOpt("forceDownload").hasArg().argName("force_download").desc("true: downloaded file from URL even if it has been already downloaded / false: if file exists in download directory this one will be used; default = false").build());
+        options.addOption(Option.builder("cf").longOpt("keepConvertedFile").hasArg().argName("keep_converted_file").desc("false: converted file will be deleted afterwards; default = true").build());
+        options.addOption(Option.builder("u").longOpt("importUrl").hasArg().argName("import_url").desc("server URL to import the converted graph file").build());
         options.addOption(Option.builder("e").longOpt("pixel-cut-enable-short-conn").desc("By default short connections below 3.5 meter with frc 0 are ignored. This is to filter the connections between highways and streets. If this option is set all gip links are considered").build());
         options.addOption(Option.builder("bl").longOpt("extract-buslane-info").desc("By default no bus lane info will be extracted.").build());
         options.addOption(Option.builder("fc").longOpt("full-connectivity").hasArg().argName("full_connectivity").desc("Create a full connected network ignoring one ways (default = false)").build());
@@ -138,38 +143,41 @@ public class IDF2JSONConverter {
                 throw new RuntimeException("Missing required option: -i");
             }
 
-            IImportConfig config = ImportConfig.getConfig(name,version,gipFile)
-                    .outPutDir(outputDirectory).frcList(frcValues).accessTypes(accessTypes).setCsvConfig(csvConfig);
+            IImportConfigIdf config = ImportConfigIdf.getConfig(name,version,gipFile);
+            config.setOutPutDir(outputDirectory);
+            config.setFrcList(frcValues);
+            config.setAccessTypes(accessTypes);
+            config.setCsvConfig(csvConfig);
 
             Date now = new Date();
             if (cmd.hasOption("vf")) {
-            	config.validFrom(df.parse(cmd.getOptionValue("vf")));
+            	config.setValidFrom(df.parse(cmd.getOptionValue("vf")));
             } else {
-            	config.validFrom(now);
+            	config.setValidFrom(now);
             }
             
             if (cmd.hasOption("vt")) {
-            	config.validTo(df.parse(cmd.getOptionValue("vt")));
+            	config.setValidTo(df.parse(cmd.getOptionValue("vt")));
             } 
             
             if (!gipImport){
-                config.noGipImport();
+                config.setNoGipImport();
             }
 
             if (cmd.hasOption('e')) {
                 config.enableSmallConnections();
             }
             if (cmd.hasOption("bl")) {
-                config.extractBusLaneInfo(true);
+                config.setExtractBusLaneInfo(true);
             }
             if (cmd.hasOption("skip-pixel-cut")) {
-                config.noPixelCut();
+                config.setNoPixelCut();
             } else {
                 if (cmd.hasOption('m')) {
-                    config.minFrc(Integer.parseInt(cmd.getOptionValue('m')));
+                    config.setMinFrc(Integer.parseInt(cmd.getOptionValue('m')));
                 }
                 if (cmd.hasOption('M')) {
-                    config.maxFrc(Integer.parseInt(cmd.getOptionValue('M')));
+                    config.setMaxFrc(Integer.parseInt(cmd.getOptionValue('M')));
                 }
             }
             if (cmd.hasOption("fc")) {
@@ -181,6 +189,32 @@ public class IDF2JSONConverter {
 
             if (cmd.hasOption("csv-encoding")) {
             	config.setCsvEncodingName(cmd.getOptionValue("csv-encoding"));
+            }
+
+            if (cmd.hasOption("d")) {
+            	config.setDownloadDir(cmd.getOptionValue("d"));
+            }
+            
+            if (cmd.hasOption("df")) {
+            	config.setKeepDownloadFile(Boolean.parseBoolean(cmd.getOptionValue("df")));
+            } else {
+            	config.setKeepDownloadFile(true);
+            }
+
+            if (cmd.hasOption("fd")) {
+            	config.setForceDownload(Boolean.parseBoolean(cmd.getOptionValue("fd")));
+            } else {
+            	config.setForceDownload(false);
+            }
+
+            if (cmd.hasOption("cf")) {
+            	config.setKeepConvertedFile(Boolean.parseBoolean(cmd.getOptionValue("cf")));
+            } else {
+            	config.setKeepConvertedFile(true);
+            }
+            
+            if (cmd.hasOption("u")) {
+            	config.setImportUrl(cmd.getOptionValue("u"));
             }
             
             log.info("Starte IDF to JSON Converter ...");

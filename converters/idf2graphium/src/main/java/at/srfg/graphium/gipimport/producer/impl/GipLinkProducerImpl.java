@@ -18,7 +18,7 @@ package at.srfg.graphium.gipimport.producer.impl;
 import java.util.concurrent.BlockingQueue;
 
 import at.srfg.graphium.gipimport.model.IDFMetadata;
-import at.srfg.graphium.gipimport.model.IImportConfig;
+import at.srfg.graphium.gipimport.model.IImportConfigIdf;
 import at.srfg.graphium.gipimport.parser.IGipParser;
 import at.srfg.graphium.gipimport.producer.IGipLinkProducer;
 import at.srfg.graphium.model.IBaseSegment;
@@ -28,7 +28,7 @@ public class GipLinkProducerImpl<T extends IBaseSegment> implements IGipLinkProd
 	
 	private BlockingQueue<T> queue;
 	
-	private IImportConfig config;
+	private IImportConfigIdf config;
 	private IDFMetadata metadata;
 	
 	private IGipParser<T> parser;
@@ -39,7 +39,7 @@ public class GipLinkProducerImpl<T extends IBaseSegment> implements IGipLinkProd
 	
 	@Override
 	public Thread produceLinks(BlockingQueue<T> queue,
-			   final IImportConfig config,
+			   final IImportConfigIdf config,
 			   final IDFMetadata metadata) {		
 		this.queue = queue;
 		this.metadata = metadata;

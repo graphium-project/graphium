@@ -27,8 +27,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
+import at.srfg.graphium.converter.commons.service.impl.AbstractImporterService;
 import at.srfg.graphium.gipimport.model.IDFMetadata;
-import at.srfg.graphium.gipimport.model.IImportConfig;
+import at.srfg.graphium.gipimport.model.IImportConfigIdf;
 import at.srfg.graphium.gipimport.parser.IGipParser;
 import at.srfg.graphium.gipimport.parser.impl.GipParserImpl;
 import at.srfg.graphium.gipimport.producer.IGipLinkProducer;
@@ -81,14 +82,13 @@ import at.srfg.graphium.pixelcuts.model.impl.PixelCut;
  * It is splittet in a Producer and Consumer. The Consumer takes all gip Links and serialiazes them to the
  * {@link IWayGraphOutputFormatFactory}.
  */
-public class GipImporterService<T extends IBaseSegment, D extends IBaseSegmentDTO> {
+public class GipImporterService<T extends IBaseSegment, D extends IBaseSegmentDTO> extends AbstractImporterService {
 
     private static Logger log = Logger.getLogger(GipImporterService.class);
 
     public GipImporterService() {}
 
-
-    private IWayGraphVersionMetadata getVersionMetadata(IImportConfig config, IDFMetadata idfMetaData) {
+    private IWayGraphVersionMetadata getVersionMetadata(IImportConfigIdf config, IDFMetadata idfMetaData) {
         IWayGraphVersionMetadata metadata = new WayGraphVersionMetadata();
         metadata.setGraphName(config.getGraphName());
         metadata.setVersion(config.getVersion());
@@ -104,7 +104,7 @@ public class GipImporterService<T extends IBaseSegment, D extends IBaseSegmentDT
     }
 
     protected ISegmentOutputFormat<T> getSegmentOutputFormat(
-    		IImportConfig config, OutputStream outStream) throws IOException {    	
+    		IImportConfigIdf config, OutputStream outStream) throws IOException {    	
     	ISegmentAdapterRegistry<D, T> adapterRegistry = 
     			new SegmentAdapterRegistryImpl<D, T>();
     	
@@ -171,7 +171,7 @@ public class GipImporterService<T extends IBaseSegment, D extends IBaseSegmentDT
      * Imports GIP into File with the given Config. This file can also be used as Singleton. It Uses a new
      * parser instance for every new producer.
      */
-    public void importGip(IImportConfig config) throws Exception {
+    public void importGip(IImportConfigIdf config) throws Exception {
     	 
         IGipLinkProducer<T> producer;
         IGipParser<T> gipParser;
@@ -187,15 +187,30 @@ public class GipImporterService<T extends IBaseSegment, D extends IBaseSegmentDT
     	FileOutputStream stream = null;
     	ISegmentOutputFormat<T> outputFormat = null;
     	
+    	String fileName = createOutputFileName(config);
+    	
         try {
             log.info("GIP import job started");
-            IDFMetadata idfMetaData = gipParser.parseHeader(config.getInputFile());
-            String fileName = config.getOutputDir() + "/" + config.getGraphName() + "_" + config.getVersion();
+            
+            String inputFile = config.getInputFile();
+            
+            // if input file is comes from an URL => download first
+            if (inputFile.startsWith("http")) {
+            	// download + create pathname regarding download directory
+            	inputFile = createDownloadFilename(config);
+            	download(config);
+            	downloadFile = inputFile;
+            }
+
+            IDFMetadata idfMetaData = gipParser.parseHeader(inputFile);
+            
             if(!config.isImportGip()) {
             	fileName = fileName + "_xinfos_only";
             }
             
-            stream = new FileOutputStream(fileName + ".json");
+            fileName += ".json";
+            
+            stream = new FileOutputStream(fileName);
             outputFormat = getSegmentOutputFormat(config, stream);
 
             BlockingQueue<T> queue = new ArrayBlockingQueue<>(config.getQueueSize());
@@ -257,6 +272,17 @@ public class GipImporterService<T extends IBaseSegment, D extends IBaseSegmentDT
         	}
         }
 
+        if (config.getImportUrl() != null) {
+        	importGraphFile(config, fileName);
+        }
+        
+        cleanup(config, fileName);
+        
         log.info("IDF to Graphium conversion finished");
     }
+    
+	private String createOutputFileName(IImportConfigIdf config) {
+		return config.getOutputDir() + "/" + config.getGraphName() + "_" + config.getVersion();
+	}
+
 }

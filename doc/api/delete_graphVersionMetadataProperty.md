@@ -6,18 +6,18 @@
 
 ## Parameters
 
-| **Attribut**      | **Datentyp** | **Beschreibung**                         |
-| ----------------- | ------------ | ---------------------------------------- |
-| **graph**         | String       | unique graph name                        |
-| **version**       | String       | unique graph version or **current** for currently active graph version |
-| **propertyName**  | String       | metadata's property name                 |
-| **value**         | Object       | property's value                         |
-| **groupname**     | String       | optional; only needed in case of changing state to **ACTIVATE**; name of group to activate a graph version for; if not set activation will be done for all subscribers |
-| **segmentscount** | int          | optional; only needed in case of changing state to **ACTIVATE**; number of segments in graph version to activate; needed for validation issues |
+| attribute         | type   | description                                                  |
+| ----------------- | ------ | ------------------------------------------------------------ |
+| **graph**         | String | unique graph name                                            |
+| **version**       | String | unique graph version or **current** for currently active graph version |
+| **propertyName**  | String | metadata's property name                                     |
+| **value**         | Object | property's value                                             |
+| **groupname**     | String | optional; only needed in case of changing state to **ACTIVATE**; name of group to activate a graph version for; if not set activation will be done for all subscribers |
+| **segmentscount** | int    | optional; only needed in case of changing state to **ACTIVATE**; number of segments in graph version to activate; needed for validation issues |
 
 ## Example URL
 
-`http://localhost:8080/graphium-central-server/api/metadata/graphs/osm_at/versions/170828/description`
+`http://localhost:8080/graphium/api/metadata/graphs/osm_at/versions/200603/description`
 
 ## Example Response
 

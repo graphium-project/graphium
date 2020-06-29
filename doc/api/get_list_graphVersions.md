@@ -12,16 +12,16 @@ List versions within a time period:
 
 ## Parameters
 
-| **Attribut**       | **Datentyp** | **Beschreibung**                         |
-| ------------------ | ------------ | ---------------------------------------- |
-| **graph**          | String       | unique graph name                        |
-| **startTimestamp** | long         | optional; start of requested time period |
-| **endTimestamp**   | long         | optional; end of requested time period   |
+| attribute          | type   | description                              |
+| ------------------ | ------ | ---------------------------------------- |
+| **graph**          | String | unique graph name                        |
+| **startTimestamp** | long   | optional; start of requested time period |
+| **endTimestamp**   | long   | optional; end of requested time period   |
 
 
 ## Example URL
 
-`http://localhost:8080/graphium-central-server/api/metadata/graphs/osm_at/versions`
+`http://localhost:8080/graphium/api/metadata/graphs/osm_at/versions`
 
 ## Example Response
 
@@ -29,9 +29,9 @@ List versions within a time period:
 [{
   "id" : 56,
   "graphName" : "osm_at",
-  "version" : "170828",
+  "version" : "200603",
   "originGraphName" : "osm_at",
-  "originVersion" : "161201",
+  "originVersion" : "200603",
   "state" : "INITIAL",
   "validFrom" : 1485262403320,
   "coveredArea" : "POLYGON ((9.528048700000001 46.4084712, 9.528048700000001 49.0140693, 17.156510700000002 49.0140693, 17.156510700000002 46.4084712, 9.528048700000001 46.4084712))",

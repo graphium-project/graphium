@@ -36,13 +36,18 @@
 		</layout>
 	</appender>
 
-	<category name="at.srfg.graphium.core.service.impl">
-		<priority value="DEBUG" />
+	<category name="at.srfg.graphium.osmimport.application">
+		<priority value="INFO"/>
 	</category>
-	
-	<category name="at.srfg.graphium.postgis.service.impl">
-		<priority value="DEBUG" />
+	<category name="at.srfg.graphium.ioutils">
+		<priority value="INFO"/>
 	</category>
+	<category name="at.srfg.graphium.osmimport.service">
+		<priority value="INFO"/>
+	</category>
+	<!-- <category name="at.srfg.graphium">
+		<priority value="INFO" />
+	</category> -->
 	
 	<root>
         <priority value="INFO"/>       

@@ -10,7 +10,7 @@ No parameters.
 
 ## Example URL
 
-`http://localhost:8080/graphium-central-server/api/status`
+`http://localhost:8080/graphium/api/status`
 
 ## Example Response
 

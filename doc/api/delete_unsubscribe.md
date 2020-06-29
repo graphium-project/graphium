@@ -6,10 +6,10 @@
 
 ## Parameters
 
-| **Attribut**   | **Datentyp** | **Beschreibung**                       |
-| -------------- | ------------ | -------------------------------------- |
-| **servername** | String       | unique name of external central server |
-| **graph**      | String       | unique graph name                      |
+| attribute      | type   | description                            |
+| -------------- | ------ | -------------------------------------- |
+| **servername** | String | unique name of external central server |
+| **graph**      | String | unique graph name                      |
 ## Example URL
 
 `http://localhost:8081/graphium-satellite-server/api/graphs/osm_at/subscriptions?servername=central_server`

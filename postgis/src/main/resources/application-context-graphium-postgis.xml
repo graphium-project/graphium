@@ -96,4 +96,7 @@
     	<property name="rowMapper" ref="defaultSegmentXInfoRowMapper"/>
     	<property name="viewDao" ref="postgisWayGraphViewDao"/>
     </bean>
+    
+    <bean id="postgisCapability" class="at.srfg.graphium.postgis.capabilities.impl.PostgisCapabilityImpl"/>
+    
 </beans>

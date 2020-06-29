@@ -11,7 +11,7 @@
 	<parent>
 		<groupId>at.srfg.graphium</groupId>
 		<artifactId>graphium-parent</artifactId>
-		<version>1.0.3</version>
+		<version>1.1.0</version>
 	</parent>
 
 	<dependencies>
@@ -27,5 +27,23 @@
 			<artifactId>jts</artifactId>
 			<version>${jts.version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>${slf4j-log4j12.version}</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>commons-io</groupId>
+		    <artifactId>commons-io</artifactId>
+		    <version>2.6</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+		</dependency>
+		
 	</dependencies>
 </project>

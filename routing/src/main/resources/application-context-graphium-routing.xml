@@ -1,0 +1,32 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<bean id="segmentDurationCostEvaluator" class="at.srfg.graphium.routing.cost.impl.SegmentDurationCostEvaluatorImpl"/>
+	<bean id="segmentLengthCostEvaluator" class="at.srfg.graphium.routing.cost.impl.SegmentLengthCostEvaluatorImpl"/>
+
+	<bean id="segmentCostEvaluatorFactory" class="at.srfg.graphium.routing.cost.impl.SegmentCostEvaluatorFactoryImpl" scope="singleton">
+		<constructor-arg name="lengthEvaluator" ref="segmentLengthCostEvaluator"/>
+		<constructor-arg name="durationEvaluator" ref="segmentDurationCostEvaluator"/>
+	</bean>
+	
+	<bean id="routingOptionsFactory" class="at.srfg.graphium.routing.model.impl.RoutingOptionsFactoryImpl"/>
+
+	<bean id="directedSegmentSetToRouteAdapterService" class="at.srfg.graphium.routing.service.impl.DirectedSegmentSetToRouteAdapterServiceImpl">
+		<constructor-arg name="costEvaluatorFactory" ref="segmentCostEvaluatorFactory"/>
+		<constructor-arg name="waySegmentsByIdLoader" ref="waySegmentsByIdLoader"/>
+	</bean>
+	
+</beans>

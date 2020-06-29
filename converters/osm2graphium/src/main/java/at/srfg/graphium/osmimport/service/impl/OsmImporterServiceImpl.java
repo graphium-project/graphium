@@ -17,6 +17,7 @@ package at.srfg.graphium.osmimport.service.impl;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,6 +37,7 @@ import org.openstreetmap.osmosis.tagfilter.v0_6.TagFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.srfg.graphium.converter.commons.service.impl.AbstractImporterService;
 import at.srfg.graphium.io.adapter.IAdapter;
 import at.srfg.graphium.io.adapter.ISegmentAdapter;
 import at.srfg.graphium.io.adapter.impl.GraphVersionMetadata2GraphVersionMetadataDTOAdapter;
@@ -53,7 +55,7 @@ import at.srfg.graphium.model.IWayGraphVersionMetadata;
 import at.srfg.graphium.model.IWaySegment;
 import at.srfg.graphium.model.impl.WayGraphVersionMetadata;
 import at.srfg.graphium.model.management.impl.Source;
-import at.srfg.graphium.osmimport.model.IImportConfig;
+import at.srfg.graphium.osmimport.model.IImportConfigOsm;
 import at.srfg.graphium.osmimport.model.impl.NodeCoord;
 import at.srfg.graphium.osmimport.reader.pbf.RelationSink;
 import at.srfg.graphium.osmimport.reader.pbf.SegmentationNodesSink;
@@ -66,7 +68,7 @@ import gnu.trove.map.hash.TLongObjectHashMap;
  * @author mwimmer
  *
  */
-public class OsmImporterServiceImpl {
+public class OsmImporterServiceImpl extends AbstractImporterService {
 
 	private static Logger log = LoggerFactory.getLogger(OsmImporterServiceImpl.class);
 	
@@ -93,7 +95,7 @@ public class OsmImporterServiceImpl {
     			new GenericJacksonWayGraphOutputFormatFactoryImpl<IWaySegment>(segmentOutputFormatFactory,adapter);
     }
 	
-	public void importOsm(IImportConfig config) throws Exception {
+	public void importOsm(IImportConfigOsm config) throws Exception {
         log.info("Start converting OSM file for graph " + config.getGraphName() + " in version " + config.getVersion() + "...");
 
         // read OSM model and identify end nodes and nodes for segmentation task
@@ -127,9 +129,11 @@ public class OsmImporterServiceImpl {
     	FileOutputStream stream = null;
         IWayGraphOutputFormat<IWaySegment> outputFormat = null;
        
+        String outputFileName = createOutputFileName(config);
+        
         try {
 	        int wayCount = 0;
-			stream = new FileOutputStream(config.getOutputDir() + "/" + config.getGraphName() + "_" + config.getVersion() + ".json");
+			stream = new FileOutputStream(outputFileName);
 	        outputFormat = outputFormatFactory.getWayGraphOutputFormat(stream);
 	        outputFormat.serialize(this.getVersionMetadata(config));
 	
@@ -139,7 +143,7 @@ public class OsmImporterServiceImpl {
 	        startTime = System.currentTimeMillis();
 	
 	        ArrayBlockingQueue<IWaySegment> waysQueue = new ArrayBlockingQueue<>(config.getQueueSize());
-	        SegmentationWaySink segmentationWaySink = new SegmentationWaySink(wayRefs, relations, waysQueue);
+	        SegmentationWaySink segmentationWaySink = new SegmentationWaySink(wayRefs, relations, waysQueue, config.getTagAdaptionMode());
 	        Thread segmentationThread = readOsm(segmentationWaySink, wayTagFilter, config, true);
 
 	        IWaySegment segment;
@@ -176,7 +180,7 @@ public class OsmImporterServiceImpl {
 	        log.info("Start reading PBF for building non-segmented ways...");
 	        startTime = System.currentTimeMillis();
 
-	        WaySink waySink = new WaySink(wayRefs, nodes, segmentedWaySegments, relations, waysQueue);
+	        WaySink waySink = new WaySink(wayRefs, nodes, segmentedWaySegments, relations, waysQueue, config.getTagAdaptionMode());
 	        Thread wayThread = readOsm(waySink, wayTagFilter, config, true);
 
 	        // retrieve ways and process them
@@ -226,11 +230,21 @@ public class OsmImporterServiceImpl {
         	}
         }
 
+        if (config.getImportUrl() != null) {
+        	importGraphFile(config, outputFileName);
+        }
+        
+        cleanup(config, outputFileName);
+        
         log.info("Finished converting OSM");
 
 	}
 	
-	private SinkSource createWayTagFilter(IImportConfig config) {
+	private String createOutputFileName(IImportConfigOsm config) {
+		return config.getOutputDir() + "/" + config.getGraphName() + "_" + config.getVersion() + ".json";
+	}
+
+	private SinkSource createWayTagFilter(IImportConfigOsm config) {
         Set<String> keys = new HashSet<>();
         Map<String, Set<String>> keyValues = new HashMap<>();
         if (config.getHighwayList() != null && !config.getHighwayList().isEmpty()) {
@@ -251,7 +265,7 @@ public class OsmImporterServiceImpl {
         return filterSink;
 	}
 	
-	private Thread readOsm(Sink sink, SinkSource filter, IImportConfig config, boolean async) {
+	private Thread readOsm(Sink sink, SinkSource filter, IImportConfigOsm config, boolean async) throws IOException {
         filter.setSink(sink);
         
         Sink readerSink;
@@ -269,8 +283,18 @@ public class OsmImporterServiceImpl {
         	// Tagfilter -> Sink
         	readerSink = filter;
         }
-        		
-        PbfReader reader = new PbfReader(new File(config.getInputFile()), config.getWorkerThreads());
+        
+        String inputFile = config.getInputFile();
+        
+        // if input file is comes from an URL => download first
+        if (inputFile.startsWith("http")) {
+        	// download + create pathname regarding download directory
+        	inputFile = createDownloadFilename(config);
+        	download(config);
+        	downloadFile = inputFile;
+        }
+        
+        PbfReader reader = new PbfReader(new File(inputFile), config.getWorkerThreads());
         
         reader.setSink(readerSink);
         
@@ -284,18 +308,17 @@ public class OsmImporterServiceImpl {
         }
 	}
 	
-    private IWayGraphVersionMetadata getVersionMetadata(IImportConfig config) {
-        IWayGraphVersionMetadata metadata = new WayGraphVersionMetadata();
-        metadata.setGraphName(config.getGraphName());
-        metadata.setVersion(config.getVersion());
-        metadata.setOriginGraphName(config.getOriginalGraphName());
-        metadata.setOriginVersion(config.getOriginalVersion());
-        metadata.setValidFrom(config.getValidFrom());
-        metadata.setValidTo(config.getValidTo());
-        metadata.setSource(new Source(2, "OSM"));
-        metadata.setSegmentsCount(-1);
-        metadata.setConnectionsCount(-1);
-        return metadata;
-    }
-
+	private IWayGraphVersionMetadata getVersionMetadata(IImportConfigOsm config) {
+		IWayGraphVersionMetadata metadata = new WayGraphVersionMetadata();
+		metadata.setGraphName(config.getGraphName());
+		metadata.setVersion(config.getVersion());
+		metadata.setOriginGraphName(config.getOriginalGraphName());
+		metadata.setOriginVersion(config.getOriginalVersion());
+		metadata.setValidFrom(config.getValidFrom());
+		metadata.setValidTo(config.getValidTo());
+		metadata.setSource(new Source(2, "OSM"));
+		metadata.setSegmentsCount(-1);
+		metadata.setConnectionsCount(-1);
+		return metadata;
+	}
 }

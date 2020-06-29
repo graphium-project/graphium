@@ -382,7 +382,7 @@ public class WayGraphVersionMetadataDaoImpl extends AbstractWayGraphDaoImpl impl
 		Map<String, Object> paramMap = new HashMap<String, Object>();
 		paramMap.put("graphName", graphMetadata.getGraphName());
 		paramMap.put("validTo", graphMetadata.getValidFrom());
-		paramMap.put("state", graphMetadata.getState().name());
+		paramMap.put("state", State.DELETED.name());
 		
 		getNamedParameterJdbcTemplate().update("UPDATE " + schema + METADATA_TABLE_NAME + " SET valid_to = :validTo " +
 				"WHERE graphname = :graphName AND valid_from < :validTo AND valid_to IS NULL AND state = :state", 

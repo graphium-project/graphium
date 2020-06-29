@@ -44,6 +44,7 @@ import at.srfg.graphium.osmimport.adapter.Way2WaySegmentAdapter;
 import at.srfg.graphium.osmimport.connections.ConnectionsBuilder;
 import at.srfg.graphium.osmimport.helper.WayHelper;
 import at.srfg.graphium.osmimport.model.impl.NodeCoord;
+import at.srfg.graphium.osmimport.model.impl.OsmTagAdaptionMode;
 import at.srfg.graphium.osmimport.segmentation.WaySegmenter;
 import gnu.trove.list.array.TLongArrayList;
 import gnu.trove.map.hash.TLongObjectHashMap;
@@ -62,7 +63,7 @@ public class SegmentationWaySink implements Sink, EntityProcessor {
 	private TLongObjectHashMap<NodeCoord> nodes = new TLongObjectHashMap<>();
 	private BlockingQueue<IWaySegment> waysQueue;
 	private WaySegmenter segmenter = new WaySegmenter();
-    private Way2WaySegmentAdapter wayAdapter = new Way2WaySegmentAdapter();
+    private Way2WaySegmentAdapter wayAdapter;
     private Set<Access> defaultAccesses = null;
     private TLongObjectHashMap<List<IWaySegment>> segmentedWaySegments = new TLongObjectHashMap<>(); 
 	private int wayCount = 0;
@@ -70,7 +71,7 @@ public class SegmentationWaySink implements Sink, EntityProcessor {
 	private ConnectionsBuilder connectionsBuilder;
 	
 	public SegmentationWaySink(TLongObjectHashMap<List<WayRef>> wayRefs, TLongObjectHashMap<List<Relation>> wayRelations, 
-			BlockingQueue<IWaySegment> waysQueue) {
+			BlockingQueue<IWaySegment> waysQueue, OsmTagAdaptionMode tagAdaptionMode) {
 		this.wayRefs = wayRefs;
 		this.wayRelations = wayRelations;
 		for (long nodeId : wayRefs.keys()) {
@@ -85,7 +86,7 @@ public class SegmentationWaySink implements Sink, EntityProcessor {
 				}
 			}
 		}
-		
+		this.wayAdapter = new Way2WaySegmentAdapter(tagAdaptionMode);
 		this.waysQueue = waysQueue;
 		connectionsBuilder = new ConnectionsBuilder();
 	}
@@ -231,6 +232,9 @@ public class SegmentationWaySink implements Sink, EntityProcessor {
 		}
 		
 		wayCount++;
+		if (wayCount > 0 && wayCount % 100000 == 0) {
+			log.info(wayCount + " ways");
+		}
 	}
 
 	@Override

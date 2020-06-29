@@ -18,13 +18,13 @@ package at.srfg.graphium.gipimport.producer;
 import java.util.concurrent.BlockingQueue;
 
 import at.srfg.graphium.gipimport.model.IDFMetadata;
-import at.srfg.graphium.gipimport.model.IImportConfig;
+import at.srfg.graphium.gipimport.model.IImportConfigIdf;
 import at.srfg.graphium.model.IBaseSegment;
 
 public interface IGipLinkProducer<T extends IBaseSegment> extends Runnable {
 	
 	Thread produceLinks(BlockingQueue<T> queue,
-			IImportConfig config, IDFMetadata metadata);
+			IImportConfigIdf config, IDFMetadata metadata);
 	
 	boolean isReady();
 
