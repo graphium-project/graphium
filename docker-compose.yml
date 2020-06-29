@@ -28,7 +28,7 @@ services:
         source: db-init
         target: /docker-entrypoint-initdb.d/
         volume:
-          nocopy: false
+          nocopy: true
       - postgres_data:/var/lib/postgresql/data
 volumes:
   db-init:
