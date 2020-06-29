@@ -77,14 +77,14 @@ public abstract class AbstractImporterService {
 			if (file.exists()) {
 				file.delete();
 			}
-			file = new File(downloadFile + ".zip");
-			if (file.exists()) {
-				file.delete();
-			}
 		}
 		
 		if (!config.isKeepConvertedFile()) {
 			File file = new File(convertedFileName);
+			if (file.exists()) {
+				file.delete();
+			}
+			file = new File(convertedFileName + ".zip");
 			if (file.exists()) {
 				file.delete();
 			}
