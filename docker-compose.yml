@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   graphium:
-    build: .
+    image: graphiumproject/graphium
     container_name: graphium-server
     environment:
       - "db.url=jdbc:postgresql://database:5432/graphium"
@@ -28,7 +28,7 @@ services:
         source: db-init
         target: /docker-entrypoint-initdb.d/
         volume:
-          nocopy: false
+          nocopy: true
       - postgres_data:/var/lib/postgresql/data
 volumes:
   db-init:
