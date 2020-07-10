@@ -20,14 +20,14 @@ import java.util.concurrent.BlockingQueue;
 
 import at.srfg.graphium.gipimport.model.IDFMetadata;
 import at.srfg.graphium.gipimport.model.IGipModelFactory;
-import at.srfg.graphium.gipimport.model.IImportConfig;
+import at.srfg.graphium.gipimport.model.IImportConfigIdf;
 import at.srfg.graphium.model.IBaseSegment;
 
 public interface IGipParser<T extends IBaseSegment> {
 
 	String PHASE_UNDEFINED = "undefined";
 
-	void parseGip(BlockingQueue<T> queue, IImportConfig config,
+	void parseGip(BlockingQueue<T> queue, IImportConfigIdf config,
 			IDFMetadata metadata);
 	
 	boolean isActive();

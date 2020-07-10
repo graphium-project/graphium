@@ -23,9 +23,14 @@
 	<!-- add pixelcuts module-->
 	<import resource="classpath:/application-context-graphium-pixelcuts.xml" />
 
+	<!-- configure as central server -->
 	<import resource="classpath:/application-context-graphium-central-server-api.xml" />
 
 	<!-- add graphiumHD -->
 	<import resource="classpath:/application-context-graphium-hd.xml" />
     
+	<!-- configure as satellite server -->
+	<!-- adapt also server.properties! -->
+	<!-- <import resource="classpath:/application-context-graphium-satellite-server-api.xml" /> -->
+
 </beans>

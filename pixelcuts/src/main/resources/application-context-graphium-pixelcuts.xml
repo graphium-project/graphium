@@ -24,4 +24,6 @@
     	<property name="resultSetExtractorFactory" ref="segmentResultSetExtractorFactory"/>
     </bean>
 	
+	<bean id="pixelcutsCapability" class="at.srfg.graphium.pixelcuts.capabilities.impl.PixelcutsCapabilityImpl"/>
+	
 </beans>

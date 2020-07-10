@@ -17,6 +17,7 @@ package at.srfg.graphium.routing.model.impl;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -71,16 +72,16 @@ public class RoutingOptionsFactoryImpl implements IRoutingOptionsFactory<IRoutin
 		return options;
 	}
 
-	private LocalDate toRoutingTimestamp(String timestampString) throws RoutingParameterException  {
-		LocalDate date;
+	private LocalDateTime toRoutingTimestamp(String timestampString) throws RoutingParameterException  {
+		LocalDateTime date;
 		// opt. 1 - Unix Timestamp
 		if(NumberUtils.isNumber(timestampString)) {
-			date = Instant.ofEpochMilli(Long.parseLong(timestampString)).atZone(ZoneId.systemDefault()).toLocalDate();
+			date = Instant.ofEpochMilli(Long.parseLong(timestampString)).atZone(ZoneId.systemDefault()).toLocalDateTime();
 		}
 		// opt. 2 - try parse ISO-Date-Time Format
 		else {
 			try {
-				date = LocalDate.parse(timestampString, DateTimeFormatter.ISO_DATE_TIME);
+				date = LocalDateTime.parse(timestampString, DateTimeFormatter.ISO_DATE_TIME);
 			} catch(DateTimeParseException e) {
 				throw new RoutingParameterException("routing timestamp " + timestampString + " not parsable", e);
 			}

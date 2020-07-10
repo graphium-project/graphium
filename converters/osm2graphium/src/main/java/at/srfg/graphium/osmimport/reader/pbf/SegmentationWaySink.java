@@ -232,6 +232,9 @@ public class SegmentationWaySink implements Sink, EntityProcessor {
 		}
 		
 		wayCount++;
+		if (wayCount > 0 && wayCount % 100000 == 0) {
+			log.info(wayCount + " ways");
+		}
 	}
 
 	@Override

@@ -81,4 +81,6 @@
 		<property name="adapterRegistry" ref="autodetectingSegmentAdapterRegistry"/>
 	</bean>
 	
+	<bean id="coreCapability" class="at.srfg.graphium.core.capabilities.impl.CoreCapabilityImpl"/>
+	
 </beans>

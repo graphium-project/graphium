@@ -32,8 +32,8 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.log4j.Logger;
 
-import at.srfg.graphium.osmimport.model.IImportConfig;
-import at.srfg.graphium.osmimport.model.impl.ImportConfig;
+import at.srfg.graphium.osmimport.model.IImportConfigOsm;
+import at.srfg.graphium.osmimport.model.impl.ImportConfigOsm;
 import at.srfg.graphium.osmimport.model.impl.OsmTagAdaptionMode;
 import at.srfg.graphium.osmimport.service.impl.OsmImporterServiceImpl;
 
@@ -54,26 +54,26 @@ public class OSM2JSONConverter {
 
         Options options = new Options();
         options.addOption("h", "help", false, "display this help page");
-        options.addOption(Option.builder("i").longOpt("input").hasArg().argName("input_file").desc("path to OSM File (PBF)").build());;
+        options.addOption(Option.builder("i").longOpt("input").hasArg().argName("input_file").desc("path or URL to OSM File (PBF)").build());;
         options.addOption(Option.builder("o").longOpt("output").hasArg().argName("output_dir").desc("path to result directory. (default: user.home)").build());
         options.addOption(Option.builder("n").longOpt("name").hasArg().argName("graph_name").desc("Name of the graph to be imported").build());
         options.addOption(Option.builder("v").longOpt("version").hasArg().argName("graph_version").desc("Version of the graph to be imported").build());
         options.addOption(Option.builder("vf").longOpt("valid-from").hasArg().argName("valid_from").desc("validFrom timestamp (format 'yyyy-MM-dd HH:mm')").build());;
         options.addOption(Option.builder("vt").longOpt("valid-to").hasArg().argName("valid_from").desc("validTo timestamp (format 'yyyy-MM-dd HH:mm')").build());;
-//        options.addOption(null, "original-name", false, "the original name of the graph");
-//        options.addOption(null, "original-version", false, "the original version of the graph");
         options.addOption(Option.builder("b").longOpt("bounds").hasArg().argName("bounds_file").desc("Name of bounds file for geographical filtering (format alá Osmosis)").build());
         options.addOption(Option.builder("q").longOpt("queueSize").hasArg().argName("queue_size").desc("Size of import queue").build());
         options.addOption(Option.builder("t").longOpt("threads").hasArg().argName("worker_threads").desc("Number of worker threads").build());
+        options.addOption(Option.builder("d").longOpt("downloadDir").hasArg().argName("download_dir").desc("directory to store download files").build());
+        options.addOption(Option.builder("df").longOpt("keepDownloadFile").hasArg().argName("keep_download_file").desc("false: downloaded file from URL will be deleted afterwards; default = true").build());
+        options.addOption(Option.builder("fd").longOpt("forceDownload").hasArg().argName("force_download").desc("true: download file from URL even if it has been already downloaded / false: if file exists in download directory this one will be used; default = false").build());
+        options.addOption(Option.builder("cf").longOpt("keepConvertedFile").hasArg().argName("keep_converted_file").desc("false: converted file will be deleted afterwards; default = true").build());
+        options.addOption(Option.builder("u").longOpt("importUrl").hasArg().argName("import_url").desc("server URL to import the converted graph file").build());
         
         options.addOption(Option.builder("T").longOpt("tags").hasArg().argName("tag_mode").desc("mode how osm tags of ways are stored on created segments, "
         		+ "allowed modes 'none'|'all', defaults to 'none'").build());
         
         options.addOption(Option.builder().longOpt("highwayTypes").hasArgs().valueSeparator(',').argName("highway_types")
                 .desc("Comma separated List of highway types, to be considered. If not set, all highway types will be considered").build());
-        
-//        options.addOption(Option.builder().longOpt("retrictions").hasArgs().valueSeparator(',').argName("restrictions")
-//                .desc("Comma separated List of retrictions, to be considered. If not set, all retrictions will be considered").build());
 
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = null;
@@ -92,7 +92,7 @@ public class OSM2JSONConverter {
 
             if (cmd.hasOption('h')) {
                 HelpFormatter helpFormatter = new HelpFormatter();
-                helpFormatter.printHelp("java -jar osm2graphium-X.X.X.one-jar.jar [OPTION]...", options);
+                helpFormatter.printHelp("java -jar osm2graphium.one-jar.jar [OPTION]...", options);
                 return;
             }
             if (cmd.hasOption('o')) {
@@ -144,25 +144,51 @@ public class OSM2JSONConverter {
             	}
             }
             
-            IImportConfig config = ImportConfig.getConfig(name, version, osmFile)
-                    .outPutDir(outputDirectory)
-					.boundsFile(boundsFile)
-					.queueSize(queueSize)
-					.workerThreads(threads)
-					.highwayList(highwayTypesString)
-					.tagAdaptionMode(tagAdaptionMode);
+            IImportConfigOsm config = ImportConfigOsm.getConfig(name, version, osmFile);
+            config.setOutPutDir(outputDirectory);
+            config.setBoundsFile(boundsFile);
+            config.setQueueSize(queueSize);
+            config.setWorkerThreads(threads);
+            config.setHighwayList(highwayTypesString);
+            config.setTagAdaptionMode(tagAdaptionMode);
 
 
             Date now = new Date();
             if (cmd.hasOption("vf")) {
-            	config.validFrom(df.parse(cmd.getOptionValue("vf")));
+            	config.setValidFrom(df.parse(cmd.getOptionValue("vf")));
             } else {
-            	config.validFrom(now);
+            	config.setValidFrom(now);
             }
             
             if (cmd.hasOption("vt")) {
-            	config.validTo(df.parse(cmd.getOptionValue("vt")));
+            	config.setValidTo(df.parse(cmd.getOptionValue("vt")));
             } 
+
+            if (cmd.hasOption("d")) {
+            	config.setDownloadDir(cmd.getOptionValue("d"));
+            }
+            
+            if (cmd.hasOption("df")) {
+            	config.setKeepDownloadFile(Boolean.parseBoolean(cmd.getOptionValue("df")));
+            } else {
+            	config.setKeepDownloadFile(true);
+            }
+
+            if (cmd.hasOption("fd")) {
+            	config.setForceDownload(Boolean.parseBoolean(cmd.getOptionValue("fd")));
+            } else {
+            	config.setForceDownload(false);
+            }
+
+            if (cmd.hasOption("cf")) {
+            	config.setKeepConvertedFile(Boolean.parseBoolean(cmd.getOptionValue("cf")));
+            } else {
+            	config.setKeepConvertedFile(true);
+            }
+            
+            if (cmd.hasOption("u")) {
+            	config.setImportUrl(cmd.getOptionValue("u"));
+            }
             
             log.info("Starte OSM to JSON Converter ...");
 

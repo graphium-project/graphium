@@ -182,6 +182,7 @@
 		<module>converters/lanelet2graphium</module>
 		<module>routing</module>
 		<module>routing-api</module>
+		<module>converters/converter-commons</module>
 	</modules>
 
 	<scm>

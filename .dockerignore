@@ -1,0 +1,9 @@
+.idea
+*.jar
+*.war
+*.ear
+*.tar.gz
+*.rar
+target/
+Dockerfile
+docker-compose.yml

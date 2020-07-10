@@ -56,10 +56,11 @@ public interface IRoutingService<T extends IBaseWaySegment, W extends Object, O 
 	 * @param segments the segment in the graph the route has to pass (in order given in list)
 	 * @return the found route or null if no route could be found.
 	 * @throws UnkownRoutingAlgoException 
+	 * @throws RoutingException 
 	 *
 	 */
 	IRoute<T, W> routePerSegments(O options,
-			List<T> segments) throws UnkownRoutingAlgoException;
+			List<T> segments) throws UnkownRoutingAlgoException, RoutingException;
 
 	/**
 	 * TODO: überarbeiten
@@ -71,8 +72,9 @@ public interface IRoutingService<T extends IBaseWaySegment, W extends Object, O 
 	 * @param segments the segment in the graph the route has to pass (in order given in list)
 	 * @return the found route or null if no route could be found.
 	 * @throws UnkownRoutingAlgoException 
+	 * @throws RoutingException 
 	 *
 	 */
-	IRoute<T, W> routePerSegmentIds(O options, List<Long> segmentIds) throws UnkownRoutingAlgoException;
+	IRoute<T, W> routePerSegmentIds(O options, List<Long> segmentIds) throws UnkownRoutingAlgoException, RoutingException;
 
 }

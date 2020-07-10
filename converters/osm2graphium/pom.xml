@@ -15,8 +15,41 @@
 	</parent>
 
 	<build>
-		<finalName>${project.artifactId}_${project.version}</finalName>
+		<finalName>${project.artifactId}</finalName>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/lib</outputDirectory>
+							<overWriteReleases>false</overWriteReleases>
+							<overWriteSnapshots>false</overWriteSnapshots>
+							<overWriteIfNewer>true</overWriteIfNewer>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+	            <groupId>org.apache.maven.plugins</groupId>
+	            <artifactId>maven-jar-plugin</artifactId>
+	            <configuration>
+	               <archive>
+	                 <manifest>
+						<mainClass>at.srfg.graphium.osmimport.application.OSM2JSONConverter</mainClass>
+						<addClasspath>true</addClasspath>
+						<classpathPrefix>lib/</classpathPrefix>
+	                 </manifest>
+					
+	               </archive>
+	            </configuration>
+	        </plugin>
 			<plugin>
 				<groupId>com.jolira</groupId>
 				<artifactId>onejar-maven-plugin</artifactId>
@@ -25,6 +58,7 @@
 					<execution>
 						<configuration>
 							<mainClass>at.srfg.graphium.osmimport.application.OSM2JSONConverter</mainClass>
+							<filename></filename>
 						</configuration>
 						<goals>
 							<goal>one-jar</goal>
@@ -40,6 +74,12 @@
 		<dependency>
 			<groupId>at.srfg.graphium</groupId>
 			<artifactId>graphium-io</artifactId>
+			<version>${graphium.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>at.srfg.graphium</groupId>
+			<artifactId>graphium-converter-commons</artifactId>
 			<version>${graphium.version}</version>
 		</dependency>
 

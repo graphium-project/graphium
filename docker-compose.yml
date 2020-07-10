@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  graphium:
+    image: graphiumproject/graphium
+    container_name: graphium-server
+    environment:
+      - "db.url=jdbc:postgresql://database:5432/graphium"
+      - "db.username=graphium"
+      - "db.password=graphium"
+    ports:
+      - "8080:8080"
+    volumes:
+      - db-init:/db-init/
+    depends_on:
+      - database
+  database:
+    image: "mdillon/postgis:11"
+    container_name: graphium-database
+    environment:
+      - "POSTGRES_USER=graphium"
+      - "POSTGRES_PASSWORD=graphium"
+      - "POSTGRES_DB=graphium"
+    ports:
+      - "5432:5432"
+    volumes:
+      - type: volume
+        source: db-init
+        target: /docker-entrypoint-initdb.d/
+        volume:
+          nocopy: true
+      - postgres_data:/var/lib/postgresql/data
+volumes:
+  db-init:
+  postgres_data:

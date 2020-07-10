@@ -24,7 +24,7 @@ import at.srfg.graphium.gipimport.helper.ParserHelper;
 import at.srfg.graphium.gipimport.model.IGipLink;
 import at.srfg.graphium.gipimport.model.IGipNode;
 import at.srfg.graphium.gipimport.model.IGipTurnEdge;
-import at.srfg.graphium.gipimport.model.IImportConfig;
+import at.srfg.graphium.gipimport.model.IImportConfigIdf;
 import at.srfg.graphium.gipimport.parser.IGipParser;
 import at.srfg.graphium.gipimport.parser.IGipSectionParser;
 import gnu.trove.map.TLongObjectMap;
@@ -38,13 +38,13 @@ import gnu.trove.set.TLongSet;
  */
 public class GipLinkTurnEdgesParser extends AbstractSectionParser<TLongObjectMap<List<IGipTurnEdge>>> {
 
-    private final IImportConfig config;
+    private final IImportConfigIdf config;
     private final IGipSectionParser<TLongObjectMap<IGipNode>> nodeParser;
     private final IGipSectionParser<TLongObjectMap<IGipLink>> linkParser;
     private final IGipSectionParser<TLongSet> linkCoordinateParser;
     private final TLongObjectMap<List<IGipTurnEdge>> turnEdges;
 
-    public GipLinkTurnEdgesParser(IGipParser parserReference, IImportConfig config,
+    public GipLinkTurnEdgesParser(IGipParser parserReference, IImportConfigIdf config,
                                   IGipSectionParser<TLongObjectMap<IGipNode>> nodeParser,
                                   IGipSectionParser<TLongObjectMap<IGipLink>> linkParser,
                                   IGipSectionParser<TLongSet> linkCoordinateParser) {

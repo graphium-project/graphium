@@ -16,7 +16,7 @@
 package at.srfg.graphium.routing.model.impl;
 
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +46,7 @@ public class RoutingOptionsImpl implements IRoutingOptions, Serializable {
 	List<Coordinate> coordinates;
 
 	// optional params (with defaults)
-	private LocalDate routingTimestamp;
+	private LocalDateTime routingTimestamp;
 	private IRoutingAlgorithm algorithm;
 	private IRoutingCriteria criteria;
 	private IRoutingMode mode;
@@ -60,7 +60,7 @@ public class RoutingOptionsImpl implements IRoutingOptions, Serializable {
 	public RoutingOptionsImpl(String graphName, String graphVersion) {
 		this.graphName = graphName;
 		this.graphVersion = graphVersion;
-		this.routingTimestamp = LocalDate.now();
+		this.routingTimestamp = LocalDateTime.now();
 		this.algorithm = RoutingAlgorithms.BIDIRECTIONAL_DIJKSTRA;
 		this.criteria = RoutingCriteria.LENGTH;
 		this.mode = RoutingMode.CAR;
@@ -146,12 +146,12 @@ public class RoutingOptionsImpl implements IRoutingOptions, Serializable {
 	}
 
 	@Override
-	public LocalDate getRoutingTimestamp() {
+	public LocalDateTime getRoutingTimestamp() {
 		return routingTimestamp;
 	}
 
 	@Override
-	public void setRoutingTimestamp(LocalDate routingTimestamp) {
+	public void setRoutingTimestamp(LocalDateTime routingTimestamp) {
 		this.routingTimestamp = routingTimestamp;
 	}
 	

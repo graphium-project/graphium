@@ -15,27 +15,22 @@
  */
 package at.srfg.graphium.osmimport.model;
 
-import java.util.Date;
 import java.util.Set;
 
+import at.srfg.graphium.model.config.IImportConfig;
 import at.srfg.graphium.osmimport.model.impl.OsmTagAdaptionMode;
 
-public interface IImportConfig {
-    IImportConfig outPutDir(String outputDirectory);
+public interface IImportConfigOsm extends IImportConfig {
 
-    IImportConfig highwayList(String... highwayList);
+    void setHighwayList(String... highwayList);
 
-    IImportConfig restrictions(String... restrictions);
+    void setRestrictions(String... restrictions);
 
-    IImportConfig boundsFile(String boundsFile);
+    void setBoundsFile(String boundsFile);
 
-    IImportConfig originalGraphName(String originalGraphName);
+    void setQueueSize(int queueSize);
 
-    IImportConfig originalGraphVersion(String originalVersion);
-
-    IImportConfig queueSize(int queueSize);
-
-    IImportConfig workerThreads(int workerThreads);
+    void setWorkerThreads(int workerThreads);
     
     Set<String> getHighwayList();
 
@@ -43,33 +38,12 @@ public interface IImportConfig {
 
     String getBoundsFile();
 
-    String getGraphName();
-
-    String getVersion();
-
-    String getOriginalGraphName();
-
-    String getOriginalVersion();
-
-    String getInputFile();
-
-    String getOutputDir();
-    
     int getQueueSize();
 
     int getWorkerThreads();
     
     OsmTagAdaptionMode getTagAdaptionMode();
 
-	IImportConfig validTo(Date validTo);
+    void setTagAdaptionMode(OsmTagAdaptionMode tagAdaptionMode);
 
-	IImportConfig validFrom(Date validFrom);
-	
-	IImportConfig tagAdaptionMode(OsmTagAdaptionMode tagAdaptionMode);
-
-	Date getValidFrom();
-
-	Date getValidTo();
-
-	
 }

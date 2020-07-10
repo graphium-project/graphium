@@ -61,7 +61,7 @@ public abstract class GenericRoutingApiController<T extends IBaseWaySegment, O e
 		// output --> overview, default / path?, details
 		// avoid --> bbox? 
 		// insgesamt, routing GET mit weniger Optionen, routing POST mit mehr?				
-	@RequestMapping(value = "/routing/graphs/{graphName}/route.do", method=RequestMethod.GET)
+	@RequestMapping(value = "/routing/graphs/{graphName}/route", method=RequestMethod.GET)
 	public ModelAndView route(
 			@PathVariable(value = "graphName") String graphName,
 			@RequestParam(value = "coords") String coords,
@@ -71,17 +71,16 @@ public abstract class GenericRoutingApiController<T extends IBaseWaySegment, O e
 		return doRoute(graphName, null, coords, output, allRequestParams);
 	}
 	
-	@RequestMapping(value = "/routing/graphs/{graphName}/versions/{graphVersion}/route.do", method=RequestMethod.GET)
+	@RequestMapping(value = "/routing/graphs/{graphName}/versions/{graphVersion}/route", method=RequestMethod.GET)
 	public ModelAndView routeForVersion(
 			@PathVariable(value = "graphName") String graphName,
 			@PathVariable(value = "graphVersion") String graphVersion,
 			@RequestParam(value = "coords") String coords,
-			@RequestParam(value = "output") String output,
+			@RequestParam(value = "output", defaultValue = "overview") String output,
 			@RequestParam MultiValueMap<String,String> allRequestParams) throws RoutingException, RoutingParameterException, UnkownRoutingAlgoException  {
 		return doRoute(graphName, graphVersion, coords, output, allRequestParams);
 	}
 	
-
 	protected ModelAndView doRoute(String graphName, String graphVersion, String coordString, 
 			String output, MultiValueMap<String, String> allRequestParams) throws RoutingParameterException, UnkownRoutingAlgoException, RoutingException {
 		IRouteOutputAdapter<IRouteDTO<W>, W, T> adapter = adapterRegistry.getAdapter(output);

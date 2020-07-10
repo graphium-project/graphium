@@ -251,6 +251,11 @@ public class QueuingGraphVersionImportServiceImpl<T extends IBaseWaySegment> imp
                 log.warn(waitingConnectionsSize + " connections are left because their toSegmentIds are not valid");
             }
 
+            // check if graph contains segments
+            if (segmentsCount == 0) {
+                throw new GraphImportException("Import failed: graph contains no segments!");
+            }
+
             // check if counts of original graph's metadata are equal to saved ones
             if ((originalSegmentsCount > 0 && originalSegmentsCount != segmentsCount) ||
                     (originalConnectionsCount > 0 && originalConnectionsCount != connectionsCount)) {

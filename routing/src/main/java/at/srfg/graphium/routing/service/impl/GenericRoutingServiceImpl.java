@@ -74,6 +74,8 @@ public abstract class GenericRoutingServiceImpl<T extends IBaseWaySegment, N ext
 																  options.getGraphName(), 
 																  options.getGraphVersion());
 
+			validateNodes(startNode, endNode);
+			
 			// calculate node's geometries
 			startNodeGeometry = getNodeGeometry(startNode);
 			endNodeGeometry = getNodeGeometry(endNode);
@@ -94,8 +96,17 @@ public abstract class GenericRoutingServiceImpl<T extends IBaseWaySegment, N ext
 		return currentRoute;
 	}
 
+	private void validateNodes(N startNode, N endNode) throws RoutingException {
+		if (startNode == null) {
+			throw new RoutingException("No start node not found!");
+		}
+		if (endNode == null) {
+			throw new RoutingException("No end node not found!");
+		}
+	}
+
 	@Override
-	public IRoute<T, W> routePerSegments(O options, List<T> segments) throws UnkownRoutingAlgoException {
+	public IRoute<T, W> routePerSegments(O options, List<T> segments) throws UnkownRoutingAlgoException, RoutingException {
 		Iterator<T> segmentIt = segments.iterator();
 		
 		T current = null;
@@ -117,6 +128,8 @@ public abstract class GenericRoutingServiceImpl<T extends IBaseWaySegment, N ext
 																  options.getGraphName(), 
 																  options.getGraphVersion());
 			
+			validateNodes(startNode, endNode);
+			
 			routeFragments.add(routeFragment(options, startNode, percentageStartWeight, endNode, percentageEndWeight));
 		}
 		
@@ -126,7 +139,7 @@ public abstract class GenericRoutingServiceImpl<T extends IBaseWaySegment, N ext
 	}
 
 	@Override
-	public IRoute<T, W> routePerSegmentIds(O options, List<Long> segmentIds) throws UnkownRoutingAlgoException {
+	public IRoute<T, W> routePerSegmentIds(O options, List<Long> segmentIds) throws UnkownRoutingAlgoException, RoutingException {
 		Iterator<Long> segmentIt = segmentIds.iterator();
 		
 		Long current = null;
@@ -147,6 +160,8 @@ public abstract class GenericRoutingServiceImpl<T extends IBaseWaySegment, N ext
 			endNode = segmentIdToRoutingNodeResolver.resolveSegment(current, 
 																  options.getGraphName(), 
 																  options.getGraphVersion());
+			
+			validateNodes(startNode, endNode);
 			
 			routeFragments.add(routeFragment(options, startNode, percentageStartWeight, endNode, percentageEndWeight));
 		}

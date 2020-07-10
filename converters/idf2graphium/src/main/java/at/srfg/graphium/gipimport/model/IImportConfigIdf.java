@@ -15,48 +15,42 @@
  */
 package at.srfg.graphium.gipimport.model;
 
-import java.util.Date;
 import java.util.Properties;
 import java.util.Set;
 
 import com.vividsolutions.jts.geom.Polygon;
 
 import at.srfg.graphium.model.Access;
+import at.srfg.graphium.model.config.IImportConfig;
 import gnu.trove.set.TIntSet;
 
 /**
  * Created by shennebe on 11.12.2015.
  */
-public interface IImportConfig {
-    IImportConfig outPutDir(String outputDirectory);
+public interface IImportConfigIdf extends IImportConfig {
+    void setQueueSize(int queueSize);
 
-    IImportConfig queueSize(int queueSize);
+    void setBatchSize(int batchSize);
 
-    IImportConfig batchSize(int batchSize);
+    void setFrcList(Integer... frcList);
 
-    IImportConfig frcList(Integer... frcList);
+    void setAccessTypes(Access... accessTypes);
 
-    IImportConfig accessTypes(Access... accessTypes);
+    void setMinFrc(int minFrc);
 
-    IImportConfig minFrc(int minFrc);
+    void setMaxFrc(int maxFrc);
 
-    IImportConfig maxFrc(int maxFrc);
+    void setBounds(Polygon bounds);
 
-    IImportConfig bounds(Polygon bounds);
+    void setIncludedGipIds(Integer... gipIds);
 
-    IImportConfig includedGipIds(Integer... gipIds);
+    void setExcludedGipIds(Integer... gipIds);
 
-    IImportConfig excludedGipIds(Integer... gipIds);
+    void enableSmallConnections();
 
-    IImportConfig originalGraphName(String originalGraphName);
+    void setNoPixelCut();
 
-    IImportConfig originalGraphVersion(String originalVersion);
-
-    IImportConfig enableSmallConnections();
-
-    IImportConfig noPixelCut();
-
-    IImportConfig noGipImport();
+    void setNoGipImport();
 
     int getQueueSize();
 
@@ -76,14 +70,6 @@ public interface IImportConfig {
 
     TIntSet getExcludedGipIds();
 
-    String getGraphName();
-
-    String getVersion();
-
-    String getOriginalGraphName();
-
-    String getOriginalVersion();
-
     boolean isEnableSmallConnections();
 
     boolean isImportGip();
@@ -94,27 +80,19 @@ public interface IImportConfig {
 
     String getOutputDir();
 
-	IImportConfig extractBusLaneInfo(boolean extractBusLaneInfo);
+    void setExtractBusLaneInfo(boolean extractBusLaneInfo);
 	
 	boolean isExtractBusLaneInfo();
 
-	IImportConfig validTo(Date validTo);
-
-	IImportConfig validFrom(Date validFrom);
-
-	Date getValidFrom();
-
-	Date getValidTo();
-	
-	IImportConfig enableFullConnectivity();
+	void enableFullConnectivity();
 	
 	boolean isEnableFullConnectivity();
 
 	Properties getCsvConfig();
 
-	IImportConfig setCsvConfig(Properties csvConfig);
+	void setCsvConfig(Properties csvConfig);
 	
 	String getCsvEncodingName();
 	
-	IImportConfig setCsvEncodingName(String csvEncodingName);
+	void setCsvEncodingName(String csvEncodingName);
 }
