@@ -510,10 +510,7 @@ public class LaneletsAdapter {
 	private void setAccesses(IHDWaySegment segment, Map<String, String> tags) {
 		Set<Access> accesses = new HashSet<>();
 		convertAccesses(tags, Constants.LANELET_PARTICIPANT, "yes", accesses);
-
-		if (!accesses.isEmpty()) {
-			segment.setAccessTow(accesses);
-		}
+		segment.setAccessTow(accesses);
 	}
 	
 	/**

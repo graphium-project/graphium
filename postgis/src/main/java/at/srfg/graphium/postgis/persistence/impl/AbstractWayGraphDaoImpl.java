@@ -38,16 +38,17 @@ public abstract class AbstractWayGraphDaoImpl extends AbstractDaoImpl {
 	public final static String SOURCE_TABLE_NAME = "sources";
 	
 	protected Array convertToArray(Connection con, Set<Access> accessTypes) throws SQLException {
+		Integer[] accessIds;
 		if (accessTypes != null) {
-			Integer[] accessIds = new Integer[accessTypes.size()];
+			accessIds = new Integer[accessTypes.size()];
 			int j = 0;
 			for (Access access : accessTypes) {
 				accessIds[j++] = access.getId();
 			}
-			return con.createArrayOf("smallint", accessIds);
 		} else {
-			return null;
+			accessIds = new Integer[0];
 		}
+		return con.createArrayOf("smallint", accessIds);
 	}
 
 

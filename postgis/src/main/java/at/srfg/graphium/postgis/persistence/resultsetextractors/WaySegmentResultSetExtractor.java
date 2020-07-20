@@ -327,7 +327,10 @@ public class WaySegmentResultSetExtractor<S extends IBaseSegment, W extends IWay
 		stripedSerializedCon = stripedSerializedCon.replace("\"", ""); //100000833,960301,101021339,{15,4,22,2,9,19,11,13,12,1,10,3,24
 		String[] splitCons = stripedSerializedCon.split("\\{"); //[100000833,960301,101021339,, 15,4,22,2,9,19,11,13,12,1,10,3,24]
 		String[] tokens = splitCons[0].split(ARRAYVALUESEP);
-		String[] accessTypeIdsArray = splitCons[1].split(ARRAYVALUESEP); //[15, 4, 22, 2, 9, 19, 11, 13, 12, 1, 10, 3, 24] 
+		String[] accessTypeIdsArray = new String[]{};
+		if (splitCons.length > 1) {
+			accessTypeIdsArray = splitCons[1].split(ARRAYVALUESEP); //[15, 4, 22, 2, 9, 19, 11, 13, 12, 1, 10, 3, 24]
+		}
 
 //		String s1 = StringUtils.removePattern(stripedSerializedCon, "\\\"\\{[0-9,]*\\}\\\"");
 		int[] accessTypeIds = new int[accessTypeIdsArray.length];
