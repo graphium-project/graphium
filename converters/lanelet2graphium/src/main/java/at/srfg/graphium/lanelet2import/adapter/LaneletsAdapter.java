@@ -272,6 +272,17 @@ public class LaneletsAdapter {
 			segment.setFormOfWay(FormOfWay.NOT_APPLICABLE);
 			break;
 
+		case "parking":
+			segment.setFrc(FuncRoadClass.SONSTIGE_STRASSEN);
+//			segment.setUrban(true);
+			// TODO: set default average pedestrian walking speed
+			accesses = allVehiclesAccesses();
+			accesses.add(Access.BIKE);
+			accesses.add(Access.PEDESTRIAN);
+			segment.setAccessTow(accesses);
+			segment.setFormOfWay(FormOfWay.PART_OF_AN_ETA_PARKING_PLACE);
+			break;
+
 		case "walkway":
 			segment.setFrc(FuncRoadClass.RAD_FUSSWEG);
 //			segment.setUrban(true);
