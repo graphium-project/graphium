@@ -139,9 +139,8 @@ public class GraphVersionMetadataServiceImpl extends Observable implements IGrap
 
 	public List<String> getViews() {
 		List<String> graphNames = getGraphs();
-		List<String> viewNames = null;
+		List<String> viewNames = new ArrayList<>();
 		if (graphNames != null && !graphNames.isEmpty()) {
-			viewNames = new ArrayList<>();
 			for (String graphName : graphNames) {
 				List<IWayGraphView> views = viewDao.getViewsForGraph(graphName);
 				for (IWayGraphView view : views) {
