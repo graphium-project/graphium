@@ -48,8 +48,10 @@ public class PathRouteOutputAdapterImpl<T extends IBaseWaySegment>
 			geometryWkt = route.getGeometry().toText();
 		}
 		List<IDirectedSegmentDTO> segments = new ArrayList<IDirectedSegmentDTO>();
-		for (IDirectedSegment segment : route.getPath()) {
-			segments.add(new DirectedSegmentDTOImpl(segment.getId(), segment.isTowards()));
+		if (route.getPath() != null) {
+			for (IDirectedSegment segment : route.getPath()) {
+				segments.add(new DirectedSegmentDTOImpl(segment.getId(), segment.isTowards()));
+			}
 		}
 		
 		return new PathRouteDTOImpl(route.getWeight(), route.getLength(), route.getDuration(), 
