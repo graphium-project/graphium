@@ -27,6 +27,7 @@ import org.openstreetmap.osmosis.core.domain.v0_6.WayNode;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.linearref.LengthLocationMap;
 import com.vividsolutions.jts.linearref.LinearLocation;
 import com.vividsolutions.jts.linearref.LocationIndexedLine;
 
@@ -273,20 +274,35 @@ public class LaneletHelper {
 				return new boolean[] { false, false };
 			}
 		} else {
-			Coordinate[] coords0 = new Coordinate[] { coordsLeft[0], coordsRight[0] };
-			Coordinate[] coords1 = new Coordinate[] { coordsLeft[1], coordsRight[1] };
+			int leftIndex = -1, rightIndex = -1;
+			Coordinate leftCoordinate = null, rightCoordinate = null;
+			
+			leftCoordinate = calculateLineCenter(segment.getLeftBorderGeometry());
+			rightCoordinate = calculateLineCenter(segment.getRightBorderGeometry());
+			leftIndex = findNearestPartner(segment.getLeftBorderGeometry().getCoordinates(), leftCoordinate);
+			rightIndex = findNearestPartner(segment.getRightBorderGeometry().getCoordinates(), rightCoordinate);
+			
+			if (leftIndex + 1 >= segment.getLeftBorderGeometry().getCoordinates().length) {
+				leftIndex = segment.getLeftBorderGeometry().getCoordinates().length - 2;
+			}
+			if (rightIndex + 1 >= segment.getRightBorderGeometry().getCoordinates().length) {
+				rightIndex = segment.getRightBorderGeometry().getCoordinates().length - 2;
+			}
+			
+			Coordinate[] coords0 = new Coordinate[] { coordsLeft[leftIndex], coordsRight[rightIndex] };
+			Coordinate[] coords1 = new Coordinate[] { coordsLeft[leftIndex + 1], coordsRight[rightIndex + 1] };
 			LineString line0 = GeometryUtils.createLineString(coords0, 4236);
 			LineString line1 = GeometryUtils.createLineString(coords1, 4236);
 			if (!line0.crosses(line1)
 					&& !line0.crosses(segment.getLeftBorderGeometry())
 					&& !line0.crosses(segment.getRightBorderGeometry())) {
-				if (calculateOffset(segment.getLeftBorderGeometry(), coordsRight[0]) > 0) {
+				if (calculateOffset(segment.getLeftBorderGeometry(), coordsRight[rightIndex]) > 0) {
 					return new boolean[] { true, true };
 				} else {
 					return new boolean[] { false, false };
 				}
 			} else {
-				if (calculateOffset(segment.getLeftBorderGeometry(), coordsRight[coordsRight.length-1]) > 0) {
+				if (calculateOffset(segment.getLeftBorderGeometry(), coordsRight[rightIndex]) > 0) {
 					return new boolean[] { true, false };
 				} else {
 					return new boolean[] { false, true };
@@ -320,6 +336,12 @@ public class LaneletHelper {
 		double direction = (coordinate.x - a.x) * (b.y - a.y) - (coordinate.y - a.y) * (b.x - a.x);
 		
 		return (direction < 0) ? -1 : 1;
+	}
+	
+	private static Coordinate calculateLineCenter(LineString lineString) {
+		LocationIndexedLine indexedLine = new LocationIndexedLine(lineString);
+		LinearLocation linearLocation = LengthLocationMap.getLocation(lineString, lineString.getLength() * 0.5);
+		return indexedLine.extractPoint(linearLocation);
 	}
 
 }
