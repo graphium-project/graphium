@@ -27,6 +27,7 @@ import org.openstreetmap.osmosis.core.domain.v0_6.WayNode;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.linearref.LengthLocationMap;
 import com.vividsolutions.jts.linearref.LinearLocation;
 import com.vividsolutions.jts.linearref.LocationIndexedLine;
 
@@ -163,28 +164,35 @@ public class LaneletHelper {
 			indexRight++;
 		}
 		
-//		for(int i=1; i<coords1.length-1; i++) {
 		while (indexLeft < coordsLeft.length && indexRight < coordsRight.length) {
-			int indexOnRight = findNearestPartner(coordsRight, coordsLeft[indexLeft]);
-			int indexOnLeft = findNearestPartner(coordsLeft, coordsRight[indexRight]);
+			//Find nearest coordinate on opposite bounds
+			int oppositeIndexLeft = findNearestIndex(coordsLeft, coordsRight[indexRight], indexLeft);
+			int oppositeIndexRight = findNearestIndex(coordsRight, coordsLeft[indexLeft], indexRight);
 			
-			if (indexOnRight > indexRight) {
-				x = (coordsRight[indexRight].x + coordsLeft[indexOnLeft].x) / 2;
-				y = (coordsRight[indexRight].y + coordsLeft[indexOnLeft].y) / 2;
+			if (oppositeIndexRight > indexRight) {
+				// index on right bound is behind index on left bound
+				x = (coordsLeft[oppositeIndexLeft].x + coordsRight[indexRight].x) / 2;
+				y = (coordsLeft[oppositeIndexLeft].y + coordsRight[indexRight].y) / 2;
 				addToCenterline(centerlineCoordinates, x, y);
 				indexRight++;
-				if (indexLeft < indexOnLeft) {
-					indexLeft = indexOnLeft;
+				if (indexLeft < oppositeIndexLeft) {
+					// to avoid zig-zag-pattern
+					indexLeft = oppositeIndexLeft;
 				}
-			} else if (indexOnLeft > indexLeft) {
-				x = (coordsLeft[indexLeft].x + coordsRight[indexOnRight].x) / 2;
-				y = (coordsLeft[indexLeft].y + coordsRight[indexOnRight].y) / 2;
+				
+			} else if (oppositeIndexLeft > indexLeft) {
+				// index on left bound is behind index on right bound
+				x = (coordsLeft[indexLeft].x + coordsRight[oppositeIndexRight].x) / 2;
+				y = (coordsLeft[indexLeft].y + coordsRight[oppositeIndexRight].y) / 2;
 				addToCenterline(centerlineCoordinates, x, y);
 				indexLeft++;
-				if (indexLeft < indexOnLeft) {
-					indexLeft = indexOnLeft;
+				if (indexRight < oppositeIndexRight) {
+					// to avoid zig-zag-pattern
+					indexRight = oppositeIndexRight;
 				}
+				
 			} else {
+				// default case > move both coordinates
 				x = (coordsLeft[indexLeft].x + coordsRight[indexRight].x) / 2;
 				y = (coordsLeft[indexLeft].y + coordsRight[indexRight].y) / 2;
 				addToCenterline(centerlineCoordinates, x, y);
@@ -223,10 +231,17 @@ public class LaneletHelper {
 		centerlineCoordinates.add(new Coordinate(x ,y));
 	}
 
-	private static int findNearestPartner(Coordinate[] coordinates, Coordinate coordinate) {
+	/**
+	 * 
+	 * @param coordinates list of coordinates (e.g. line string coordinates) 
+	 * @param coordinate
+	 * @param minIndex minimum index to return
+	 * @return index of list item in coordinates with shortest distance to coordinate
+	 */
+	private static int findNearestIndex(Coordinate[] coordinates, Coordinate coordinate, int minIndex) {
 		double minimumDistance = Double.MAX_VALUE;
 		int minimumDistanceIndex = -1;
-		for (int j=0; j<coordinates.length; j++) {
+		for (int j=minIndex; j<coordinates.length; j++) {
 			double distance = GeometryUtils.distanceAndoyer(coordinate, coordinates[j]);
 			if (distance < minimumDistance) {
 				minimumDistance = distance;
@@ -273,20 +288,35 @@ public class LaneletHelper {
 				return new boolean[] { false, false };
 			}
 		} else {
-			Coordinate[] coords0 = new Coordinate[] { coordsLeft[0], coordsRight[0] };
-			Coordinate[] coords1 = new Coordinate[] { coordsLeft[1], coordsRight[1] };
+			int leftIndex = -1, rightIndex = -1;
+			Coordinate leftCoordinate = null, rightCoordinate = null;
+			
+			leftCoordinate = calculateLineCenter(segment.getLeftBorderGeometry());
+			rightCoordinate = calculateLineCenter(segment.getRightBorderGeometry());
+			leftIndex = findNearestIndex(segment.getLeftBorderGeometry().getCoordinates(), leftCoordinate, 0);
+			rightIndex = findNearestIndex(segment.getRightBorderGeometry().getCoordinates(), rightCoordinate, 0);
+			
+			if (leftIndex + 1 >= segment.getLeftBorderGeometry().getCoordinates().length) {
+				leftIndex = segment.getLeftBorderGeometry().getCoordinates().length - 2;
+			}
+			if (rightIndex + 1 >= segment.getRightBorderGeometry().getCoordinates().length) {
+				rightIndex = segment.getRightBorderGeometry().getCoordinates().length - 2;
+			}
+			
+			Coordinate[] coords0 = new Coordinate[] { coordsLeft[leftIndex], coordsRight[rightIndex] };
+			Coordinate[] coords1 = new Coordinate[] { coordsLeft[leftIndex + 1], coordsRight[rightIndex + 1] };
 			LineString line0 = GeometryUtils.createLineString(coords0, 4236);
 			LineString line1 = GeometryUtils.createLineString(coords1, 4236);
 			if (!line0.crosses(line1)
 					&& !line0.crosses(segment.getLeftBorderGeometry())
 					&& !line0.crosses(segment.getRightBorderGeometry())) {
-				if (calculateOffset(segment.getLeftBorderGeometry(), coordsRight[0]) > 0) {
+				if (calculateOffset(segment.getLeftBorderGeometry(), coordsRight[rightIndex]) > 0) {
 					return new boolean[] { true, true };
 				} else {
 					return new boolean[] { false, false };
 				}
 			} else {
-				if (calculateOffset(segment.getLeftBorderGeometry(), coordsRight[coordsRight.length-1]) > 0) {
+				if (calculateOffset(segment.getLeftBorderGeometry(), coordsRight[rightIndex]) > 0) {
 					return new boolean[] { true, false };
 				} else {
 					return new boolean[] { false, true };
@@ -320,6 +350,12 @@ public class LaneletHelper {
 		double direction = (coordinate.x - a.x) * (b.y - a.y) - (coordinate.y - a.y) * (b.x - a.x);
 		
 		return (direction < 0) ? -1 : 1;
+	}
+	
+	private static Coordinate calculateLineCenter(LineString lineString) {
+		LocationIndexedLine indexedLine = new LocationIndexedLine(lineString);
+		LinearLocation linearLocation = LengthLocationMap.getLocation(lineString, lineString.getLength() * 0.5);
+		return indexedLine.extractPoint(linearLocation);
 	}
 
 }
