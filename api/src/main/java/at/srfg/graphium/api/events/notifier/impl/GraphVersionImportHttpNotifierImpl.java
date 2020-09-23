@@ -30,8 +30,11 @@ import org.springframework.web.client.RestTemplate;
 
 import at.srfg.graphium.api.events.listener.IEventListener;
 import at.srfg.graphium.api.events.notifier.IGraphVersionImportNotifier;
+import at.srfg.graphium.core.exception.GraphNotExistsException;
 import at.srfg.graphium.core.persistence.IGraphImportStateDao;
 import at.srfg.graphium.core.persistence.ISubscriptionDao;
+import at.srfg.graphium.core.persistence.IWayGraphVersionMetadataDao;
+import at.srfg.graphium.model.IWayGraphVersionMetadata;
 import at.srfg.graphium.model.State;
 import at.srfg.graphium.model.management.ISubscription;
 import at.srfg.graphium.model.management.impl.GraphImportState;
@@ -53,6 +56,7 @@ public class GraphVersionImportHttpNotifierImpl
 	private RestTemplate restTemplate;
 	private ISubscriptionDao subscriptionDao;
 	private IGraphImportStateDao graphImportStateDao;
+	private IWayGraphVersionMetadataDao metadataDao;
 	private String getGraphVersionUrl;
 	private String setGraphVersionStateUrl;
 	private String notificationUrl;
@@ -81,8 +85,8 @@ public class GraphVersionImportHttpNotifierImpl
 						null));
 				// notify servers
 				try {
-					notify(subscription, version);
-				} catch (RestClientException e) {
+					notifyOfPublishing(subscription, version);
+				} catch (RestClientException | GraphNotExistsException e) {
 					log.error("Notification of server " + subscription.getServerName() + " failed!", e);
 					ok = false;
 					graphImportStateDao.update(new GraphImportState(
@@ -188,16 +192,29 @@ public class GraphVersionImportHttpNotifierImpl
 		restTemplate.put(graphVersionStateUpdateUrl, request);	
 	}
 	
-	private void notify(ISubscription subscription, String version) throws RestClientException {
+	private void notifyOfPublishing(ISubscription subscription, String version) throws RestClientException, GraphNotExistsException {
 		log.info("Notifing Server " + subscription.getServerName() + " at " + subscription.getUrl());
 		
+		// read type of graph
+		IWayGraphVersionMetadata metadata = metadataDao.getWayGraphVersionMetadataForView(subscription.getViewName(), version);
+		if (metadata == null) {
+			throw new GraphNotExistsException("Graph not found", subscription.getViewName());
+		}
+		String type = metadata.getType();
+		if (!type.endsWith("s")) {
+			// plural
+			type += "s";
+		}
+		String urlString = getGraphVersionUrl + (getGraphVersionUrl.endsWith("/") ? "" : "/");
+		urlString = urlString.replace("{segments_type}", type);
+
 		Map<String, Object> requestParams = new HashMap<String, Object>();
 		requestParams.put(IEventListener.EVENTSOURCEPARAMNAME, getSourceString());
 		requestParams.put("serverName", serverName);
 		requestParams.put("graphName", subscription.getViewName());
 		requestParams.put("version", version);
-		requestParams.put("getGraphVersionUrl", getGraphVersionUrl + (getGraphVersionUrl.endsWith("/") ? "" : "/")); 
-//												"/graphs/{graph}/version/{version}/segments");
+		requestParams.put("getGraphVersionUrl", urlString); 
+//												"/segments/graphs/{graph}/version/{version}");
 
 		String serverNotificationUrl = createServerNotificationUrl(subscription.getUrl());
 // TODO: Set Credentials
@@ -305,6 +322,14 @@ public class GraphVersionImportHttpNotifierImpl
 
 	public void setSetGraphVersionStateUrl(String setGraphVersionStateUrl) {
 		this.setGraphVersionStateUrl = setGraphVersionStateUrl;
+	}
+
+	public IWayGraphVersionMetadataDao getMetadataDao() {
+		return metadataDao;
+	}
+
+	public void setMetadataDao(IWayGraphVersionMetadataDao metadataDao) {
+		this.metadataDao = metadataDao;
 	}
 
 }
