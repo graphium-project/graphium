@@ -1,0 +1,8 @@
+{{- if .Values.database.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-postgis-init
+data:
+{{ (.Files.Glob "postgis-init/*").AsConfig | indent 2 }}
+{{- end }}

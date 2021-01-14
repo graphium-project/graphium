@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "graphium-chart.fullname" . }}
+  labels:
+  {{- include "graphium-chart.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+  {{- include "graphium-chart.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+    {{- include "graphium-chart.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "graphium-chart.serviceAccountName" . }}
+      securityContext:
+      {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            {{- if .Values.database.enabled }}
+            - name: "db.url"
+              value: "jdbc:postgresql://{{ .Release.Name }}-database:5432/{{ .Values.database.postgresDb }}"
+            - name: "db.username"
+              value: "{{ .Values.database.postgresUser }}"
+            - name: "db.password"
+              value: "{{ .Values.database.postgresPassword }}"
+            {{- else }}
+            - name: "db.url"
+              value: "{{ .Values.graphium.dbUrl }}"
+            - name: "db.username"
+              value: "{{ .Values.graphium.dbUsername }}"
+            - name: "db.password"
+              value: "{{ .Values.graphium.dbPassword }}"
+          {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /graphium/api/status
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /graphium/api/status
+              port: http
+          resources:
+      {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+      {{- toYaml . | nindent 8 }}
+  {{- end }}
