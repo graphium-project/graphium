@@ -70,7 +70,10 @@ public class LaneletsAdapter {
 		for (Relation rel : relations) {
 			String type = LaneletHelper.getType(rel);
 			if (type != null && type.equals(Constants.TYPE_LANELET)) {
-				segments.add(adapt(rel, ways, nodes));
+				IHDWaySegment lanelet = adapt(rel, ways, nodes);
+				if (lanelet != null) {
+					segments.add(lanelet);
+				}
 			}
 		}
 		
@@ -90,16 +93,19 @@ public class LaneletsAdapter {
 				if (role.equals("left")) {
 					leftBorder = ways.get(member.getMemberId());
 					if (leftBorder == null) {
-						log.error("Way " + member.getMemberId() + " is null");
+						log.error("Relation " + relation.getId() + ": Way " + member.getMemberId() + " is null");
 						return null;
 					}
 				} else if (role.equals("right")) {
 					rightBorder = ways.get(member.getMemberId());
 					if (rightBorder == null) {
-						log.error("Way " + member.getMemberId() + " is null");
+						log.error("Relation " + relation.getId() + ": Way " + member.getMemberId() + " is null");
 						return null;
 					}
 				}
+			} else {
+				log.error("Relation " + relation.getId() + ": Member " + member.getMemberId() + " is not a Way");
+				return null;
 			}
 		}
 		
