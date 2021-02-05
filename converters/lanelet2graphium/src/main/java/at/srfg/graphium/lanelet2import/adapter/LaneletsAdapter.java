@@ -125,7 +125,7 @@ public class LaneletsAdapter {
 		relation.getTags().forEach(tag -> tags.put(tag.getKey(), tag.getValue()));
 		
 		setRoadCharacteristics(segment, tags);
-		setAccesses(segment, tags);
+		setOverridingAccesses(segment, tags);
 		setOnewayAttributes(segment, tags);
 		
 //		setAccess(segment, tags);
@@ -182,10 +182,12 @@ public class LaneletsAdapter {
 			location = "urban"; // default
 		}
 		
+		boolean onewayNoByDefault = isOnewayNoByDefault(roadType);
+		
 		segment.getTags().put(Constants.ROAD_TYPE, roadType);
 		segment.getTags().put(Constants.LOCATION, location);
 		
-		Set<Access> accesses;
+		Set<Access> accesses = new HashSet<>();
 		switch (roadType) {
 		case "road":
 			if (location.equals(Constants.URBAN)) {
@@ -199,7 +201,6 @@ public class LaneletsAdapter {
 			}
 			accesses = allVehiclesAccesses();
 			accesses.add(Access.BIKE);
-			segment.setAccessTow(accesses);
 			segment.setFormOfWay(FormOfWay.PART_OF_MULTI_CARRIAGEWAY_WHICH_IS_NOT_A_MOTORWAY);
 			break;
 
@@ -214,7 +215,6 @@ public class LaneletsAdapter {
 				// TODO: set default nonurban highway speed limit
 			}
 			accesses = allVehiclesAccesses();
-			segment.setAccessTow(accesses);
 			segment.setFormOfWay(FormOfWay.PART_OF_MOTORWAY);
 			break;
 
@@ -225,7 +225,6 @@ public class LaneletsAdapter {
 			accesses = allVehiclesAccesses();
 			accesses.add(Access.BIKE);
 			accesses.add(Access.PEDESTRIAN);
-			segment.setAccessTow(accesses);
 			segment.setFormOfWay(FormOfWay.PART_OF_A_SERVICE_ROAD);
 			break;
 
@@ -233,9 +232,7 @@ public class LaneletsAdapter {
 			segment.setFrc(FuncRoadClass.SONSTIGE_STRASSEN);
 //			segment.setUrban(true);
 			// TODO: set default average emergency vehicle speed?
-			accesses = new HashSet<>();
 			accesses.add(Access.EMERGENCY_VEHICLE);
-			segment.setAccessTow(accesses);
 			segment.setFormOfWay(FormOfWay.ROAD_FOR_AUTHORITIES);
 			break;
 
@@ -253,7 +250,6 @@ public class LaneletsAdapter {
 			accesses.add(Access.EMERGENCY_VEHICLE);
 			accesses.add(Access.PUBLIC_BUS);
 			accesses.add(Access.TAXI);
-			segment.setAccessTow(accesses);
 			segment.setFormOfWay(FormOfWay.ROAD_FOR_AUTHORITIES);
 			break;
 
@@ -261,9 +257,7 @@ public class LaneletsAdapter {
 			segment.setFrc(FuncRoadClass.RAD_FUSSWEG);
 //			segment.setUrban(true);
 			// TODO: set default average bike vehicle speed?
-			accesses = new HashSet<>();
 			accesses.add(Access.BIKE);
-			segment.setAccessTow(accesses);
 			segment.setFormOfWay(FormOfWay.PART_OF_A_WALKWAY_OR_BICYCLE_WAY);
 			break;
 
@@ -274,7 +268,6 @@ public class LaneletsAdapter {
 			accesses = allVehiclesAccesses();
 			accesses.add(Access.BIKE);
 			accesses.add(Access.PEDESTRIAN);
-			segment.setAccessTow(accesses);
 			segment.setFormOfWay(FormOfWay.NOT_APPLICABLE);
 			break;
 
@@ -285,7 +278,6 @@ public class LaneletsAdapter {
 			accesses = allVehiclesAccesses();
 			accesses.add(Access.BIKE);
 			accesses.add(Access.PEDESTRIAN);
-			segment.setAccessTow(accesses);
 			segment.setFormOfWay(FormOfWay.PART_OF_AN_ETA_PARKING_PLACE);
 			break;
 
@@ -293,10 +285,7 @@ public class LaneletsAdapter {
 			segment.setFrc(FuncRoadClass.RAD_FUSSWEG);
 //			segment.setUrban(true);
 			// TODO: set default average pedestrian walking speed
-			accesses = new HashSet<>();
 			accesses.add(Access.PEDESTRIAN);
-			segment.setAccessTow(accesses);
-			segment.setAccessBkw(accesses);
 			segment.setFormOfWay(FormOfWay.PART_OF_A_WALKWAY_OR_BICYCLE_WAY);
 			break;
 
@@ -304,11 +293,8 @@ public class LaneletsAdapter {
 			segment.setFrc(FuncRoadClass.RAD_FUSSWEG);
 //			segment.setUrban(true);
 			// TODO: set default average pedestrian walking speed
-			accesses = new HashSet<>();
 			accesses.add(Access.BIKE);
 			accesses.add(Access.PEDESTRIAN);
-			segment.setAccessTow(accesses);
-			segment.setAccessBkw(accesses);
 			segment.setFormOfWay(FormOfWay.PART_OF_A_WALKWAY_OR_BICYCLE_WAY);
 			break;
 
@@ -316,10 +302,7 @@ public class LaneletsAdapter {
 			segment.setFrc(FuncRoadClass.RAD_FUSSWEG);
 //			segment.setUrban(true);
 			// TODO: set default average pedestrian walking speed
-			accesses = new HashSet<>();
 			accesses.add(Access.PEDESTRIAN);
-			segment.setAccessTow(accesses);
-			segment.setAccessBkw(accesses);
 			segment.setFormOfWay(FormOfWay.PART_OF_A_WALKWAY_OR_BICYCLE_WAY);
 			break;
 
@@ -327,10 +310,7 @@ public class LaneletsAdapter {
 			segment.setFrc(FuncRoadClass.RAD_FUSSWEG);
 //			segment.setUrban(true);
 			// TODO: set default average pedestrian walking speed
-			accesses = new HashSet<>();
 			accesses.add(Access.PEDESTRIAN);
-			segment.setAccessTow(accesses);
-			segment.setAccessBkw(accesses);
 			segment.setFormOfWay(FormOfWay.PART_OF_A_PEDESTRIAN_ZONE);
 			break;
 
@@ -339,7 +319,23 @@ public class LaneletsAdapter {
 			segment.setFormOfWay(FormOfWay.NOT_APPLICABLE);
 			break;
 		}
-
+		
+		segment.setAccessTow(accesses);
+		if (onewayNoByDefault) {
+			segment.setAccessBkw(accesses);
+		}
+	}
+	
+	private boolean isOnewayNoByDefault(String roadType) {
+		switch (roadType) {
+		case "walkway":
+		case "shared_walkway":
+		case "crosswalk":
+		case "stairs":
+			return true;
+		default:
+			return false;
+		}
 	}
 
 	private Set<Access> allVehiclesAccesses() {
@@ -528,10 +524,19 @@ public class LaneletsAdapter {
 		}
 	}
 	
-	private void setAccesses(IHDWaySegment segment, Map<String, String> tags) {
-		Set<Access> accesses = new HashSet<>();
-		convertAccesses(tags, Constants.LANELET_PARTICIPANT, "yes", accesses);
-		segment.setAccessTow(accesses);
+	private void setOverridingAccesses(IHDWaySegment segment, Map<String, String> tags) {
+		String roadType = tags.get("subtype");
+		if (roadType == null) {
+			roadType = "road"; // default
+		}
+		
+		// Override access set for direction towards
+		convertAccesses(tags, Constants.LANELET_PARTICIPANT, "yes", segment.getAccessTow());
+		
+		if (isOnewayNoByDefault(roadType)) {
+			// Override access set for direction backwards
+			convertAccesses(tags, Constants.LANELET_PARTICIPANT, "yes", segment.getAccessBkw());
+		}
 	}
 	
 	/**
@@ -580,7 +585,7 @@ public class LaneletsAdapter {
 					if (key.equals(keyPrefix + ":" + Constants.LANELET_PEDESTRIAN)) {
 						accesses.add(Access.PEDESTRIAN);
 					} else
-					if (key.equals(keyPrefix + ":" + Constants.LANELET_BYCICLE)) {
+					if (key.equals(keyPrefix + ":" + Constants.LANELET_BICYCLE)) {
 						accesses.add(Access.BIKE);
 					}
 				}
