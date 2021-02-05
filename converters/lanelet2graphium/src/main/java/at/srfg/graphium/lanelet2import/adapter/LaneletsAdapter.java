@@ -189,11 +189,11 @@ public class LaneletsAdapter {
 		switch (roadType) {
 		case "road":
 			if (location.equals(Constants.URBAN)) {
-				segment.setFrc(FuncRoadClass.OTHER_MAJOR_ROAD);
+				segment.setFrc(FuncRoadClass.LOCAL_CONNECTING_ROAD);
 				segment.setUrban(true);
 				// TODO: set default city speed limit
 			} else {
-				segment.setFrc(FuncRoadClass.MAJOR_ROAD_LESS_IMORTANT_THAN_MOTORWAY);
+				segment.setFrc(FuncRoadClass.OTHER_MAJOR_ROAD);
 				segment.setUrban(false);
 				// TODO: set default nonurban speed limit
 			}
@@ -296,6 +296,7 @@ public class LaneletsAdapter {
 			accesses = new HashSet<>();
 			accesses.add(Access.PEDESTRIAN);
 			segment.setAccessTow(accesses);
+			segment.setAccessBkw(accesses);
 			segment.setFormOfWay(FormOfWay.PART_OF_A_WALKWAY_OR_BICYCLE_WAY);
 			break;
 
@@ -307,6 +308,7 @@ public class LaneletsAdapter {
 			accesses.add(Access.BIKE);
 			accesses.add(Access.PEDESTRIAN);
 			segment.setAccessTow(accesses);
+			segment.setAccessBkw(accesses);
 			segment.setFormOfWay(FormOfWay.PART_OF_A_WALKWAY_OR_BICYCLE_WAY);
 			break;
 
@@ -317,6 +319,7 @@ public class LaneletsAdapter {
 			accesses = new HashSet<>();
 			accesses.add(Access.PEDESTRIAN);
 			segment.setAccessTow(accesses);
+			segment.setAccessBkw(accesses);
 			segment.setFormOfWay(FormOfWay.PART_OF_A_WALKWAY_OR_BICYCLE_WAY);
 			break;
 
@@ -327,6 +330,7 @@ public class LaneletsAdapter {
 			accesses = new HashSet<>();
 			accesses.add(Access.PEDESTRIAN);
 			segment.setAccessTow(accesses);
+			segment.setAccessBkw(accesses);
 			segment.setFormOfWay(FormOfWay.PART_OF_A_PEDESTRIAN_ZONE);
 			break;
 
