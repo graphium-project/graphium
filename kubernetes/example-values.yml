@@ -1,5 +1,0 @@
-database:
-  enabled: true
-
-service:
-  type: NodePort

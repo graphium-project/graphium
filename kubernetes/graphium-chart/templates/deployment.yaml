@@ -5,9 +5,7 @@ metadata:
   labels:
   {{- include "graphium-chart.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
-  {{- end }}
+  replicas: 1
   selector:
     matchLabels:
   {{- include "graphium-chart.selectorLabels" . | nindent 6 }}
@@ -47,11 +45,11 @@ spec:
               value: "{{ .Values.database.postgresPassword }}"
             {{- else }}
             - name: "db.url"
-              value: "{{ .Values.graphium.dbUrl }}"
+              value: "{{ .Values.graphiumCentral.dbUrl }}"
             - name: "db.username"
-              value: "{{ .Values.graphium.dbUsername }}"
+              value: "{{ .Values.graphiumCentral.dbUsername }}"
             - name: "db.password"
-              value: "{{ .Values.graphium.dbPassword }}"
+              value: "{{ .Values.graphiumCentral.dbPassword }}"
           {{- end }}
           livenessProbe:
             httpGet:
