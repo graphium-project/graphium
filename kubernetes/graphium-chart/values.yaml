@@ -65,11 +65,6 @@ graphiumCentral:
   dbUsername: "graphium"
   dbPassword: "graphium"
 
-graphiumSatellite:
-  image: "jinnerbichler/graphium-satellite:latest"
-  replicaCount: 0
-
-
 database:
   enabled: true
   image: mdillon/postgis:11
