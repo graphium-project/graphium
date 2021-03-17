@@ -19,6 +19,8 @@ public class RoutingErrorDtoImpl {
 
 	private String msg;
 	
+	public RoutingErrorDtoImpl() {}
+	
 	public RoutingErrorDtoImpl(String msg) {
 		this.msg = msg;
 	}
