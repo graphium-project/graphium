@@ -109,7 +109,7 @@ public class LaneletHelper {
 	 * @return
 	 */
 	public static LineString createLinestring(Way way, TLongObjectHashMap<Node> nodes, int srid) {
-		if (way.getWayNodes() == null) {
+		if (way == null || way.getWayNodes() == null) {
 			return null;
 		}
 		
@@ -134,6 +134,7 @@ public class LaneletHelper {
 	
 	/**
 	 * calculates the centerline of a lanelet according to left and right bounds linestrings
+	 * based on https://github.com/fzi-forschungszentrum-informatik/Lanelet2/blob/master/lanelet2_core/src/Lanelet.cpp
 	 * @param segment
 	 * @param lineDirections
 	 * @return
@@ -156,48 +157,61 @@ public class LaneletHelper {
 		double y = (coordsLeft[0].y + coordsRight[0].y) / 2;
 		addToCenterline(centerlineCoordinates, x, y);
 		
-		int indexLeft = 1;
-		int indexRight = 1;
+		int indexLeft = 0;
+		int indexRight = 0;
 		
 		if (coordsLeft[indexLeft].equals(coordsRight[indexRight])) {
 			// equal coordinate
-			indexRight++;
+			indexLeft++;
 		}
 		
-		while (indexLeft < coordsLeft.length && indexRight < coordsRight.length) {
+		while (indexLeft + 1 < coordsLeft.length || indexRight + 1 < coordsRight.length) {
 			//Find nearest coordinate on opposite bounds
-			int oppositeIndexLeft = findNearestIndex(coordsLeft, coordsRight[indexRight], indexLeft);
-			int oppositeIndexRight = findNearestIndex(coordsRight, coordsLeft[indexLeft], indexRight);
+			int leftCandidateIndex = findNearestIndex(coordsLeft, coordsRight[indexRight], indexLeft + 1, centerlineCoordinates.get(centerlineCoordinates.size() - 1), segment);
+			int rightCandidateIndex = findNearestIndex(coordsRight, coordsLeft[indexLeft], indexRight + 1, centerlineCoordinates.get(centerlineCoordinates.size() - 1), segment);
 			
-			if (oppositeIndexRight > indexRight) {
-				// index on right bound is behind index on left bound
-				x = (coordsLeft[oppositeIndexLeft].x + coordsRight[indexRight].x) / 2;
-				y = (coordsLeft[oppositeIndexLeft].y + coordsRight[indexRight].y) / 2;
+			Double leftCandidateDistance = null;
+			Double rightCandidateDistance = null;
+			if (leftCandidateIndex >= 0) {
+				leftCandidateDistance = GeometryUtils.distanceAndoyer(coordsRight[indexRight], coordsLeft[leftCandidateIndex]) / 2;
+			}
+			if (rightCandidateIndex >= 0) {
+				rightCandidateDistance = GeometryUtils.distanceAndoyer(coordsLeft[indexLeft], coordsRight[rightCandidateIndex]) / 2;
+			}
+			
+			if (leftCandidateDistance != null && rightCandidateDistance != null) {
+				// use left and right candidate to avoid steps
+//				x = (coordsLeft[indexLeft].x + coordsRight[rightCandidateIndex].x
+//						+ coordsLeft[leftCandidateIndex].x + coordsRight[indexRight].x) / 4;
+//				y = (coordsLeft[indexLeft].y + coordsRight[indexRight].y
+//						+ coordsLeft[leftCandidateIndex].y + coordsRight[rightCandidateIndex].y) / 4;
+//				addToCenterline(centerlineCoordinates, x, y);
+				x = (coordsLeft[leftCandidateIndex].x + coordsRight[rightCandidateIndex].x) / 2;
+				y = (coordsLeft[leftCandidateIndex].y + coordsRight[rightCandidateIndex].y) / 2;
 				addToCenterline(centerlineCoordinates, x, y);
-				indexRight++;
-				if (indexLeft < oppositeIndexLeft) {
-					// to avoid zig-zag-pattern
-					indexLeft = oppositeIndexLeft;
-				}
+				indexLeft = leftCandidateIndex;
+				indexRight = rightCandidateIndex;
 				
-			} else if (oppositeIndexLeft > indexLeft) {
-				// index on left bound is behind index on right bound
-				x = (coordsLeft[indexLeft].x + coordsRight[oppositeIndexRight].x) / 2;
-				y = (coordsLeft[indexLeft].y + coordsRight[oppositeIndexRight].y) / 2;
-				addToCenterline(centerlineCoordinates, x, y);
-				indexLeft++;
-				if (indexRight < oppositeIndexRight) {
-					// to avoid zig-zag-pattern
-					indexRight = oppositeIndexRight;
+			} else if (leftCandidateDistance != null && (rightCandidateDistance == null || leftCandidateDistance <= rightCandidateDistance)) {
+				// index on right bound is behind index on left bound
+				for (int i=indexLeft; i<=leftCandidateIndex; i++) {
+					x = (coordsLeft[i].x + coordsRight[indexRight].x) / 2;
+					y = (coordsLeft[i].y + coordsRight[indexRight].y) / 2;
+					addToCenterline(centerlineCoordinates, x, y);
 				}
+				indexLeft = leftCandidateIndex;
+				
+			} else if (rightCandidateDistance != null && (leftCandidateDistance == null || rightCandidateDistance < leftCandidateDistance)) {
+				// index on left bound is behind index on right bound
+				for (int i=indexRight; i<=rightCandidateIndex; i++) {
+					x = (coordsLeft[indexLeft].x + coordsRight[i].x) / 2;
+					y = (coordsLeft[indexLeft].y + coordsRight[i].y) / 2;
+					addToCenterline(centerlineCoordinates, x, y);
+				}
+				indexRight = rightCandidateIndex;
 				
 			} else {
-				// default case > move both coordinates
-				x = (coordsLeft[indexLeft].x + coordsRight[indexRight].x) / 2;
-				y = (coordsLeft[indexLeft].y + coordsRight[indexRight].y) / 2;
-				addToCenterline(centerlineCoordinates, x, y);
-				indexLeft++;
-				indexRight++;
+				break;
 			}
 		}
 		
@@ -233,16 +247,53 @@ public class LaneletHelper {
 
 	/**
 	 * 
-	 * @param coordinates list of coordinates (e.g. line string coordinates) 
-	 * @param coordinate
+	 * @param candidateCoordinates list of coordinates (e.g. line string coordinates) 
+	 * @param otherCoordinate
+	 * @param minIndex minimum index to return
+	 * @param lastCenterlineCoordinate
+	 * @return index of list item in coordinates with shortest distance to coordinate
+	 */
+	private static int findNearestIndex(Coordinate[] candidateCoordinates,
+			Coordinate otherCoordinate, int minIndex, Coordinate lastCenterlineCoordinate,
+			IHDWaySegment segment) {
+		double minimumDistance = Double.MAX_VALUE;
+		int closestCoordinateIndex = -1;
+		double distanceLastOther = GeometryUtils.distanceAndoyer(otherCoordinate, lastCenterlineCoordinate);
+		for (int j=minIndex; j<candidateCoordinates.length; j++) {
+			double candidateDistance = GeometryUtils.distanceAndoyer(otherCoordinate, candidateCoordinates[j]) / 2;
+			// triangle inequation to find a distance where we can not expect a closer coordinate
+			if (candidateDistance - distanceLastOther > minimumDistance) {
+				break;
+			}
+			if (candidateDistance < minimumDistance) {
+				// check intersection
+				double x = (candidateCoordinates[j].x + otherCoordinate.x) / 2;
+				double y = (candidateCoordinates[j].y + otherCoordinate.y) / 2;
+				Coordinate[] candidateArray = {lastCenterlineCoordinate, new Coordinate(x, y)};
+				LineString centerline = GeometryUtils.createLineString(candidateArray, 4326);
+				if (!centerline.intersects(segment.getLeftBorderGeometry()) &&
+						!centerline.intersects(segment.getRightBorderGeometry())) {
+					minimumDistance = candidateDistance;
+					closestCoordinateIndex = j;
+				}
+			}
+		}
+		return closestCoordinateIndex;
+	}
+
+	/**
+	 * 
+	 * @param candidateCoordinates list of coordinates (e.g. line string coordinates) 
+	 * @param otherCoordinate
 	 * @param minIndex minimum index to return
 	 * @return index of list item in coordinates with shortest distance to coordinate
 	 */
-	private static int findNearestIndex(Coordinate[] coordinates, Coordinate coordinate, int minIndex) {
+	private static int findNearestIndex(Coordinate[] candidateCoordinates,
+			Coordinate otherCoordinate, int minIndex) {
 		double minimumDistance = Double.MAX_VALUE;
 		int minimumDistanceIndex = -1;
-		for (int j=minIndex; j<coordinates.length; j++) {
-			double distance = GeometryUtils.distanceAndoyer(coordinate, coordinates[j]);
+		for (int j=minIndex; j<candidateCoordinates.length; j++) {
+			double distance = GeometryUtils.distanceAndoyer(otherCoordinate, candidateCoordinates[j]);
 			if (distance < minimumDistance) {
 				minimumDistance = distance;
 				minimumDistanceIndex = j;
