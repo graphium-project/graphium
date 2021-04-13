@@ -21,7 +21,6 @@ import java.util.List;
 import at.srfg.graphium.model.IBaseWaySegment;
 import at.srfg.graphium.routing.api.adapter.IRouteOutput;
 import at.srfg.graphium.routing.api.adapter.IRouteOutputAdapter;
-import at.srfg.graphium.routing.api.dto.IDirectedSegmentDTO;
 import at.srfg.graphium.routing.api.dto.impl.DirectedSegmentDTOImpl;
 import at.srfg.graphium.routing.api.dto.impl.PathRouteDTOImpl;
 import at.srfg.graphium.routing.model.IDirectedSegment;

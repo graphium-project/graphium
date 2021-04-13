@@ -15,8 +15,6 @@
  */
 package at.srfg.graphium.routing.api.dto.impl;
 
-import at.srfg.graphium.routing.api.dto.impl.PathRouteDTOImpl;
-
 public class RouteDTOImpl {
 
 	private PathRouteDTOImpl route;
