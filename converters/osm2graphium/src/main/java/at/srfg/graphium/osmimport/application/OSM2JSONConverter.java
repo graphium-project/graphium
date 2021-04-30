@@ -60,7 +60,7 @@ public class OSM2JSONConverter {
         options.addOption(Option.builder("v").longOpt("version").hasArg().argName("graph_version").desc("Version of the graph to be imported").build());
         options.addOption(Option.builder("vf").longOpt("valid-from").hasArg().argName("valid_from").desc("validFrom timestamp (format 'yyyy-MM-dd HH:mm')").build());;
         options.addOption(Option.builder("vt").longOpt("valid-to").hasArg().argName("valid_from").desc("validTo timestamp (format 'yyyy-MM-dd HH:mm')").build());;
-        options.addOption(Option.builder("b").longOpt("bounds").hasArg().argName("bounds_file").desc("Name of bounds file for geographical filtering (format alá Osmosis)").build());
+        options.addOption(Option.builder("b").longOpt("bounds").hasArg().argName("bounds_file").desc("Name of bounds file for geographical filtering (format as described by Osmosis)").build());
         options.addOption(Option.builder("q").longOpt("queueSize").hasArg().argName("queue_size").desc("Size of import queue").build());
         options.addOption(Option.builder("t").longOpt("threads").hasArg().argName("worker_threads").desc("Number of worker threads").build());
         options.addOption(Option.builder("d").longOpt("downloadDir").hasArg().argName("download_dir").desc("directory to store download files").build());

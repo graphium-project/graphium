@@ -28,6 +28,8 @@ public class BaseRouteDTOImpl<W extends Object> implements IRouteDTO<W> {
 	// TODO: change to Polyline
 	private String geometry;
 
+	public BaseRouteDTOImpl() {}
+	
 	public BaseRouteDTOImpl(W weight, float length, int duration, int runtimeInMs, String graphName,
 			String graphVersion, String geometry) {
 		this.weight = weight;

@@ -21,7 +21,6 @@ import java.util.List;
 import at.srfg.graphium.model.IBaseWaySegment;
 import at.srfg.graphium.routing.api.adapter.IRouteOutput;
 import at.srfg.graphium.routing.api.adapter.IRouteOutputAdapter;
-import at.srfg.graphium.routing.api.dto.IDirectedSegmentDTO;
 import at.srfg.graphium.routing.api.dto.impl.DirectedSegmentDTOImpl;
 import at.srfg.graphium.routing.api.dto.impl.PathRouteDTOImpl;
 import at.srfg.graphium.routing.model.IDirectedSegment;
@@ -47,9 +46,11 @@ public class PathRouteOutputAdapterImpl<T extends IBaseWaySegment>
 		if (route.getGeometry() != null) {
 			geometryWkt = route.getGeometry().toText();
 		}
-		List<IDirectedSegmentDTO> segments = new ArrayList<IDirectedSegmentDTO>();
-		for (IDirectedSegment segment : route.getPath()) {
-			segments.add(new DirectedSegmentDTOImpl(segment.getId(), segment.isTowards()));
+		List<DirectedSegmentDTOImpl> segments = new ArrayList<DirectedSegmentDTOImpl>();
+		if (route.getPath() != null) {
+			for (IDirectedSegment segment : route.getPath()) {
+				segments.add(new DirectedSegmentDTOImpl(segment.getId(), segment.isTowards()));
+			}
 		}
 		
 		return new PathRouteDTOImpl(route.getWeight(), route.getLength(), route.getDuration(), 
