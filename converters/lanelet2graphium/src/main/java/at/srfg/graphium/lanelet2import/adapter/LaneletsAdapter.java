@@ -48,20 +48,16 @@ import gnu.trove.map.hash.TLongObjectHashMap;
  *
  */
 public class LaneletsAdapter {
-	
-	
-	// TODO: Sollen wir die Border-Linestrings umdrehen, falls die Digitalisierungsrichtung nicht mit der Fahrtrichtung zusammenpasst?
-	
-
 	private static Logger log = LoggerFactory.getLogger(LaneletsAdapter.class);
 	
 	private long nodeIdCounter = -1;
-	//TODO replace maps with spatial index
+	// TODO replace maps with spatial index
 	private Map<Double, Map<Double, Long>> nodeIdRepository = null; // Map<Longitudes, Map<Latitudes, nodeId>>
 
 	private float miles2km = 1.60934f;
 	
-	public List<IHDWaySegment> adaptLanelets(List<Relation> relations, TLongObjectHashMap<Way> ways, TLongObjectHashMap<Node> nodes) {
+	public List<IHDWaySegment> adaptLanelets(List<Relation> relations, TLongObjectHashMap<Way> ways,
+			TLongObjectHashMap<Node> nodes) {
 		List<IHDWaySegment> segments = new ArrayList<>();
 		
 		nodeIdCounter = -1;
@@ -111,10 +107,10 @@ public class LaneletsAdapter {
 		
 		segment.setLeftBorderGeometry(LaneletHelper.createLinestring(leftBorder, nodes, Constants.SRID));
 		segment.setLeftBorderStartNodeId(leftBorder.getWayNodes().get(0).getNodeId());
-		segment.setLeftBorderEndNodeId(leftBorder.getWayNodes().get(leftBorder.getWayNodes().size()-1).getNodeId());
+		segment.setLeftBorderEndNodeId(leftBorder.getWayNodes().get(leftBorder.getWayNodes().size() - 1).getNodeId());
 		segment.setRightBorderGeometry(LaneletHelper.createLinestring(rightBorder, nodes, Constants.SRID));
 		segment.setRightBorderStartNodeId(rightBorder.getWayNodes().get(0).getNodeId());
-		segment.setRightBorderEndNodeId(rightBorder.getWayNodes().get(rightBorder.getWayNodes().size()-1).getNodeId());
+		segment.setRightBorderEndNodeId(rightBorder.getWayNodes().get(rightBorder.getWayNodes().size() - 1).getNodeId());
 
 		boolean[] borderDirections = checkBorderInversion(segment);
 		
@@ -171,8 +167,12 @@ public class LaneletsAdapter {
 		return nodeId.longValue();
 	}
 
+	/**
+	 * Details see https://github.com/fzi-forschungszentrum-informatik/Lanelet2/blob/master/lanelet2_core/src/Attribute.cpp
+	 * @param segment
+	 * @param tags
+	 */
 	private void setRoadCharacteristics(IHDWaySegment segment, Map<String, String> tags) {
-		// see https://github.com/fzi-forschungszentrum-informatik/Lanelet2/blob/master/lanelet2_core/src/Attribute.cpp
 		String roadType = tags.get("subtype");
 		if (roadType == null) {
 			roadType = "road"; // default
@@ -197,7 +197,7 @@ public class LaneletsAdapter {
 			} else {
 				segment.setFrc(FuncRoadClass.OTHER_MAJOR_ROAD);
 				segment.setUrban(false);
-				// TODO: set default nonurban speed limit
+				// TODO: set default non-urban speed limit
 			}
 			accesses = allVehiclesAccesses();
 			accesses.add(Access.BIKE);
@@ -338,8 +338,11 @@ public class LaneletsAdapter {
 		}
 	}
 
+	/**
+	 * Details see https://github.com/fzi-forschungszentrum-informatik/Lanelet2/blob/master/lanelet2_core/src/Attribute.cpp
+	 * @return
+	 */
 	private Set<Access> allVehiclesAccesses() {
-		// see https://github.com/fzi-forschungszentrum-informatik/Lanelet2/blob/master/lanelet2_core/src/Attribute.cpp
 		Set<Access> accesses = new HashSet<>();
 		accesses.add(Access.PUBLIC_BUS);
 		accesses.add(Access.PRIVATE_CAR);
@@ -351,8 +354,12 @@ public class LaneletsAdapter {
 		return accesses;
 	}
 
+	/**
+	 * Details see https://github.com/fzi-forschungszentrum-informatik/Lanelet2/blob/master/lanelet2_core/src/Attribute.cpp
+	 * @param segment
+	 * @param tags
+	 */
 	private void setOnewayAttributes(IHDWaySegment segment, Map<String, String> tags) {
-		// see https://github.com/fzi-forschungszentrum-informatik/Lanelet2/blob/master/lanelet2_core/src/Attribute.cpp
 		segment.setLanesTow((short)1);
 
 		Set<Access> accesses = new HashSet<>();
@@ -375,7 +382,12 @@ public class LaneletsAdapter {
 		String laneChangePossible = "false";
 		if (typeEntry != null) {
 			segment.getTags().put("left:" + typeEntry.getKey(), typeEntry.getValue());
-			laneChangePossible = determineLaneChange(true, !borderDirections[0], typeEntry.getKey(), typeEntry.getValue());
+			laneChangePossible = determineLaneChange(true, !borderDirections[0], typeEntry.getKey(),
+					typeEntry.getValue());
+		}
+		String[] laneChange = LaneletHelper.parseBorderLaneChange(leftBorder);
+		if (laneChange[0] != null) {
+			laneChangePossible = (laneChange[0].equals("yes")) ? "true" : "false";
 		}
 		segment.getTags().put(Constants.TAG_LANE_CHANGE + ":left", laneChangePossible);
 		
@@ -384,7 +396,12 @@ public class LaneletsAdapter {
 		laneChangePossible = "false";
 		if (typeEntry != null) {
 			segment.getTags().put("right:" + typeEntry.getKey(), typeEntry.getValue());
-			laneChangePossible = determineLaneChange(false, !borderDirections[1], typeEntry.getKey(), typeEntry.getValue());
+			laneChangePossible = determineLaneChange(false, !borderDirections[1], typeEntry.getKey(),
+					typeEntry.getValue());
+		}
+		laneChange = LaneletHelper.parseBorderLaneChange(rightBorder);
+		if (laneChange[1] != null) {
+			laneChangePossible = (laneChange[1].equals("yes")) ? "true" : "false";
 		}
 		segment.getTags().put(Constants.TAG_LANE_CHANGE + ":right", laneChangePossible);
 	}
@@ -432,12 +449,12 @@ public class LaneletsAdapter {
 					// no lane change allowed
 					laneChange = false;
 					break;
-	
+					
 				case Constants.LANELET_SUBTYPE_DASHED:
 					// lane change allowed
 					laneChange = true;
 					break;
-	
+					
 				case Constants.LANELET_SUBTYPE_DASHED_SOLID:
 					// lane change from left to right allowed
 					if (leftBorder) {
@@ -453,7 +470,7 @@ public class LaneletsAdapter {
 							laneChange = false;
 						}
 					}
-						
+					
 					break;
 	
 				case Constants.LANELET_SUBTYPE_SOLID_DASHED:
@@ -471,9 +488,9 @@ public class LaneletsAdapter {
 							laneChange = true;
 						}
 					}
-						
+					
 					break;
-	
+				
 				default:
 					break;
 				}
@@ -556,36 +573,26 @@ public class LaneletsAdapter {
 					
 					if (key.equals(keyPrefix + ":" + Constants.LANELET_VEHICLE)) {
 						accesses = allVehiclesAccesses();
-					} else
-					if (key.equals(keyPrefix + ":" + Constants.LANELET_VEHICLE_CAR)) {
+					} else if (key.equals(keyPrefix + ":" + Constants.LANELET_VEHICLE_CAR)) {
 						accesses.add(Access.PRIVATE_CAR);
 						accesses.add(Access.ELECTRIC_CAR);
-					} else
-					if (key.equals(keyPrefix + ":" + Constants.LANELET_VEHICLE_CAR_COMBUSTION)) {
+					} else if (key.equals(keyPrefix + ":" + Constants.LANELET_VEHICLE_CAR_COMBUSTION)) {
 						accesses.add(Access.PRIVATE_CAR);
-					} else
-					if (key.equals(keyPrefix + ":" + Constants.LANELET_VEHICLE_CAR_ELECTRIC)) {
+					} else if (key.equals(keyPrefix + ":" + Constants.LANELET_VEHICLE_CAR_ELECTRIC)) {
 						accesses.add(Access.ELECTRIC_CAR);
-					} else
-					if (key.equals(keyPrefix + ":" + Constants.LANELET_VEHICLE_BUS)) {
+					} else if (key.equals(keyPrefix + ":" + Constants.LANELET_VEHICLE_BUS)) {
 						accesses.add(Access.PUBLIC_BUS);
-					} else
-					if (key.equals(keyPrefix + ":" + Constants.LANELET_VEHICLE_TRUCK)) {
+					} else if (key.equals(keyPrefix + ":" + Constants.LANELET_VEHICLE_TRUCK)) {
 						accesses.add(Access.TRUCK);
-					} else
-					if (key.equals(keyPrefix + ":" + Constants.LANELET_VEHICLE_MOTORCYCLE)) {
+					} else if (key.equals(keyPrefix + ":" + Constants.LANELET_VEHICLE_MOTORCYCLE)) {
 						accesses.add(Access.MOTORCYCLE);
-					} else
-					if (key.equals(keyPrefix + ":" + Constants.LANELET_VEHICLE_TAXI)) {
+					} else if (key.equals(keyPrefix + ":" + Constants.LANELET_VEHICLE_TAXI)) {
 						accesses.add(Access.TAXI);
-					} else
-					if (key.equals(keyPrefix + ":" + Constants.LANELET_VEHICLE_EMERGENCY)) {
+					} else if (key.equals(keyPrefix + ":" + Constants.LANELET_VEHICLE_EMERGENCY)) {
 						accesses.add(Access.EMERGENCY_VEHICLE);
-					} else
-					if (key.equals(keyPrefix + ":" + Constants.LANELET_PEDESTRIAN)) {
+					} else if (key.equals(keyPrefix + ":" + Constants.LANELET_PEDESTRIAN)) {
 						accesses.add(Access.PEDESTRIAN);
-					} else
-					if (key.equals(keyPrefix + ":" + Constants.LANELET_BICYCLE)) {
+					} else if (key.equals(keyPrefix + ":" + Constants.LANELET_BICYCLE)) {
 						accesses.add(Access.BIKE);
 					}
 				}

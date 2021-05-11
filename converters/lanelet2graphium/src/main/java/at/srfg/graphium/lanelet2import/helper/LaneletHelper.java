@@ -102,6 +102,37 @@ public class LaneletHelper {
 	}
 	
 	/**
+	 * parses the type and optionally the subtype of a lanelet border 
+	 * @param way
+	 * @return
+	 */
+	public static String[] parseBorderLaneChange(Way way) {
+		String laneChange = null;
+		String laneChangeLeft = null;
+		String laneChangeRight = null;
+		
+		for (Tag tag : way.getTags()) {
+			if (Constants.LANELET_LANE_CHANGE.equals(tag.getKey().toLowerCase())) {
+				laneChange = tag.getValue();
+			}
+			if ((Constants.LANELET_LANE_CHANGE + ":left").equals(tag.getKey().toLowerCase())) {
+				laneChangeLeft = tag.getValue();
+			}
+			if ((Constants.LANELET_LANE_CHANGE + ":right").equals(tag.getKey().toLowerCase())) {
+				laneChangeRight = tag.getValue();
+			}
+		}
+		if (laneChangeLeft == null) {
+			laneChangeLeft = laneChange;
+		}
+		if (laneChangeRight == null) {
+			laneChangeRight = laneChange;
+		}
+		
+		return new String[] { laneChangeLeft, laneChangeRight };
+	}
+	
+	/**
 	 * creates the OSM way's linestring from its given node geometries
 	 * @param way
 	 * @param nodes

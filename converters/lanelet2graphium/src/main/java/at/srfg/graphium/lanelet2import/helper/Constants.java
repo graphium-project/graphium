@@ -55,6 +55,7 @@ public class Constants {
 	public final static String LANELET_VEHICLE_EMERGENCY = "vehicle:emergency";
 	public final static String LANELET_PEDESTRIAN = "pedestrian";
 	public final static String LANELET_BICYCLE = "bicycle";
+	public final static String LANELET_LANE_CHANGE = "lane_change";
 
 	public final static String BORDER_INVERTED = "invertedBorder";
 	public final static String ROAD_TYPE = "roadType";
