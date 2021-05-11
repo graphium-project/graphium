@@ -142,13 +142,18 @@ public class WayGraphReadDaoImpl<T extends IBaseSegment, X extends ISegmentXInfo
 			ps.setFetchSize(fetchSize);
 			rs = ps.executeQuery();
 			T segment = null;
-			rs.next();
-			do {
-				segment = rsExtractor.extractData(rs);
-				if (segment != null) {
-					segments.add(segment);
-				}
-			} while (segment != null);
+
+			// iterate result set;
+			boolean atLeastOneRowFound = rs.next();
+			
+			if (atLeastOneRowFound) {
+				do {
+					segment = rsExtractor.extractData(rs);
+					if (segment != null) {
+						segments.add(segment);
+					}
+				} while (segment != null);
+			}
 			
 		} catch (SQLException e) {			
 			log.error("error executing segment iteration query", e);

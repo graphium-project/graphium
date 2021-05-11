@@ -15,25 +15,23 @@
  */
 package at.srfg.graphium.routing.api.dto.impl;
 
-import java.util.List;
+public class RouteDTOImpl {
 
-public class PathRouteDTOImpl extends OverviewRouteDTOImpl {
+	private PathRouteDTOImpl route;
+
+	public RouteDTOImpl() {}
 	
-	private List<DirectedSegmentDTOImpl> segments;
+	public RouteDTOImpl(PathRouteDTOImpl route) {
+		super();
+		this.route = route;
+	}
 
-	public PathRouteDTOImpl() {}
+	public PathRouteDTOImpl getRoute() {
+		return route;
+	}
+
+	public void setRoute(PathRouteDTOImpl route) {
+		this.route = route;
+	}
 	
-	public PathRouteDTOImpl(Float weight, float length, int duration, int runtimeInMs, String graphName,
-			String graphVersion, String geometry, List<DirectedSegmentDTOImpl> segments) {
-		super(weight, length, duration, runtimeInMs, graphName, graphVersion, geometry);
-		this.segments = segments;
-	}
-
-	public List<DirectedSegmentDTOImpl> getSegments() {
-		return segments;
-	}
-
-	public void setSegments(List<DirectedSegmentDTOImpl> segments) {
-		this.segments = segments;
-	}
 }

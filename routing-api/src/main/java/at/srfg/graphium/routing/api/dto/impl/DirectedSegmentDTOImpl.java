@@ -7,6 +7,8 @@ public class DirectedSegmentDTOImpl implements IDirectedSegmentDTO {
 	private long id;
 	private boolean linkDirectionForward;
 
+	public DirectedSegmentDTOImpl() {}
+	
 	public DirectedSegmentDTOImpl(long id, boolean linkDirectionForward) {
 		this.id = id;
 		this.linkDirectionForward = linkDirectionForward;
