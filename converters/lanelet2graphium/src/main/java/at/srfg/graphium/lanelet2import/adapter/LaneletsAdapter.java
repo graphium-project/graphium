@@ -182,8 +182,6 @@ public class LaneletsAdapter {
 			location = "urban"; // default
 		}
 		
-		boolean onewayNoByDefault = isOnewayNoByDefault(roadType);
-		
 		segment.getTags().put(Constants.ROAD_TYPE, roadType);
 		segment.getTags().put(Constants.LOCATION, location);
 		
@@ -321,8 +319,10 @@ public class LaneletsAdapter {
 		}
 		
 		segment.setAccessTow(accesses);
-		if (onewayNoByDefault) {
-			segment.setAccessBkw(accesses);
+		if (isOnewayNoByDefault(roadType)) {
+			segment.setAccessBkw(new HashSet<Access>(accesses));
+		} else {
+			segment.setAccessBkw(new HashSet<Access>());
 		}
 	}
 	
@@ -361,6 +361,7 @@ public class LaneletsAdapter {
 	 */
 	private void setOnewayAttributes(IHDWaySegment segment, Map<String, String> tags) {
 		segment.setLanesTow((short)1);
+		segment.setLanesBkw((short)0);
 
 		Set<Access> accesses = new HashSet<>();
 		boolean oneway = convertAccesses(tags, Constants.LANELET_ONEWAY, "no", accesses);
@@ -547,12 +548,18 @@ public class LaneletsAdapter {
 			roadType = "road"; // default
 		}
 		
-		// Override access set for direction towards
+		// Override access set: participant:*=yes
 		convertAccesses(tags, Constants.LANELET_PARTICIPANT, "yes", segment.getAccessTow());
-		
 		if (isOnewayNoByDefault(roadType)) {
-			// Override access set for direction backwards
 			convertAccesses(tags, Constants.LANELET_PARTICIPANT, "yes", segment.getAccessBkw());
+		}
+		
+		// Override access set: participant:*=no
+		Set<Access> toRemoveFromAccess = new HashSet<Access>();
+		convertAccesses(tags, Constants.LANELET_PARTICIPANT, "no", toRemoveFromAccess);
+		segment.getAccessTow().removeAll(toRemoveFromAccess);
+		if (isOnewayNoByDefault(roadType)) {
+			segment.getAccessBkw().removeAll(toRemoveFromAccess);
 		}
 	}
 	
@@ -572,7 +579,7 @@ public class LaneletsAdapter {
 					conditionTrue = true;
 					
 					if (key.equals(keyPrefix + ":" + Constants.LANELET_VEHICLE)) {
-						accesses = allVehiclesAccesses();
+						accesses.addAll(allVehiclesAccesses());
 					} else if (key.equals(keyPrefix + ":" + Constants.LANELET_VEHICLE_CAR)) {
 						accesses.add(Access.PRIVATE_CAR);
 						accesses.add(Access.ELECTRIC_CAR);
