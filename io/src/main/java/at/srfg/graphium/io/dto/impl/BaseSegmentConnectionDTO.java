@@ -34,15 +34,17 @@ public class BaseSegmentConnectionDTO implements IBaseSegmentConnectionDTO {
 
 	public BaseSegmentConnectionDTO() {}
 
-    public BaseSegmentConnectionDTO(long nodeId, long toSegmentId, Map<String, List<IConnectionXInfoDTO>> xInfo) {
+    public BaseSegmentConnectionDTO(long nodeId, long toSegmentId, Map<String, List<IConnectionXInfoDTO>> xInfo, Map<String, String> tags) {
         this.nodeId = nodeId;
         this.toSegmentId = toSegmentId;
         this.xInfo = xInfo;
+        this.tags = tags;
     }
 
     private long nodeId;
     private long toSegmentId;
     private Map<String,List<IConnectionXInfoDTO>> xInfo;
+    private Map<String, String> tags;
 
     @Override
     public long getNodeId() {
@@ -73,4 +75,15 @@ public class BaseSegmentConnectionDTO implements IBaseSegmentConnectionDTO {
     public void setxInfo(Map<String, List<IConnectionXInfoDTO>> xInfo) {
         this.xInfo = xInfo;
     }
+    
+	@Override
+	public Map<String, String> getTags() {
+		return tags;
+	}
+
+	@Override
+	public void setTags(Map<String, String> tags) {
+		this.tags = tags;
+	}
+
 }

@@ -45,7 +45,13 @@ public abstract class AbstractWayGraphModelFactory<T extends IBaseWaySegment>
 	public IWaySegmentConnection newWaySegmentConnection(long nodeId, long fromSegmentId,
 			long toSegmentId, Set<Access> access) {
 		return new WaySegmentConnection(nodeId, fromSegmentId, toSegmentId, access);
-	}	
+	}
+
+	@Override
+	public IWaySegmentConnection newWaySegmentConnection(long nodeId, long fromSegmentId,
+			long toSegmentId, Set<Access> access, Map<String, String> tags) {
+		return new WaySegmentConnection(nodeId, fromSegmentId, toSegmentId, access, null, tags);
+	}
 	
 	protected List<ISegmentXInfo> mergeXInfoList(Map<String, List<ISegmentXInfo>> xInfo) {
 		List<ISegmentXInfo> merged = new ArrayList<ISegmentXInfo>();
@@ -77,5 +83,18 @@ public abstract class AbstractWayGraphModelFactory<T extends IBaseWaySegment>
 				tags, source, type, description, creationTimestamp,
 				storageTimestamp, creator, originUrl);
 	}
+
+	protected List<IWaySegmentConnection> adaptConns(List<IWaySegmentConnection> startNodeCons,
+			   List<IWaySegmentConnection> endNodeCons) {
+		List<IWaySegmentConnection> conns = new ArrayList<>();
+		if (startNodeCons != null) {
+		conns.addAll(startNodeCons);
+		}
+		if (endNodeCons != null) {
+		conns.addAll(endNodeCons);
+		}
+		return conns;
+	}
+
 
 }

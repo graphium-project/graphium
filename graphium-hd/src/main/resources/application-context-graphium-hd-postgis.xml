@@ -1,0 +1,39 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- override ResultSetExtractor -->
+    <bean id="hdWaySegmentResultSetExtractor" class="at.srfg.graphium.postgis.persistence.resultsetextractors.HDWaySegmentResultSetExtractor"/>    
+
+    <bean id="hdSegmentResultSetExtractorFactory" class="at.srfg.graphium.postgis.persistence.resultsetextractors.impl.SegmentResultSetExtractorFactoryImpl">
+    	<lookup-method bean="hdWaySegmentResultSetExtractor" name="createResultSetExtractor"/>
+    	<property name="xInfoRowMapperFactory" ref="segmentXInfoRowMapperFactory"/>
+    </bean>
+
+    <bean id="postgisHDWayGraphWriteDao" class="at.srfg.graphium.postgis.persistence.impl.HDWayGraphWriteDaoImpl" parent="graphiumAbstractPostgisDao">
+    	<property name="xInfoDaoRegistry" ref="xInfoDaoRegistry"/>
+    	<property name="metadataDao" ref="postgisWayGraphVersionMetadataDao"/>
+    </bean>
+    
+    <bean id="postgisHDWayGraphReadDao" class="at.srfg.graphium.postgis.persistence.impl.WayGraphReadDaoImpl" parent="graphiumAbstractPostgisDao">
+    	<property name="viewDao" ref="wayGraphViewDao"/>
+    	<property name="resultSetExtractorFactory" ref="hdSegmentResultSetExtractorFactory"/>
+    </bean>
+    
+    <bean id="postgisHDWayGraphViewDao" class="at.srfg.graphium.postgis.persistence.impl.HDWayGraphViewDaoImpl" parent="graphiumAbstractPostgisDao">
+    	<property name="rowMapper" ref="wayGraphViewRowMapper"/>
+    	<property name="waySegmentRowMapper" ref="waySegmentResultSetExtractor"/>
+    </bean>
+    
+    <alias name="postgisHDWayGraphReadDao" alias="hdWayGraphReadDao"/>
+    <alias name="postgisHDWayGraphWriteDao" alias="hdWayGraphWriteDao"/>
+ 	<alias name="postgisQueuingHDGraphVersionImportService" alias="queuingHDGraphVersionImportService"/>
+
+</beans>

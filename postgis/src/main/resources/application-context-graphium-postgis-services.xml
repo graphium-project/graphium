@@ -28,7 +28,7 @@
     	<property name="validityPeriodValidator" ref="graphVersionValidityPeriodValidator"/>
     </bean>
  
-     <bean id="postgisQueuingGraphVersionImportService" parent="defaultQueuingGraphVersionImportService"
+    <bean id="postgisQueuingGraphVersionImportService" parent="defaultQueuingGraphVersionImportService"
      	class="at.srfg.graphium.postgis.service.impl.PostgisQueuingGraphVersionImportServiceImpl" >
      	<property name="importDao" ref="wayGraphImportDao"/>
     </bean>

@@ -1,8 +1,8 @@
-version: '3.8'
+version: '3'
 
 services:
   graphium:
-    image: graphiumproject/graphium
+    build: .
     container_name: graphium-server
     environment:
       - "db.url=jdbc:postgresql://database:5432/graphium"
@@ -15,7 +15,7 @@ services:
     depends_on:
       - database
   database:
-    image: "mdillon/postgis:11"
+    image: "postgis/postgis:12-3.1-alpine"
     container_name: graphium-database
     environment:
       - "POSTGRES_USER=graphium"

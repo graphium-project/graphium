@@ -53,13 +53,13 @@ import at.srfg.graphium.postgis.persistence.rowmapper.RowMapperUtils;
  * @author mwimmer
  *
  */
-public class WaySegmentResultSetExtractor<S extends IBaseSegment> implements ISegmentResultSetExtractor<S, ISegmentXInfo> {
+public class WaySegmentResultSetExtractor<S extends IBaseSegment, W extends IWaySegment> implements ISegmentResultSetExtractor<S, ISegmentXInfo> {
 
 	private static Logger log = LoggerFactory.getLogger(WaySegmentResultSetExtractor.class);
 
-	private static final String ARRAYVALUESEP = ",";
-	private static final String QUERY_PREFIX = "wayseg";
-	private static final String ATTRIBUTES = "id, " +	// ID erhält kein Prefix, darf nur für Segment-Table gelten, erleichtert Suche nach ID in DAO
+	protected static final String ARRAYVALUESEP = ",";
+	protected static final String QUERY_PREFIX = "wayseg";
+	protected static final String ATTRIBUTES = "id, " +	// ID erhält kein Prefix, darf nur für Segment-Table gelten, erleichtert Suche nach ID in DAO
 											"ST_AsEWKB(geometry) AS " + QUERY_PREFIX + "_geometry, " +
 											"length AS " + QUERY_PREFIX + "_length," + 
 											"name AS " + QUERY_PREFIX + "_name, " +
@@ -85,9 +85,9 @@ public class WaySegmentResultSetExtractor<S extends IBaseSegment> implements ISe
 											"timestamp AS " + QUERY_PREFIX + "_timestamp, " +
 											"tags AS " + QUERY_PREFIX + "_tags ";
 	
-	private JtsBinaryParser bp = new JtsBinaryParser();
+	protected JtsBinaryParser bp = new JtsBinaryParser();
 	@Autowired(required=false)
-	private List<ISegmentXInfoRowMapper> rowMappers;
+	protected List<ISegmentXInfoRowMapper> rowMappers;
 	
 	/**
 	 * WaySegmentResultSetExtractor ist immer Root-Extractor, d.h. er ist immer für das Mapping eines Segments verantwortlich und delegiert ggf. an
@@ -184,7 +184,7 @@ public class WaySegmentResultSetExtractor<S extends IBaseSegment> implements ISe
 		
 		if (createfullWaySegment) {
 		
-			IWaySegment waySegment = new WaySegment();
+			W waySegment = createSegment();
 			waySegment.setId(segmentId);
 
 			mapSegment(waySegment, rs);
@@ -204,12 +204,16 @@ public class WaySegmentResultSetExtractor<S extends IBaseSegment> implements ISe
 		return segment;
 	}
 
+	protected W createSegment() {
+		return (W) new WaySegment();
+	}
+
 	/**
 	 * @param waySegment
 	 * @param rs
 	 * @throws SQLException 
 	 */
-	private void mapSegment(IWaySegment waySegment, ResultSet rs) throws SQLException {
+	protected void mapSegment(W waySegment, ResultSet rs) throws SQLException {
 		// TODO: graphId is missing - do we need it?
 
 		ColumnFinder colFinder = new ColumnFinder(rs);
@@ -323,7 +327,10 @@ public class WaySegmentResultSetExtractor<S extends IBaseSegment> implements ISe
 		stripedSerializedCon = stripedSerializedCon.replace("\"", ""); //100000833,960301,101021339,{15,4,22,2,9,19,11,13,12,1,10,3,24
 		String[] splitCons = stripedSerializedCon.split("\\{"); //[100000833,960301,101021339,, 15,4,22,2,9,19,11,13,12,1,10,3,24]
 		String[] tokens = splitCons[0].split(ARRAYVALUESEP);
-		String[] accessTypeIdsArray = splitCons[1].split(ARRAYVALUESEP); //[15, 4, 22, 2, 9, 19, 11, 13, 12, 1, 10, 3, 24] 
+		String[] accessTypeIdsArray = new String[]{};
+		if (splitCons.length > 1) {
+			accessTypeIdsArray = splitCons[1].split(ARRAYVALUESEP); //[15, 4, 22, 2, 9, 19, 11, 13, 12, 1, 10, 3, 24]
+		}
 
 //		String s1 = StringUtils.removePattern(stripedSerializedCon, "\\\"\\{[0-9,]*\\}\\\"");
 		int[] accessTypeIds = new int[accessTypeIdsArray.length];
@@ -381,5 +388,10 @@ public class WaySegmentResultSetExtractor<S extends IBaseSegment> implements ISe
 		if (!found) {
 			rowMappers.add(rowMapper);
 		}
+	}
+
+	@Override
+	public String getGeometryManipulationClause() {
+		return ", st_asewkb(wayseg_geometry) AS wayseg_geometry_ewkb";
 	}
 }

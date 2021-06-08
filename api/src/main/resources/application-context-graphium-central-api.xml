@@ -44,8 +44,7 @@
 		<property name="notificationUrl" value="${graphium.server.notification.urlpart}"/>
 		<property name="serverName" value="${graphium.server.name}"/>
 		<property name="restTemplate" ref="notificationRestTemplate"/>
-		<!-- <property name="servletContext" ref=""/> -->
-
+		<property name="metadataDao" ref="wayGraphVersionMetadataDao"/>
 		<property name="subscriptionDao" ref="subscriptionDao"/>
 		<property name="graphImportStateDao" ref="graphImportStateDao"/>
 	</bean>

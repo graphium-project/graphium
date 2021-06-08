@@ -13,12 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/**
- * (C) 2016 Salzburg Research Forschungsgesellschaft m.b.H.
- *
- * All rights reserved.
- *
- */
 package at.srfg.graphium.postgis.persistence;
 
 import java.util.List;
@@ -33,7 +27,7 @@ import at.srfg.graphium.model.ISegmentXInfo;
  * All implementations can use RowMappers to map extended information tables.
  * Those RowMappers will be provided by an SegmentXInfoRowMapperFactory.
  * 
- * @author User
+ * @author mwimmer
  */
 public interface ISegmentResultSetExtractor<S extends IBaseSegment, X extends ISegmentXInfo> 
 		extends ResultSetExtractor<S>, ISegmentMapper {
@@ -43,4 +37,7 @@ public interface ISegmentResultSetExtractor<S extends IBaseSegment, X extends IS
 	public void setRowMappers(List<ISegmentXInfoRowMapper> rowMappers);
 	
 	public void addRowMapper(ISegmentXInfoRowMapper rowMapper);
+	
+	public String getGeometryManipulationClause();
+	
 }
