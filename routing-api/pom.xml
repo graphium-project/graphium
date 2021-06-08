@@ -9,20 +9,20 @@
 	<parent>
 		<groupId>at.srfg.graphium</groupId>
 		<artifactId>graphium-parent</artifactId>
-		<version>v1.1.1</version>
+		<version>v1.1.2-SNAPSHOT</version>
 	</parent>
 
 	<dependencies>
 		<dependency>
 			<groupId>at.srfg.graphium</groupId>
 			<artifactId>graphium-io</artifactId>
-			<version>v1.1.1</version>
+			<version>v1.1.2-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
 			<groupId>at.srfg.graphium</groupId>
 			<artifactId>graphium-routing</artifactId>
-			<version>v1.1.1</version>
+			<version>v1.1.2-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
