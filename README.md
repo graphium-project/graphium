@@ -191,6 +191,7 @@ Look at the tutorial package.
 - Jackson-annotations, Apache License, Version 2.0 (http://github.com/FasterXML/jackson)
 - Jackson-core, Apache License, Version 2.0 (https://github.com/FasterXML/jackson-core)
 - jackson-databind, Apache License, Version 2.0 (http://github.com/FasterXML/jackson)
+- Jackson datatype: JSR310, Apache License, Version 2.0 (http://wiki.fasterxml.com/JacksonModuleJSR310)
 - JTS Topology Suite, LGPL (http://sourceforge.net/projects/jts-topo-suite)
 - Apache Commons Codec, Apache License, Version 2.0 (http://commons.apache.org/proper/commons-codec/)
 - JUnit, Eclipse Public License 1.0 (http://junit.org)
