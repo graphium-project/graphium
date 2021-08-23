@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>at.srfg.graphium</groupId>
 	<artifactId>graphium-parent</artifactId>
-	<version>1.1.1-SNAPSHOT</version>
+	<version>1.2.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>graphium-builder</name>
@@ -121,7 +121,7 @@
 	</build>
 
 	<properties>
-		<graphium.version>1.1.1-SNAPSHOT</graphium.version>
+		<graphium.version>1.2.0-SNAPSHOT</graphium.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<slf4j-log4j12.version>1.7.21</slf4j-log4j12.version>
 		<junit.version>4.12</junit.version>
@@ -193,13 +193,15 @@
 		<module>model</module>
 		<module>postgis</module>
 		<module>utils</module>
-		<module>routing</module>
-		<module>routing-api</module>
-		<module>converters/converter-commons</module>
 		<module>converters/idf2graphium</module>
 		<module>converters/osm2graphium</module>
 		<module>tutorial/model_extension</module>
 		<module>tutorial/central_server</module>
+		<module>graphium-hd</module>
+		<module>converters/lanelet2graphium</module>
+		<module>routing</module>
+		<module>routing-api</module>
+		<module>converters/converter-commons</module>
 	</modules>
 
 	<reporting>

@@ -32,7 +32,11 @@ public class WaySegment2SegmentDTOAdapter<O extends IWaySegmentDTO, I extends IW
 	public WaySegment2SegmentDTOAdapter() {
 		super(WaySegment.class, WaySegmentDTOImpl.class);
 	}
-	
+
+	public WaySegment2SegmentDTOAdapter(Class<? extends IWaySegment> modelClass, Class<? extends IWaySegmentDTO> dtoClass) {
+		super(modelClass, dtoClass);
+	}
+
 	@Override
 	public O adapt(I segment) {
 		O segmentDTO = (O) new WaySegmentDTOImpl();

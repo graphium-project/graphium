@@ -15,7 +15,6 @@
  */
 package at.srfg.graphium.model.impl;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -141,18 +140,6 @@ public class WayGraphModelFactory extends
 				frc, formOfWay, streetType, wayId, startNodeId, startNodeIndex,
 				endNodeId, endNodeIndex, accessTow, accessBkw, tunnel, bridge,
 				urban, timestamp, adaptConns(startNodeCons, endNodeCons), tags, xInfo);
-	}
-
-	private List<IWaySegmentConnection> adaptConns(List<IWaySegmentConnection> startNodeCons,
-								  				   List<IWaySegmentConnection> endNodeCons) {
-		List<IWaySegmentConnection> conns = new ArrayList<>();
-		if (startNodeCons != null) {
-			conns.addAll(startNodeCons);
-		}
-		if (endNodeCons != null) {
-			conns.addAll(endNodeCons);
-		}
-		return conns;
 	}
 
 }

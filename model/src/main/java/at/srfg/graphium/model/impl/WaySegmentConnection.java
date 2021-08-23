@@ -35,6 +35,7 @@ public class WaySegmentConnection implements IWaySegmentConnection, Serializable
 	protected long toSegmentId;
 	protected Set<Access> access;
 	protected Map<String, List<IConnectionXInfo>> xInfo;
+	protected Map<String, String> tags;
 	
 	public WaySegmentConnection() {}
 	
@@ -55,6 +56,17 @@ public class WaySegmentConnection implements IWaySegmentConnection, Serializable
 		this.toSegmentId = toSegmentId;
 		this.access = access;
 		this.xInfo = xInfo;
+	}
+
+	public WaySegmentConnection(long nodeId, long fromSegmentId, long toSegmentId, Set<Access> access,
+			Map<String, List<IConnectionXInfo>> xInfo, Map<String, String> tags) {
+		super();
+		this.nodeId = nodeId;
+		this.fromSegmentId = fromSegmentId;
+		this.toSegmentId = toSegmentId;
+		this.access = access;
+		this.xInfo = xInfo;
+		this.tags = tags;
 	}
 
 	@Override
@@ -184,6 +196,24 @@ public class WaySegmentConnection implements IWaySegmentConnection, Serializable
 				this.xInfo.get(type).add(extInfo);
 			}
 		}
+	}
+
+	@Override
+	public Map<String, String> getTags() {
+		return tags;
+	}
+
+	@Override
+	public void addTag(String key, String value) {
+		if (tags == null) {
+			tags = new HashMap<>();
+		}
+		tags.put(key, value);
+	}
+	
+	@Override
+	public void setTags(Map<String, String> tags) {
+		this.tags = tags;
 	}
 
 }

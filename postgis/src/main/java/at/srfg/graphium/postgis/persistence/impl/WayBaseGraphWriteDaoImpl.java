@@ -66,9 +66,18 @@ public class WayBaseGraphWriteDaoImpl<W extends IBaseWaySegment>
 	protected IXInfoDaoRegistry<ISegmentXInfo,IConnectionXInfo> xInfoDaoRegistry;
 	protected IWayGraphVersionMetadataDao metadataDao;
 	
+	protected String segmentTablePrefix = null;
+	protected String connectionTablePrefix = null;
+	protected String parentSegmentTableName = null;
+	protected String parentConnectionTableName = null;
+	
 	@PostConstruct
 	public void setup() {
 		wktWriter = new WKTWriter();
+		segmentTablePrefix = SEGMENT_TABLE_PREFIX;
+		connectionTablePrefix = CONNECTION_TABLE_PREFIX;
+		parentSegmentTableName = PARENT_SEGMENT_TABLE_NAME;
+		parentConnectionTableName = PARENT_CONNECTION_TABLE_NAME;
 	}
 	
 	@Override
@@ -83,13 +92,23 @@ public class WayBaseGraphWriteDaoImpl<W extends IBaseWaySegment>
 			}
 		}
 
-		getJdbcTemplate().execute("CREATE TABLE " + schema + SEGMENT_TABLE_PREFIX + graphVersionName + 
-			" (CONSTRAINT " + SEGMENT_TABLE_PREFIX + graphVersionName + "_pk PRIMARY KEY (id)) INHERITS (" +
-				schema + PARENT_SEGMENT_TABLE_NAME + ") WITH (OIDS=FALSE)");
+		createSegmentsTable(graphVersionName);
+		
+		createConnectionsTable(graphVersionName);
 
-		getJdbcTemplate().execute("CREATE TABLE " + schema + CONNECTION_TABLE_PREFIX + graphVersionName + 
-			" () INHERITS (" +	schema + PARENT_CONNECTION_TABLE_NAME + ") WITH (OIDS=FALSE)");
-}
+	}
+	
+	protected void createConnectionsTable(String graphVersionName) {
+		getJdbcTemplate().execute("CREATE TABLE " + schema + connectionTablePrefix + graphVersionName + 
+				" () INHERITS (" +	schema + parentConnectionTableName + ") WITH (OIDS=FALSE)");
+
+	}
+
+	protected void createSegmentsTable(String graphVersionName) {
+		getJdbcTemplate().execute("CREATE TABLE " + schema + segmentTablePrefix + graphVersionName + 
+			" (CONSTRAINT " + segmentTablePrefix + graphVersionName + "_pk PRIMARY KEY (id)) INHERITS (" +
+				schema + parentSegmentTableName + ") WITH (OIDS=FALSE)");
+	}
 
 	@Override
 	public void createGraphVersion(String graphName, String version,  boolean overrideGraphIfExsists,
@@ -99,14 +118,14 @@ public class WayBaseGraphWriteDaoImpl<W extends IBaseWaySegment>
 		createGraph(graphName, version, overrideGraphIfExsists);
 		
 		if (createConnectionConstraint) {
-			getJdbcTemplate().execute("ALTER TABLE " + schema + CONNECTION_TABLE_PREFIX + graphVersionName + 
-				" ADD CONSTRAINT " + CONNECTION_TABLE_PREFIX + graphVersionName + "_pk PRIMARY KEY" +
+			getJdbcTemplate().execute("ALTER TABLE " + schema + connectionTablePrefix + graphVersionName + 
+				" ADD CONSTRAINT " + connectionTablePrefix + graphVersionName + "_pk PRIMARY KEY" +
 				" (node_id, from_segment_id, to_segment_id)," +
-				" ADD CONSTRAINT " + CONNECTION_TABLE_PREFIX + graphVersionName + "_from_segment_id_fk FOREIGN KEY (from_segment_id)" +
-				" REFERENCES " + schema + SEGMENT_TABLE_PREFIX + graphVersionName + " (id) MATCH SIMPLE" +
+				" ADD CONSTRAINT " + connectionTablePrefix + graphVersionName + "_from_segment_id_fk FOREIGN KEY (from_segment_id)" +
+				" REFERENCES " + schema + segmentTablePrefix + graphVersionName + " (id) MATCH SIMPLE" +
 				" ON UPDATE NO ACTION ON DELETE NO ACTION, " +
-				" ADD CONSTRAINT " + CONNECTION_TABLE_PREFIX + graphVersionName + "_to_segment_id_fk FOREIGN KEY (to_segment_id)" +
-				" REFERENCES " + schema + SEGMENT_TABLE_PREFIX + graphVersionName + " (id) MATCH SIMPLE" +
+				" ADD CONSTRAINT " + connectionTablePrefix + graphVersionName + "_to_segment_id_fk FOREIGN KEY (to_segment_id)" +
+				" REFERENCES " + schema + segmentTablePrefix + graphVersionName + " (id) MATCH SIMPLE" +
 				" ON UPDATE NO ACTION ON DELETE NO ACTION");
 		}
 	}
@@ -120,17 +139,17 @@ public class WayBaseGraphWriteDaoImpl<W extends IBaseWaySegment>
 		IWayGraphVersionMetadata metadata = metadataDao.getWayGraphVersionMetadata(graphName, version);
 		int graphVersionId = (int) metadata.getId();
 		
-		getJdbcTemplate().execute("ALTER TABLE " + schema + SEGMENT_TABLE_PREFIX + graphVersionName + 
-				" ADD CONSTRAINT " + SEGMENT_TABLE_PREFIX + graphVersionName + "_id_check CHECK (graphversion_id = " + graphVersionId + ")");
+		getJdbcTemplate().execute("ALTER TABLE " + schema + segmentTablePrefix + graphVersionName + 
+				" ADD CONSTRAINT " + segmentTablePrefix + graphVersionName + "_id_check CHECK (graphversion_id = " + graphVersionId + ")");
 		
-		getJdbcTemplate().execute("ALTER TABLE " + schema + CONNECTION_TABLE_PREFIX + graphVersionName + 
-				" ADD CONSTRAINT " + CONNECTION_TABLE_PREFIX + graphVersionName + "_id_check CHECK (graphversion_id = " + graphVersionId + ")");
+		getJdbcTemplate().execute("ALTER TABLE " + schema + connectionTablePrefix + graphVersionName + 
+				" ADD CONSTRAINT " + connectionTablePrefix + graphVersionName + "_id_check CHECK (graphversion_id = " + graphVersionId + ")");
 		
 	}
 
 	protected boolean checkIfSegmentTableExists(String graphVersionName)
 	{
-		String segmentTableName = SEGMENT_TABLE_PREFIX + graphVersionName;
+		String segmentTableName = segmentTablePrefix + graphVersionName;
 		String query = "SELECT count(1) FROM pg_tables WHERE tablename = '" + segmentTableName + "'";
 		return getJdbcTemplate().queryForObject(query, Integer.class) > 0;
 	}
@@ -142,14 +161,14 @@ public class WayBaseGraphWriteDaoImpl<W extends IBaseWaySegment>
 			throw new GraphNotExistsException("Could not add connection constraints to non existing graph " + graphVersionName, graphVersionName);
 		}
 		
-		getJdbcTemplate().execute("ALTER TABLE " + schema + CONNECTION_TABLE_PREFIX + graphVersionName + 
-				" ADD CONSTRAINT " + CONNECTION_TABLE_PREFIX + graphVersionName + "_pk PRIMARY KEY" +
+		getJdbcTemplate().execute("ALTER TABLE " + schema + connectionTablePrefix + graphVersionName + 
+				" ADD CONSTRAINT " + connectionTablePrefix + graphVersionName + "_pk PRIMARY KEY" +
 				" (node_id, from_segment_id, to_segment_id)," +
-				" ADD CONSTRAINT " + CONNECTION_TABLE_PREFIX + graphVersionName + "_from_segment_id_fk FOREIGN KEY (from_segment_id)" +
-				" REFERENCES " + schema + SEGMENT_TABLE_PREFIX + graphVersionName + " (id) MATCH SIMPLE" +
+				" ADD CONSTRAINT " + connectionTablePrefix + graphVersionName + "_from_segment_id_fk FOREIGN KEY (from_segment_id)" +
+				" REFERENCES " + schema + segmentTablePrefix + graphVersionName + " (id) MATCH SIMPLE" +
 				" ON UPDATE NO ACTION ON DELETE NO ACTION, " +
-				" ADD CONSTRAINT " + CONNECTION_TABLE_PREFIX + graphVersionName + "_to_segment_id_fk FOREIGN KEY (to_segment_id)" +
-				" REFERENCES " + schema + SEGMENT_TABLE_PREFIX + graphVersionName + " (id) MATCH SIMPLE" +
+				" ADD CONSTRAINT " + connectionTablePrefix + graphVersionName + "_to_segment_id_fk FOREIGN KEY (to_segment_id)" +
+				" REFERENCES " + schema + segmentTablePrefix + graphVersionName + " (id) MATCH SIMPLE" +
 				" ON UPDATE NO ACTION ON DELETE NO ACTION");
 	}
 
@@ -220,14 +239,14 @@ public class WayBaseGraphWriteDaoImpl<W extends IBaseWaySegment>
 	}
 	
 	protected String getInsertStatement(String graphVersionName) {
-		return "INSERT INTO "+ schema + SEGMENT_TABLE_PREFIX + graphVersionName + " (id, graphversion_id, geometry, length, name, streettype, way_id, " +
+		return "INSERT INTO "+ schema + segmentTablePrefix + graphVersionName + " (id, graphversion_id, geometry, length, name, streettype, way_id, " +
 				"startnode_id, startnode_index, endnode_id, endnode_index, timestamp, tags)" +
 		  	" VALUES (:id, :graphVersionId, ST_GeomFromEWKT(:geometry), :length, " +
 				" :name, :streetType, :wayId, :startNodeId, :startNodeIndex, :endNodeId, :endNodeIndex, :timestamp, :tags)";
 	}
 	
 	protected String getUpdateStatement(String graphVersionName) {
-		return "UPDATE "+ schema + SEGMENT_TABLE_PREFIX + graphVersionName + " SET geometry=ST_GeomFromEWKT(:geometry), "
+		return "UPDATE "+ schema + segmentTablePrefix + graphVersionName + " SET geometry=ST_GeomFromEWKT(:geometry), "
 				+ "length=:length, name=:name, streettype=:streetType, way_id=:wayId, startnode_id=:startNodeId, "
 				+ "startnode_index=:startNodeIndex, endnode_id=endNodeId, endnode_index=endNodeIndex, " +
 	 		" timestamp=:timestamp, tags=:tags" +
@@ -401,9 +420,9 @@ public class WayBaseGraphWriteDaoImpl<W extends IBaseWaySegment>
 		int graphVersionId = (int) metadata.getId();
 
 		int[] updateCounts = getJdbcTemplate().batchUpdate(
-				 "INSERT INTO "+ schema + CONNECTION_TABLE_PREFIX + graphVersionName + 
-				 " (node_id, from_segment_id, to_segment_id, access, graphversion_id)" +
-				 " VALUES (?,?,?,?,?)",
+				 "INSERT INTO "+ schema + connectionTablePrefix + graphVersionName + 
+				 " (node_id, from_segment_id, to_segment_id, access, graphversion_id, tags)" +
+				 " VALUES (?,?,?,?,?,?)",
 	             new BatchPreparedStatementSetter() {
 					 IWaySegmentConnection conn;
 	                 public void setValues(PreparedStatement ps, int i) throws SQLException {
@@ -414,6 +433,7 @@ public class WayBaseGraphWriteDaoImpl<W extends IBaseWaySegment>
 	                	 ps.setLong(pos++, conn.getToSegmentId());
 	                	 ps.setArray(pos++, convertToArray(ps.getConnection(), conn.getAccess()));
 	                	 ps.setInt(pos++, graphVersionId);
+	                	 ps.setObject(pos++, conn.getTags());
 	                 }
 					public int getBatchSize() {
 	                     return connections.size();
@@ -442,16 +462,16 @@ public class WayBaseGraphWriteDaoImpl<W extends IBaseWaySegment>
 	public void createIndexes(String graphName, String version) {
 		String graphVersionName = GraphVersionHelper.createGraphVersionName(graphName, version);
 		getJdbcTemplate().execute("CREATE INDEX " + graphVersionName + "_geometry_idx" +
-				" ON " + schema + SEGMENT_TABLE_PREFIX + graphVersionName + " USING GIST (geometry)");
+				" ON " + schema + segmentTablePrefix + graphVersionName + " USING GIST (geometry)");
 
 		getJdbcTemplate().execute("CREATE INDEX " + graphVersionName + "_conns_from_segment_id_idx" +
-				" ON " + schema + CONNECTION_TABLE_PREFIX + graphVersionName + " USING btree (from_segment_id)");
+				" ON " + schema + connectionTablePrefix + graphVersionName + " USING btree (from_segment_id)");
 
 		getJdbcTemplate().execute("CREATE INDEX " + graphVersionName + "_conns_to_segment_id_idx" +
-				" ON " + schema + CONNECTION_TABLE_PREFIX + graphVersionName + " USING btree (to_segment_id)");
+				" ON " + schema + connectionTablePrefix + graphVersionName + " USING btree (to_segment_id)");
 
 		getJdbcTemplate().execute("CREATE INDEX " + graphVersionName + "_conns_node_id_idx" +
-				" ON " + schema + CONNECTION_TABLE_PREFIX + graphVersionName + " USING btree (node_id)");
+				" ON " + schema + connectionTablePrefix + graphVersionName + " USING btree (node_id)");
 	}
 
 	@Override
@@ -471,8 +491,8 @@ public class WayBaseGraphWriteDaoImpl<W extends IBaseWaySegment>
 	
 	protected void deleteSegmentTables(String graphName, String version) {
 		String graphVersionName = GraphVersionHelper.createGraphVersionName(graphName, version);
-		getJdbcTemplate().execute("DROP TABLE " + schema + SEGMENT_TABLE_PREFIX + graphVersionName + " CASCADE");
-		getJdbcTemplate().execute("DROP TABLE " + schema + CONNECTION_TABLE_PREFIX + graphVersionName);
+		getJdbcTemplate().execute("DROP TABLE " + schema + segmentTablePrefix + graphVersionName + " CASCADE");
+		getJdbcTemplate().execute("DROP TABLE " + schema + connectionTablePrefix + graphVersionName);
 	}
 
 	public IXInfoDaoRegistry<ISegmentXInfo,IConnectionXInfo> getxInfoDaoRegistry() {

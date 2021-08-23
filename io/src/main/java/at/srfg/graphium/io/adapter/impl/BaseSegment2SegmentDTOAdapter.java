@@ -98,8 +98,9 @@ public class BaseSegment2SegmentDTOAdapter<O extends IBaseSegmentDTO,I extends I
         if (conn instanceof ISegmentConnectionDTO) {
             accessSet = ((ISegmentConnectionDTO) conn).getAccess();
         }
-        return new WaySegmentConnection(conn.getNodeId(),fromSegmentId,conn.getToSegmentId(),accessSet,connectionXInfos);
-    }
+		return new WaySegmentConnection(conn.getNodeId(), fromSegmentId, conn.getToSegmentId(), accessSet,
+				connectionXInfos, conn.getTags());
+	}
 
     /**
 	 * @param conn
@@ -112,7 +113,7 @@ public class BaseSegment2SegmentDTOAdapter<O extends IBaseSegmentDTO,I extends I
         } catch (XInfoNotSupportedException e) {
             log.error("adaption of connection's xinfo failed", e);
         }
-        return new BaseSegmentConnectionDTO(conn.getNodeId(), conn.getToSegmentId(), connectionXInfoDTOMap);
+        return new BaseSegmentConnectionDTO(conn.getNodeId(), conn.getToSegmentId(), connectionXInfoDTOMap, conn.getTags());
     }
 
     /**

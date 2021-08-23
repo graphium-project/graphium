@@ -25,6 +25,9 @@
 
 	<!-- configure as central server -->
 	<import resource="classpath:/application-context-graphium-central-server-api.xml" />
+
+	<!-- add graphiumHD -->
+	<import resource="classpath:/application-context-graphium-hd.xml" />
     
 	<!-- configure as satellite server -->
 	<!-- adapt also server.properties! -->
