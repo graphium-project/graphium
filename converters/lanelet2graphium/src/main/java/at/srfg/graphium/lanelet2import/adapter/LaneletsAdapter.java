@@ -382,7 +382,11 @@ public class LaneletsAdapter {
 		SimpleEntry<String, String> typeEntry = LaneletHelper.parseLaneletBorderType(leftBorder);
 		String laneChangePossible = "false";
 		if (typeEntry != null) {
-			segment.getTags().put("left:" + typeEntry.getKey(), typeEntry.getValue());
+			if (typeEntry.getValue() != null) {
+				segment.getTags().put("left", typeEntry.getKey() + ":" + typeEntry.getValue());
+			} else {
+				segment.getTags().put("left", typeEntry.getKey());
+			}
 			laneChangePossible = determineLaneChange(true, !borderDirections[0], typeEntry.getKey(),
 					typeEntry.getValue());
 		}
@@ -396,7 +400,11 @@ public class LaneletsAdapter {
 		typeEntry = LaneletHelper.parseLaneletBorderType(rightBorder);
 		laneChangePossible = "false";
 		if (typeEntry != null) {
-			segment.getTags().put("right:" + typeEntry.getKey(), typeEntry.getValue());
+			if (typeEntry.getValue() != null) {
+				segment.getTags().put("right", typeEntry.getKey() + ":" + typeEntry.getValue());
+			} else {
+				segment.getTags().put("right", typeEntry.getKey());
+			}
 			laneChangePossible = determineLaneChange(false, !borderDirections[1], typeEntry.getKey(),
 					typeEntry.getValue());
 		}
