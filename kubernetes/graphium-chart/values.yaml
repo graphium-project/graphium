@@ -72,3 +72,8 @@ database:
   postgresPassword: graphium
   postgresDb: graphium
   volumeSize: 1Gi
+  # configurations for persistent volume if required
+  #persistentVolume:
+  #  storageClass: ""
+  #  annotations: {}
+  #  subPath: database

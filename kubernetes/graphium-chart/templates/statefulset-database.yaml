@@ -48,14 +48,30 @@ spec:
           volumeMounts:
             - name: pgdata
               mountPath: /var/lib/postgresql/data
+            {{- if .Values.database.persistentVolume.subPath }}
+              subPath: {{ .Values.database.persistentVolume.subPath }}
+            {{- end }}
             - name: postgis-init
               mountPath: "/docker-entrypoint-initdb.d/"
   volumeClaimTemplates:
     - metadata:
         name: pgdata
+      {{- with .Values.database.persistentVolume.annotations }}
+        annotations:
+        {{- range $key, $value := . }}
+          {{ $key }}: {{ $value }}
+        {{- end }}
+      {{- end }}
       spec:
         accessModes: [ "ReadWriteOnce" ]
         resources:
           requests:
             storage: {{ .Values.database.volumeSize }}
+      {{- if .Values.database.persistentVolume.storageClass }}
+      {{- if (eq "-" .Values.database.persistentVolume.storageClass) }}
+        storageClassName: ""
+      {{- else }}
+        storageClassName: "{{ .Values.database.persistentVolume.storageClass }}"
+      {{- end }}
+      {{- end }}
   {{- end }}
