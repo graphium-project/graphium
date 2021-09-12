@@ -1,0 +1,79 @@
+image:
+  repository: graphiumproject/graphium
+  pullPolicy: IfNotPresent
+  tag: "v1.1.0"
+
+imagePullSecrets: [ ]
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: { }
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: { }
+
+podSecurityContext: { }
+# fsGroup: 2000
+
+securityContext: { }
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+# runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: false
+  annotations: { }
+    # kubernetes.io/ingress.class: nginx
+  # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: graphium-chart.local
+      paths: [ ]
+  tls: [ ]
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: { }
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+#   memory: 128Mi
+
+nodeSelector: { }
+
+tolerations: [ ]
+
+affinity: { }
+
+graphiumCentral:
+  dbUrl: "jdbc:postgresql://database:5432/graphium"
+  dbUsername: "graphium"
+  dbPassword: "graphium"
+
+database:
+  enabled: true
+  image: mdillon/postgis:11
+  postgresUser: graphium
+  postgresPassword: graphium
+  postgresDb: graphium
+  volumeSize: 1Gi
+  # configurations for persistent volume if required
+  #persistentVolume:
+  #  storageClass: ""
+  #  annotations: {}
+  #  subPath: database
