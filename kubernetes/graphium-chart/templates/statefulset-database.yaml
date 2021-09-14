@@ -1,0 +1,77 @@
+{{- if .Values.database.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-database
+  labels:
+    app: {{ .Release.Name }}-database
+spec:
+  ports:
+    - name: postgis
+      protocol: TCP
+      port: 5432
+  selector:
+    app: {{ .Release.Name }}-database
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Release.Name }}-database
+spec:
+  serviceName: {{ .Release.Name }}-database
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-database
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-database
+    spec:
+      volumes:
+        - name: postgis-init
+          configMap:
+            name: {{ .Release.Name }}-postgis-init
+      containers:
+        - name: {{ .Release.Name }}-database
+          image: {{ .Values.database.image }}
+          ports:
+            - containerPort: 5432
+              name: postgis
+          env:
+            - name: POSTGRES_USER
+              value: {{ .Values.database.postgresUser }}
+            - name: POSTGRES_PASSWORD
+              value: {{ .Values.database.postgresPassword }}
+            - name: POSTGRES_DB
+              value: {{ .Values.database.postgresDb }}
+          volumeMounts:
+            - name: pgdata
+              mountPath: /var/lib/postgresql/data
+            {{- if .Values.database.persistentVolume.subPath }}
+              subPath: {{ .Values.database.persistentVolume.subPath }}
+            {{- end }}
+            - name: postgis-init
+              mountPath: "/docker-entrypoint-initdb.d/"
+  volumeClaimTemplates:
+    - metadata:
+        name: pgdata
+      {{- with .Values.database.persistentVolume.annotations }}
+        annotations:
+        {{- range $key, $value := . }}
+          {{ $key }}: {{ $value }}
+        {{- end }}
+      {{- end }}
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: {{ .Values.database.volumeSize }}
+      {{- if .Values.database.persistentVolume.storageClass }}
+      {{- if (eq "-" .Values.database.persistentVolume.storageClass) }}
+        storageClassName: ""
+      {{- else }}
+        storageClassName: "{{ .Values.database.persistentVolume.storageClass }}"
+      {{- end }}
+      {{- end }}
+  {{- end }}

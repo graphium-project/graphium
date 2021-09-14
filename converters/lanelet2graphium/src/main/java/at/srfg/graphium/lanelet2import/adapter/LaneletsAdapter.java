@@ -203,14 +203,13 @@ public class LaneletsAdapter {
 			break;
 
 		case "highway":
+			segment.setFrc(FuncRoadClass.MOTORWAY_FREEWAY_OR_OTHER_MAJOR_MOTORWAY);
 			if (location.equals(Constants.URBAN)) {
-				segment.setFrc(FuncRoadClass.MOTORWAY_FREEWAY_OR_OTHER_MAJOR_MOTORWAY);
 				segment.setUrban(true);
 				// TODO: set default urban highway speed limit
 			} else {
-				segment.setFrc(FuncRoadClass.MOTORWAY_FREEWAY_OR_OTHER_MAJOR_MOTORWAY);
 				segment.setUrban(false);
-				// TODO: set default nonurban highway speed limit
+				// TODO: set default non-urban highway speed limit
 			}
 			accesses = allVehiclesAccesses();
 			segment.setFormOfWay(FormOfWay.PART_OF_MOTORWAY);
@@ -218,7 +217,7 @@ public class LaneletsAdapter {
 
 		case "play_street":
 			segment.setFrc(FuncRoadClass.SONSTIGE_STRASSEN);
-//			segment.setUrban(true);
+			segment.setUrban(true);
 			// TODO: set default play street speed limit
 			accesses = allVehiclesAccesses();
 			accesses.add(Access.BIKE);
@@ -235,14 +234,13 @@ public class LaneletsAdapter {
 			break;
 
 		case "bus_lane":
+			segment.setFrc(FuncRoadClass.LOCAL_ROAD_OF_HIGH_IMPORTANCE);
 			if (location.equals(Constants.URBAN)) {
-				segment.setFrc(FuncRoadClass.LOCAL_ROAD_OF_HIGH_IMPORTANCE);
 				segment.setUrban(true);
-				// TODO: set default city 1speed limit
+				// TODO: set default urban speed limit
 			} else {
-				segment.setFrc(FuncRoadClass.LOCAL_ROAD_OF_HIGH_IMPORTANCE);
 				segment.setUrban(false);
-				// TODO: set default nonurban speed limit
+				// TODO: set default non-urban speed limit
 			}
 			accesses = new HashSet<>();
 			accesses.add(Access.EMERGENCY_VEHICLE);
@@ -382,7 +380,11 @@ public class LaneletsAdapter {
 		SimpleEntry<String, String> typeEntry = LaneletHelper.parseLaneletBorderType(leftBorder);
 		String laneChangePossible = "false";
 		if (typeEntry != null) {
-			segment.getTags().put("left:" + typeEntry.getKey(), typeEntry.getValue());
+			if (typeEntry.getValue() != null) {
+				segment.getTags().put("left", typeEntry.getKey() + ":" + typeEntry.getValue());
+			} else {
+				segment.getTags().put("left", typeEntry.getKey());
+			}
 			laneChangePossible = determineLaneChange(true, !borderDirections[0], typeEntry.getKey(),
 					typeEntry.getValue());
 		}
@@ -396,7 +398,11 @@ public class LaneletsAdapter {
 		typeEntry = LaneletHelper.parseLaneletBorderType(rightBorder);
 		laneChangePossible = "false";
 		if (typeEntry != null) {
-			segment.getTags().put("right:" + typeEntry.getKey(), typeEntry.getValue());
+			if (typeEntry.getValue() != null) {
+				segment.getTags().put("right", typeEntry.getKey() + ":" + typeEntry.getValue());
+			} else {
+				segment.getTags().put("right", typeEntry.getKey());
+			}
 			laneChangePossible = determineLaneChange(false, !borderDirections[1], typeEntry.getKey(),
 					typeEntry.getValue());
 		}

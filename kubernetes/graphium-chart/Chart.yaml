@@ -1,0 +1,7 @@
+apiVersion: v2
+name: graphium
+description: Helm chart for Graphium on Kubernetes.
+
+type: application
+version: 0.1.2
+appVersion: 1.1.0
