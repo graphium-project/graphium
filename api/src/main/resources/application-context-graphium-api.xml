@@ -32,7 +32,8 @@
 	<bean id="multipartResolver"
         class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
         <!-- max upload size in bytes -->
-        <property name="maxUploadSize" value="4294967296" /> <!-- 4GB -->         
+        <!--<property name="maxUploadSize" value="4294967296" /> --> <!-- 4GB -->
+        <property name="maxUploadSize" value="5368709120" /> <!-- 5GB -->
         <!-- max size of file in memory (in bytes) -->
         <property name="maxInMemorySize" value="104857600" /> <!-- 100MB -->
     </bean>

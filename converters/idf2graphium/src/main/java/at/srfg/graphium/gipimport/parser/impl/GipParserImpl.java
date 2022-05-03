@@ -393,6 +393,9 @@ public class GipParserImpl<T extends IBaseSegment> implements IGipParser<T> {
 				waySeg.setLanesTow(link.getLanesTow());
 				waySeg.setLanesBkw(link.getLanesBkw());
 				waySeg.setFrc(FuncRoadClass.getFuncRoadClassForValue(link.getFuncRoadClassValue()));
+				if (waySeg.getFrc() == FuncRoadClass.NOT_APPLICABLE) {
+					log.warn("Found unknown FRC-Value: " + link.getFuncRoadClassValue() + " --> Check FuncRoadClass-Enum" );
+				}
 				waySeg.setFormOfWay(FormOfWay.getFormOfWayForValue(link.getFormOfWay()));
 				waySeg.setWayId(link.getEdgeId());
 				waySeg.setStartNodeId(link.getFromNodeId());

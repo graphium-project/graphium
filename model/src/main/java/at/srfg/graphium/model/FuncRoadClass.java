@@ -29,22 +29,31 @@ public enum FuncRoadClass {
 	SONSTIGE_STRASSEN ((short)8),
 	RAD_FUSSWEG ((short)10),
 	WIRTSCHAFTSWEG ((short)11),
-	FERNVERKEHRSGLEIS ((short)20),
+	SONSTIGER_WEG ((short)12),
+	BAHNTRASSE_HOCHRANGIG ((short)20),
+	BAHNTRASSE_NIEDERRANGIG((short)21),
+	BAHNTRASSE_ANSCHLUSSBAHN((short)22),
 	STRASSENBAHNGLEIS ((short)24),
-	U_BAHN_GLEIS ((short)25),
+	U_BAHN_TRASSE ((short)25),
 	FAEHRE ((short)31),
 	TREPPE ((short)45),
 	ROLLTREPPE ((short)46),
 	AUFZUG ((short)47),
 	RAMPE ((short)48),
+	BETRIEBSUMKEHR((short)98),
+	BETRIEBSWEG((short)99),
 	FUSSWEG_OHNE_ANZEIGE ((short)101),
 	FUSSWEGPASSAGE ((short)102),
 	SEILBAHN_UND_SONSTIGE ((short)103),
-	SONDERELEMENT ((short)104),
+	SONDERELEMENT ((short)104), //TODO: exisitert laut aktueller GIP nicht mehr
 	ALMAUFSCHLIESSUNGSWEG ((short)105),
 	FORSTAUFSCHLIESSUNGSWEG ((short)106),
-	HOFZUFAHRTEN ((short)107),
-	GUETERWEG((short)108);
+	GEBAEUDEZUFAHRTEN ((short)107),
+	GUETERWEG((short)108), //TODO: exisitert laut aktueller GIP nicht mehr
+	FRIEDHOFSWEG((short)115),
+	SINGLETRAIL((short)200),
+	SHARED_TRAIL((short)201),
+	WANDERWEG((short)300);
 	
 	private short value;
 	
