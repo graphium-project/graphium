@@ -15,6 +15,8 @@
  */
 package at.srfg.graphium.model;
 
+import org.apache.log4j.Logger;
+
 public enum FuncRoadClass {
 
 	NOT_APPLICABLE ((short)-1),
@@ -56,7 +58,8 @@ public enum FuncRoadClass {
 	WANDERWEG((short)300);
 	
 	private short value;
-	
+	private static Logger log = Logger.getLogger(FuncRoadClass.class);
+
 	FuncRoadClass (short value) {
 		this.value = value;
 	}
@@ -71,6 +74,7 @@ public enum FuncRoadClass {
 				return frc;
 			}
 		}
+		log.error("Found unknown FRC-value: " + value + " --> FRC-value is set to -1. Check FuncRoadClass-Enum" );
 		return NOT_APPLICABLE;
 	}
 	
