@@ -10,7 +10,7 @@
 	<parent>
 		<groupId>at.srfg.graphium</groupId>
 		<artifactId>graphium-parent</artifactId>
-		<version>1.2.0-SNAPSHOT</version>
+		<version>1.2.1-SNAPSHOT</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 
@@ -99,11 +99,11 @@
 			<version>3.0.3</version>
 		</dependency>
 
-		<dependency>
+		<!--  <dependency>
 			<groupId>at.srfg.graphium</groupId>
 			<artifactId>graphium-evis-location-references</artifactId>
 			<version>1.1.0</version>
-		</dependency>
+		</dependency>-->
 
 		<dependency>
 			<groupId>commons-cli</groupId>

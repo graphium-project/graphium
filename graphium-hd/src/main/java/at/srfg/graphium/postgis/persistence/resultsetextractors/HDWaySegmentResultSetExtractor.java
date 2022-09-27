@@ -17,12 +17,18 @@ package at.srfg.graphium.postgis.persistence.resultsetextractors;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.vividsolutions.jts.geom.LineString;
 
+import at.srfg.graphium.model.Access;
 import at.srfg.graphium.model.IBaseSegment;
+import at.srfg.graphium.model.IWaySegmentConnection;
 import at.srfg.graphium.model.hd.IHDWaySegment;
 import at.srfg.graphium.model.hd.impl.HDWaySegment;
+import at.srfg.graphium.model.impl.WaySegmentConnection;
 import at.srfg.graphium.postgis.persistence.rowmapper.ColumnFinder;
 
 /**
@@ -67,6 +73,10 @@ public class HDWaySegmentResultSetExtractor<S extends IBaseSegment, W extends IH
 		}
 	}
 
+	protected IWaySegmentConnection parseSerializedCon(String serializedCon) {
+		return HDResultSetExtractorUtils.parseSerializedCon(serializedCon);
+	}
+	
 	protected W createSegment() {
 		return (W) new HDWaySegment();
 	}

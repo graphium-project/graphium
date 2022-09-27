@@ -316,7 +316,7 @@ public class WaySegmentResultSetExtractor<S extends IBaseSegment, W extends IWay
 		return null;
 	}
 
-	private IWaySegmentConnection parseSerializedCon(String serializedCon) { // (100000833,960301,101021339,"{15,4,22,2,9,19,11,13,12,1,10,3}",24)
+	protected IWaySegmentConnection parseSerializedCon(String serializedCon) { // (100000833,960301,101021339,"{15,4,22,2,9,19,11,13,12,1,10,3}",24)
 		if (serializedCon == null) {
 			return null;
 		}
