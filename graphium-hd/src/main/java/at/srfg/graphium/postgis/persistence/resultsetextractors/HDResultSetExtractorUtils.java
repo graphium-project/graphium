@@ -1,10 +1,13 @@
 package at.srfg.graphium.postgis.persistence.resultsetextractors;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import at.srfg.graphium.model.Access;
 import at.srfg.graphium.model.IWaySegmentConnection;
@@ -12,6 +15,7 @@ import at.srfg.graphium.model.impl.WaySegmentConnection;
 
 public class HDResultSetExtractorUtils {
 
+	private static Logger log = LoggerFactory.getLogger(HDResultSetExtractorUtils.class);
 	protected static final String ARRAYVALUESEP = ",";
 	protected static final String TAGKVPSEP = "=>";
 	
@@ -25,22 +29,28 @@ public class HDResultSetExtractorUtils {
 		
 		String[] conAndTagSeperation = stripedSerializedCon.split("\"\"\"");
 
-//		String accessStringArray = StringUtils.substringBetween(conAndTagSeperation[0], "{", "}");
 		String[] tokens = conAndTagSeperation[0].split(ARRAYVALUESEP);
-//		String accessString = tokens[3];
+
 		String accessString = StringUtils.substringBetween(conAndTagSeperation[0], "{", "}");
 		accessString = accessString.replaceAll("\\{", "");
 		accessString = accessString.replaceAll("\\}", "");
 		
-		String[] accessTypeIdsArray = accessString.split(ARRAYVALUESEP);
-	
-		int[] accessTypeIds = new int[accessTypeIdsArray.length];
-		int i = 0;
-		for (String accessTypeId : accessTypeIdsArray) {
-			accessTypeIds[i++] = Integer.parseInt(accessTypeId);
+		Set<Access> accessTypesTow;
+		if(!accessString.isEmpty()) {
+			String[] accessTypeIdsArray = accessString.split(ARRAYVALUESEP);
+		
+			int[] accessTypeIds = new int[accessTypeIdsArray.length];
+			int i = 0;
+//			log.debug("string: {}, accessTypeIdsArray {}", serializedCon, accessTypeIdsArray);
+			for (String accessTypeId : accessTypeIdsArray) {
+				accessTypeIds[i++] = Integer.parseInt(accessTypeId);
+			}
+			accessTypesTow = Access.getAccessTypes(accessTypeIds);
 		}
-		Set<Access> accessTypesTow = Access.getAccessTypes(accessTypeIds);
-
+		else {
+			accessTypesTow = new HashSet<>();
+		}
+		
 		IWaySegmentConnection con = new WaySegmentConnection(
 				Long.parseLong(tokens[0]), 
 				Long.parseLong(tokens[1]),
@@ -69,38 +79,5 @@ public class HDResultSetExtractorUtils {
 		}
 		return con;
 	}
-	
-//	public static IWaySegmentConnection parseSerializedCon(String serializedCon) { // (100000833,960301,101021339,"{15,4,22,2,9,19,11,13,12,1,10,3}",24)
-//		if (serializedCon == null) {
-//			return null;
-//		}
-//		
-//		String stripedSerializedCon = StringUtils.removeStart(serializedCon, "(");
-//		stripedSerializedCon = StringUtils.removeEnd(stripedSerializedCon, ")");
-//		stripedSerializedCon = stripedSerializedCon.substring(0, stripedSerializedCon.indexOf("}")); // ignore everything after access types
-//		stripedSerializedCon = stripedSerializedCon.replace("\"", ""); //100000833,960301,101021339,{15,4,22,2,9,19,11,13,12,1,10,3,24
-//		String[] splitCons = stripedSerializedCon.split("\\{"); //[100000833,960301,101021339,, 15,4,22,2,9,19,11,13,12,1,10,3,24]
-//		String[] tokens = splitCons[0].split(ARRAYVALUESEP);
-//		String[] accessTypeIdsArray = new String[]{};
-//		if (splitCons.length > 1) {
-//			accessTypeIdsArray = splitCons[1].split(ARRAYVALUESEP); //[15, 4, 22, 2, 9, 19, 11, 13, 12, 1, 10, 3, 24]
-//		}
-//// TODO: add parsing of tags!
-////		{"(130,142,180,{1},2,\"\"\"connectionType\"\"=>\"\"connects\"\"\")","(130,142,182,{1},2,\"\"\"direction\"\"=>\"\"reverse\"\", \"\"connectionType\"\"=>\"\"connects\"\"\")","(130,142,184,{1},2,\"\"\"connectionType\"\"=>\"\"connects\"\"\")"}
-//		
-////		String s1 = StringUtils.removePattern(stripedSerializedCon, "\\\"\\{[0-9,]*\\}\\\"");
-//		int[] accessTypeIds = new int[accessTypeIdsArray.length];
-//		int i = 0;
-//		for (String accessTypeId : accessTypeIdsArray) {
-//			accessTypeIds[i++] = Integer.parseInt(accessTypeId);
-//		}
-//		Set<Access> accessTypesTow = Access.getAccessTypes(accessTypeIds);
-//
-//		return new WaySegmentConnection(
-//				Long.parseLong(tokens[0]), 
-//				Long.parseLong(tokens[1]),
-//				Long.parseLong(tokens[2]),
-//				accessTypesTow);	
-//	}
 	
 }
