@@ -19,11 +19,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import at.srfg.graphium.io.dto.IBaseSegmentDTO;
 import at.srfg.graphium.io.dto.ISegmentXInfoDTO;
 import at.srfg.graphium.model.IBaseSegment;
 import at.srfg.graphium.model.ISegmentXInfo;
-import javafx.util.Pair;
 
 /**
  * Created by shennebe on 10.02.2017.
@@ -36,9 +37,9 @@ public class SegmentXInfoToCSVConverterServiceImpl extends XInfoToCSVConverterSe
     }
 
     @Override
-    Map<Pair[], Map<String, List<ISegmentXInfoDTO>>> getXInfosFromSegmentDTO(IBaseSegmentDTO segmentDTO) {
-        Map<Pair[],Map<String,List<ISegmentXInfoDTO>>> resultMap = new HashMap<>();
-        resultMap.put(new Pair[]{new Pair<>("segmentId",segmentDTO.getId())},segmentDTO.getxInfo());
+    Map<Pair<String, Object>[], Map<String, List<ISegmentXInfoDTO>>> getXInfosFromSegmentDTO(IBaseSegmentDTO segmentDTO) {
+        Map<Pair<String, Object>[],Map<String,List<ISegmentXInfoDTO>>> resultMap = new HashMap<>();
+        resultMap.put(new Pair[]{Pair.of("segmentId",segmentDTO.getId())},segmentDTO.getxInfo());
         return resultMap;
     }
 }
