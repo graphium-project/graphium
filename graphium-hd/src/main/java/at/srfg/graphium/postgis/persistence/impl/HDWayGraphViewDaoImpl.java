@@ -85,6 +85,8 @@ public class HDWayGraphViewDaoImpl<W extends IHDWaySegment, X extends ISegmentXI
 				" FROM graphs.waysegment_connections con_end" +
 				" WHERE con_end.node_id = wayseg.endnode_id" +
 				"  AND con_end.from_segment_id = wayseg.id" +
+				// added connections without node (node_id = -1) by adding then "piggyback" to endnode connection array
+				" OR (con_end.node_id = -1 AND con_end.from_segment_id = wayseg.id)" +
 				" GROUP BY con_end.from_segment_id, con_end.graphversion_id" +
 				" ) AS endnodesegments" +
 				" ON endnodesegments.graphversion_id = wayseg.graphversion_id";

@@ -20,13 +20,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import at.srfg.graphium.io.dto.IBaseSegmentConnectionDTO;
 import at.srfg.graphium.io.dto.IBaseSegmentDTO;
 import at.srfg.graphium.io.dto.IConnectionXInfoDTO;
 import at.srfg.graphium.model.IBaseSegment;
 import at.srfg.graphium.model.IConnectionXInfo;
 import at.srfg.graphium.model.IWaySegmentConnection;
-import javafx.util.Pair;
 
 /**
  * Created by shennebe on 10.02.2017.
@@ -48,16 +49,16 @@ public class ConnectionXInfoToCSVConverterServiceImpl extends XInfoToCSVConverte
 
 
     @Override
-    Map<Pair[], Map<String, List<IConnectionXInfoDTO>>> getXInfosFromSegmentDTO(IBaseSegmentDTO segmentDTO) {
+    Map<Pair<String, Object>[], Map<String, List<IConnectionXInfoDTO>>> getXInfosFromSegmentDTO(IBaseSegmentDTO segmentDTO) {
         List<IBaseSegmentConnectionDTO> connectionDTOS = segmentDTO.getConnection();
-        Map<Pair[], Map<String, List<IConnectionXInfoDTO>>> resultMap = new HashMap<>();
+        Map<Pair<String, Object> [], Map<String, List<IConnectionXInfoDTO>>> resultMap = new HashMap<>();
         if (connectionDTOS != null && !connectionDTOS.isEmpty()) {
             for (IBaseSegmentConnectionDTO connectionDTO : connectionDTOS) {
                 Map<String,List<IConnectionXInfoDTO>> connectionXInfoMap = connectionDTO.getxInfo();
-                Pair[] additionalFields = new Pair[3];
-                additionalFields[0] = new Pair<>("node_id",connectionDTO.getNodeId());
-                additionalFields[1] = new Pair<>("from_segment",segmentDTO.getId());
-                additionalFields[2] = new Pair<>("to_segment",connectionDTO.getToSegmentId());
+                Pair<String, Object>[] additionalFields = new Pair[3];
+                additionalFields[0] =  Pair.of("node_id",connectionDTO.getNodeId());
+                additionalFields[1] = Pair.of("from_segment",segmentDTO.getId());
+                additionalFields[2] = Pair.of("to_segment",connectionDTO.getToSegmentId());
                 resultMap.put(additionalFields,connectionXInfoMap);
             }
         }

@@ -15,13 +15,14 @@
  */
 package at.srfg.graphium.io.converter;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import at.srfg.graphium.io.dto.IXInfoDTO;
-import javafx.util.Pair;
 
 
 public interface IXinfoDTOToCSVAdapter<T extends IXInfoDTO> {
 
-		String adapt(T xinfo, Pair... additionalFields);
+		String adapt(T xinfo, Pair<String, Object>... additionalFields);
 
-	 	String headers(T xInfo, Pair... additionalFieldNames);
+	 	String headers(T xInfo, Pair<String, Object>... additionalFieldNames);
 }

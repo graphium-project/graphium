@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +35,6 @@ import at.srfg.graphium.io.dto.IBaseSegmentDTO;
 import at.srfg.graphium.io.dto.IXInfoDTO;
 import at.srfg.graphium.model.IBaseSegment;
 import at.srfg.graphium.model.IXInfo;
-import javafx.util.Pair;
 
 public abstract class XInfoToCSVConverterServiceImpl<T extends IXInfoDTO, S extends IXInfo> implements IXInfoToCSVConverterService {
 	
@@ -59,13 +59,13 @@ public abstract class XInfoToCSVConverterServiceImpl<T extends IXInfoDTO, S exte
 
 	abstract List<S> getXInfosFromSegment(String key, IBaseSegment segment);
 
-	abstract Map<Pair[],Map<String, List<T>>> getXInfosFromSegmentDTO(IBaseSegmentDTO segmentDTO);
+	abstract Map<Pair<String, Object>[],Map<String, List<T>>> getXInfosFromSegmentDTO(IBaseSegmentDTO segmentDTO);
 	
 	@Override
 	public void convertDTOs(final List<IBaseSegmentDTO> segments,
 			final Map<String, OutputStream> outputs) throws IOException {
 		
-		Map<Pair[],Map<String, List<T>>> xInfosObjectMap;
+		Map<Pair<String, Object>[],Map<String, List<T>>> xInfosObjectMap;
 		final Set<String> headerWritten = new HashSet<>();
 		
 		for(IBaseSegmentDTO segmentDTO : segments) {
@@ -108,7 +108,7 @@ public abstract class XInfoToCSVConverterServiceImpl<T extends IXInfoDTO, S exte
 		}
 	}
 	
-	private void serializeDTO(List<T> xInfos, OutputStream outStream, Pair... additionalFields) throws IOException {
+	private void serializeDTO(List<T> xInfos, OutputStream outStream, Pair<String, Object>... additionalFields) throws IOException {
 		if(xInfos != null && !xInfos.isEmpty()) {
 			for(T xInfo : xInfos) {
 				outStream.write(dtoAdapter.adapt(xInfo, additionalFields).getBytes(Charset.forName(CHARSET)));

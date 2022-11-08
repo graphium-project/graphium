@@ -17,13 +17,14 @@ package at.srfg.graphium.io.converter.impl;
 
 import java.lang.reflect.Field;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.srfg.graphium.io.converter.IXinfoDTOToCSVAdapter;
 import at.srfg.graphium.io.dto.ISegmentXInfoDTO;
 import at.srfg.graphium.io.dto.IXInfoDTO;
-import javafx.util.Pair;
+
 public class ReflectionXInfoDTOToCSVConverterImpl implements IXinfoDTOToCSVAdapter<IXInfoDTO> {
 
     private static final char SEPERATOR = ';';
@@ -31,12 +32,12 @@ public class ReflectionXInfoDTOToCSVConverterImpl implements IXinfoDTOToCSVAdapt
 	private static Logger log = LoggerFactory.getLogger(ReflectionXInfoDTOToCSVConverterImpl.class);
 	
 	@Override
-	public String adapt(IXInfoDTO xInfo, Pair... additionalFields) {
+	public String adapt(IXInfoDTO xInfo, Pair<String, Object>... additionalFields) {
 		StringBuilder buffer = new StringBuilder();
 		if (xInfo != null) {
             Field[] fields = xInfo.getClass().getDeclaredFields();
             // write id
-            for (Pair additionalField : additionalFields) {
+            for (Pair<String, Object>  additionalField : additionalFields) {
                 buffer.append(additionalField.getValue().toString()).append(SEPERATOR);
             }
             for (Field field : fields) {
