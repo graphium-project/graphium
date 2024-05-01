@@ -22,6 +22,8 @@ package at.srfg.graphium.lanelet2import.helper;
 public class Constants {
 	
 	public final static String TYPE_LANELET = "lanelet";
+	public static final Object TYPE_AREA = "multipolygon";
+	public static final Object TYPE_REGULARTORY_ELEMENT = "regulatory_element";
 	public final static int SRID = 4326;
 	public final static String TAG_LANE_CHANGE = "laneChange";
 

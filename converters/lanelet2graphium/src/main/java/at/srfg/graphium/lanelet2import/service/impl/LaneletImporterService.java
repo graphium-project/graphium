@@ -53,12 +53,14 @@ import at.srfg.graphium.io.outputformat.IWayGraphOutputFormat;
 import at.srfg.graphium.io.outputformat.IWayGraphOutputFormatFactory;
 import at.srfg.graphium.io.outputformat.impl.jackson.GenericJacksonSegmentOutputFormatFactoryImpl;
 import at.srfg.graphium.io.outputformat.impl.jackson.GenericJacksonWayGraphOutputFormatFactoryImpl;
+import at.srfg.graphium.lanelet2import.adapter.AreasAdapter;
 import at.srfg.graphium.lanelet2import.adapter.LaneletsAdapter;
 import at.srfg.graphium.lanelet2import.connections.ConnectionsBuilder;
 import at.srfg.graphium.lanelet2import.model.IImportConfig;
 import at.srfg.graphium.lanelet2import.reader.EntitySink;
 import at.srfg.graphium.lanelet2import.reader.LaneletContainer;
 import at.srfg.graphium.model.IWayGraphVersionMetadata;
+import at.srfg.graphium.model.hd.IHDArea;
 import at.srfg.graphium.model.hd.IHDWaySegment;
 import at.srfg.graphium.model.impl.WayGraphVersionMetadata;
 import at.srfg.graphium.model.management.impl.Source;
@@ -75,6 +77,7 @@ public class LaneletImporterService {
 	private IHdWayGraphOutputFormatFactory<IHDWaySegment> outputFormatFactory;
 
     private LaneletsAdapter laneletsAdapter;
+    private AreasAdapter areasAdapter;
     private ConnectionsBuilder connectionsBuilder;
     
     public LaneletImporterService() {
@@ -118,6 +121,7 @@ public class LaneletImporterService {
 						areaOutputFormatFactory, adapter);
     	
     	laneletsAdapter = new LaneletsAdapter();
+    	areasAdapter = new AreasAdapter();
     	connectionsBuilder = new ConnectionsBuilder();
     }
 
@@ -139,10 +143,12 @@ public class LaneletImporterService {
 
 //        List<IHDRegulatoryElement> hdRegulatoryElements = adaptRegulatoryElements(entitySink);
         List<IHDWaySegment> lanelets = adaptLanelets(entitySink);
+        List<IHDArea> areas = adaptAreas(entitySink);
 //        collectRegulatoryElements(hdWaySegment, hdRegulatoryElements);
 
         log.info(lanelets.size() + " segments adapted");
-        
+        log.info(areas.size() + " areas adapted");
+
         // build nodeId->Lanelet map
         LaneletContainer laneletContainer = buildNodeId2LaneletMap(lanelets);
         
@@ -206,7 +212,11 @@ public class LaneletImporterService {
 											 entitySink.getNodes());
 	}
 
-
+	private List<IHDArea> adaptAreas(EntitySink entitySink) {
+		return areasAdapter.adaptLanelets(entitySink.getRelations(),
+											 entitySink.getWays(),
+											 entitySink.getNodes());
+	}
 
 //	private List<IHDRegulatoryElement> adaptRegulatoryElements(EntitySink entitySink) {
 //		
