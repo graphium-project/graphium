@@ -23,11 +23,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.openstreetmap.osmosis.core.domain.v0_6.EntityType;
-import org.openstreetmap.osmosis.core.domain.v0_6.Node;
-import org.openstreetmap.osmosis.core.domain.v0_6.Relation;
-import org.openstreetmap.osmosis.core.domain.v0_6.RelationMember;
-import org.openstreetmap.osmosis.core.domain.v0_6.Way;
+import at.srfg.graphium.model.ISegmentXInfo;
+import at.srfg.graphium.model.hd.IHDRegulatoryElement;
+import org.openstreetmap.osmosis.core.domain.v0_6.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,18 +53,20 @@ public class LaneletsAdapter {
 	private Map<Double, Map<Double, Long>> nodeIdRepository = null; // Map<Longitudes, Map<Latitudes, nodeId>>
 
 	private float miles2km = 1.60934f;
-	
-	public List<IHDWaySegment> adaptLanelets(List<Relation> relations, TLongObjectHashMap<Way> ways,
+
+	private RegulatoryElementsAdapter regulatoryElementsAdapter = new RegulatoryElementsAdapter();
+
+	public List<IHDWaySegment> adaptLanelets(TLongObjectHashMap<Relation> relations, TLongObjectHashMap<Way> ways,
 			TLongObjectHashMap<Node> nodes) {
 		List<IHDWaySegment> segments = new ArrayList<>();
 		
 		nodeIdCounter = -1;
 		nodeIdRepository = new HashMap<Double, Map<Double, Long>>();
 		
-		for (Relation rel : relations) {
+		for (Relation rel : relations.valueCollection()) {
 			String type = LaneletHelper.getType(rel);
 			if (type != null && type.equals(Constants.TYPE_LANELET)) {
-				IHDWaySegment lanelet = adapt(rel, ways, nodes);
+				IHDWaySegment lanelet = adapt(rel, ways, nodes, relations);
 				if (lanelet != null) {
 					segments.add(lanelet);
 				}
@@ -76,13 +76,15 @@ public class LaneletsAdapter {
 		return segments;
 	}
 	
-	public IHDWaySegment adapt(Relation relation, TLongObjectHashMap<Way> ways, TLongObjectHashMap<Node> nodes) {
+	public IHDWaySegment adapt(Relation relation, TLongObjectHashMap<Way> ways, TLongObjectHashMap<Node> nodes,
+							   TLongObjectHashMap<Relation> relations) {
 		IHDWaySegment segment = new HDWaySegment();
 		segment.setId(relation.getId());
 		
 		Way leftBorder = null;
 		Way rightBorder = null;
-		
+		List<ISegmentXInfo> regulatoryElements = new ArrayList<>();
+
 		for (RelationMember member : relation.getMembers()) {
 			if (member.getMemberType().equals(EntityType.Way)) {
 				String role = member.getMemberRole();
@@ -98,13 +100,35 @@ public class LaneletsAdapter {
 						log.error("Relation " + relation.getId() + ": Way " + member.getMemberId() + " is null");
 						return null;
 					}
+				} else if (role.equals("ref_line")) {
+					log.info("stop line");
+				}
+			} else if(member.getMemberType().equals(EntityType.Relation)) {
+				String role = member.getMemberRole();
+				if (role.equals("regulatory_element")) {
+					Relation regularyElement = relations.get(member.getMemberId());
+					if (regularyElement == null) {
+						log.error("Relation " + relation.getId() + ": Way " + member.getMemberId() + " is null");
+						return null;
+					}
+					List<IHDRegulatoryElement> adaptedRegulatoryElements = regulatoryElementsAdapter.adaptRegulatorElement(
+							regularyElement,
+							relations, ways, nodes);
+					if(adaptedRegulatoryElements != null && !adaptedRegulatoryElements.isEmpty()) {
+						regulatoryElements.addAll(adaptedRegulatoryElements);
+					}
 				}
 			} else {
-				log.error("Relation " + relation.getId() + ": Member " + member.getMemberId() + " is not a Way");
+				log.error("Relation " + relation.getId() + ": Member " + member.getMemberId() + " is not a Way or Relation");
 				return null;
 			}
 		}
-		
+
+		if(!regulatoryElements.isEmpty()) {
+			segment.setXInfo(regulatoryElements);
+		}
+
+
 		segment.setLeftBorderGeometry(LaneletHelper.createLinestring(leftBorder, nodes, Constants.SRID));
 		segment.setLeftBorderStartNodeId(leftBorder.getWayNodes().get(0).getNodeId());
 		segment.setLeftBorderEndNodeId(leftBorder.getWayNodes().get(leftBorder.getWayNodes().size() - 1).getNodeId());
@@ -133,6 +157,7 @@ public class LaneletsAdapter {
 
 		return segment;
 	}
+
 
 	private void validateTags(IHDWaySegment segment) {
 		// null values are forbidden

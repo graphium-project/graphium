@@ -149,7 +149,7 @@ public class Lanelet2JSONConverter {
             } else {
                 log.error("Unknown error",e);
             }
-            helpFormatter.printHelp("java -jar lanelet2graphium-1.1.0.one-jar.jar [OPTION]...", options);
+            helpFormatter.printHelp("java -jar lanelet2graphium-1.2.2.one-jar.jar [OPTION]...", options);
         }
     }
 

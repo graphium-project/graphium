@@ -76,5 +76,7 @@ public class Constants {
 	
 	public final static String LEFT = "left";
 	public final static String RIGHT = "right";
+
+	public final static String STOP_LINE = "stop_line";
 	
 }

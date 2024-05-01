@@ -44,7 +44,8 @@ public class EntitySink implements Sink, EntityProcessor {
 	
 	private TLongObjectHashMap<Node> nodes = new TLongObjectHashMap<Node>();
 	private TLongObjectHashMap<Way> ways = new TLongObjectHashMap<Way>();
-	private List<Relation> relations = new ArrayList<Relation>();
+	private TLongObjectHashMap<Relation> relations = new TLongObjectHashMap<>();
+	//private List<Relation> relations = new ArrayList<Relation>();
 
 	@Override
 	public void initialize(Map<String, Object> metaData) {
@@ -100,7 +101,8 @@ public class EntitySink implements Sink, EntityProcessor {
 	}
 
 	private void process(Relation relation) {
-		relations.add(relation);
+		relations.put(relation.getId(), relation);
+		//relations.add(relation);
 	}
 
 	public TLongObjectHashMap<Node> getNodes() {
@@ -111,8 +113,11 @@ public class EntitySink implements Sink, EntityProcessor {
 		return ways;
 	}
 
-	public List<Relation> getRelations() {
+	public TLongObjectHashMap<Relation> getRelations() {
 		return relations;
 	}
+	/*public List<Relation> getRelations() {
+		return relations;
+	}*/
 
 }

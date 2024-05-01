@@ -69,7 +69,8 @@ public class LaneletsAdapterTests {
 		
 		// Relations
 		// - Relation1
-		List<Relation> relations = new ArrayList<Relation>();
+		//List<Relation> relations = new ArrayList<Relation>();
+		TLongObjectHashMap<Relation> relations = new TLongObjectHashMap<>();
 		List<RelationMember> relationMembers = new ArrayList<RelationMember>();
 		relationMembers.add(new RelationMember(1l, EntityType.Way, "left"));
 		relationMembers.add(new RelationMember(2l, EntityType.Way, "right"));
@@ -78,7 +79,7 @@ public class LaneletsAdapterTests {
 		relationTags.add(new Tag("subtype", "road"));
 		relationTags.add(new Tag("location", Constants.URBAN));
 		Relation relation = new Relation(new CommonEntityData(1, 1, new Date(), null, 1l, relationTags), relationMembers);
-		relations.add(relation);
+		relations.put(1, relation);
 		
 		// urban road
 		List<IHDWaySegment> segments = adapter.adaptLanelets(relations, ways, nodes);
@@ -96,7 +97,7 @@ public class LaneletsAdapterTests {
 		relationTags.add(new Tag("location", Constants.NONURBAN));
 		relation = new Relation(new CommonEntityData(1, 1, new Date(), null, 1l, relationTags), relationMembers);
 		relations.clear();
-		relations.add(relation);
+		relations.put(2, relation);
 		segments = adapter.adaptLanelets(relations, ways, nodes);
 		Assert.assertEquals(1, segments.size());
 		segment = segments.get(0);
@@ -114,7 +115,7 @@ public class LaneletsAdapterTests {
 		relationTags.add(new Tag(Constants.LANELET_ONEWAY, "no"));
 		relation = new Relation(new CommonEntityData(1, 1, new Date(), null, 1l, relationTags), relationMembers);
 		relations.clear();
-		relations.add(relation);
+		relations.put(2, relation);
 		segments = adapter.adaptLanelets(relations, ways, nodes);
 		Assert.assertEquals(1, segments.size());
 		segment = segments.get(0);
@@ -127,7 +128,7 @@ public class LaneletsAdapterTests {
 		relationTags.add(new Tag("location", Constants.URBAN));
 		relation = new Relation(new CommonEntityData(1, 1, new Date(), null, 1l, relationTags), relationMembers);
 		relations.clear();
-		relations.add(relation);
+		relations.put(3, relation);
 		segments = adapter.adaptLanelets(relations, ways, nodes);
 		Assert.assertEquals(1, segments.size());
 		segment = segments.get(0);
@@ -143,7 +144,7 @@ public class LaneletsAdapterTests {
 		relationTags.add(new Tag("location", Constants.NONURBAN));
 		relation = new Relation(new CommonEntityData(1, 1, new Date(), null, 1l, relationTags), relationMembers);
 		relations.clear();
-		relations.add(relation);
+		relations.put(4, relation);
 		segments = adapter.adaptLanelets(relations, ways, nodes);
 		Assert.assertEquals(1, segments.size());
 		segment = segments.get(0);

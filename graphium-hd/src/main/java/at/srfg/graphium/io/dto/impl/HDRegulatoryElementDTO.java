@@ -17,8 +17,12 @@ package at.srfg.graphium.io.dto.impl;
 
 import java.util.Map;
 
+import at.srfg.graphium.io.inputformat.impl.jackson.JacksonLineStringDeserializer;
+import at.srfg.graphium.io.outputformat.impl.jackson.JacksonGeometrySerializer;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.vividsolutions.jts.geom.Geometry;
 
 import at.srfg.graphium.io.dto.IHDRegulatoryElementDTO;
@@ -77,6 +81,8 @@ public class HDRegulatoryElementDTO extends AbstractSegmentXInfoDTO implements I
 	}
 
 	@Override
+	@JsonSerialize(using = JacksonGeometrySerializer.class)
+	@JsonDeserialize(using = JacksonLineStringDeserializer.class)
 	public Geometry getGeometry() {
 		return geometry;
 	}

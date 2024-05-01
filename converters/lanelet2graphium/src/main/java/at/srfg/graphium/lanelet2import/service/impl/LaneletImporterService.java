@@ -20,6 +20,16 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import at.srfg.graphium.io.adapter.IXInfoDTOAdapter;
+import at.srfg.graphium.io.adapter.impl.HDRegulatoryElementXInfoAdapter;
+import at.srfg.graphium.io.adapter.registry.impl.SegmentXInfoAdapterRegistry;
+import at.srfg.graphium.io.dto.IHDAreaDTO;
+import at.srfg.graphium.io.dto.ISegmentXInfoDTO;
+import at.srfg.graphium.io.outputformat.hd.IHdWayGraphOutputFormat;
+import at.srfg.graphium.io.outputformat.hd.IHdWayGraphOutputFormatFactory;
+import at.srfg.graphium.io.outputformat.hd.impl.jackson.GenericJacksonHdWayGraphOutputFormatFactoryImpl;
+import at.srfg.graphium.model.ISegmentXInfo;
+import at.srfg.graphium.model.hd.IHDArea;
 import org.openstreetmap.osmosis.core.task.v0_6.RunnableSource;
 import org.openstreetmap.osmosis.core.task.v0_6.Sink;
 import org.openstreetmap.osmosis.core.task.v0_6.SinkSource;
@@ -61,7 +71,9 @@ public class LaneletImporterService {
 	
 	private static Logger log = LoggerFactory.getLogger(LaneletImporterService.class);
 
-    private IWayGraphOutputFormatFactory<IHDWaySegment> outputFormatFactory;
+   // private IWayGraphOutputFormatFactory<IHDWaySegment> outputFormatFactory;
+	private IHdWayGraphOutputFormatFactory<IHDWaySegment> outputFormatFactory;
+
     private LaneletsAdapter laneletsAdapter;
     private ConnectionsBuilder connectionsBuilder;
     
@@ -74,16 +86,36 @@ public class LaneletImporterService {
     	
     	WaySegment2SegmentDTOAdapter<IHDWaySegmentDTO, IHDWaySegment> waySegmentAdapter = 
     			new HDWaySegment2HDWaySegmentDTOAdapter<>();
-    	List<ISegmentAdapter<IHDWaySegmentDTO, IHDWaySegment>> adapters =
-    			new ArrayList<ISegmentAdapter<IHDWaySegmentDTO, IHDWaySegment>>();
+
+		// add segment xinfo adapter registry
+		SegmentXInfoAdapterRegistry<ISegmentXInfo,ISegmentXInfoDTO> segmentXInfoAdapterRegistry
+				= new SegmentXInfoAdapterRegistry<>();
+		// register xinfo adapter
+		List<IXInfoDTOAdapter<ISegmentXInfo, ISegmentXInfoDTO>> xInfoAdapters = new ArrayList<>();
+		IXInfoDTOAdapter regulationXInfoAdapter = new HDRegulatoryElementXInfoAdapter();
+        xInfoAdapters.add(regulationXInfoAdapter);
+		segmentXInfoAdapterRegistry.setAdapters(xInfoAdapters);
+		waySegmentAdapter.setSegmentXInfoAdapterRegistry(segmentXInfoAdapterRegistry);
+
+
+    	List<ISegmentAdapter<IHDWaySegmentDTO, IHDWaySegment>> adapters = new ArrayList<>();
     	adapters.add(waySegmentAdapter);
     	adapterRegistry.setAdapters(adapters);
-    	
+
+
+		ISegmentAdapterRegistry<IHDAreaDTO, IHDArea> areaAdapterRegistry =
+				new SegmentAdapterRegistryImpl<IHDAreaDTO, IHDArea>();
+		//areaAdapterRegistry.setAdapters();
+
     	ISegmentOutputFormatFactory<IHDWaySegment> segmentOutputFormatFactory = 
     			new GenericJacksonSegmentOutputFormatFactoryImpl<IHDWaySegment>(adapterRegistry);
-    	
+
+		ISegmentOutputFormatFactory<IHDArea> areaOutputFormatFactory =
+				new GenericJacksonSegmentOutputFormatFactoryImpl<IHDArea>(areaAdapterRegistry);
+
     	this.outputFormatFactory = 
-    			new GenericJacksonWayGraphOutputFormatFactoryImpl<IHDWaySegment>(segmentOutputFormatFactory, adapter);
+    			new GenericJacksonHdWayGraphOutputFormatFactoryImpl<IHDWaySegment>(segmentOutputFormatFactory,
+						areaOutputFormatFactory, adapter);
     	
     	laneletsAdapter = new LaneletsAdapter();
     	connectionsBuilder = new ConnectionsBuilder();
@@ -108,7 +140,7 @@ public class LaneletImporterService {
 //        List<IHDRegulatoryElement> hdRegulatoryElements = adaptRegulatoryElements(entitySink);
         List<IHDWaySegment> lanelets = adaptLanelets(entitySink);
 //        collectRegulatoryElements(hdWaySegment, hdRegulatoryElements);
-        
+
         log.info(lanelets.size() + " segments adapted");
         
         // build nodeId->Lanelet map
@@ -118,7 +150,8 @@ public class LaneletImporterService {
         createConnections(lanelets, laneletContainer);
         
         FileOutputStream stream = null;
-        IWayGraphOutputFormat<IHDWaySegment> outputFormat = null;
+        //IWayGraphOutputFormat<IHDWaySegment> outputFormat = null;
+		IHdWayGraphOutputFormat<IHDWaySegment> outputFormat = null;
         
         try {
 			stream = new FileOutputStream(config.getOutputDir() + "/" + config.getGraphName() + "_" + config.getVersion() + ".json");
@@ -128,7 +161,6 @@ public class LaneletImporterService {
 	        for (IHDWaySegment hdSegment : lanelets) {
 	        	outputFormat.serialize(hdSegment);
 	        }
-	        
         } catch (Exception th) {
             throw th;
         } finally {
@@ -173,7 +205,9 @@ public class LaneletImporterService {
 											 entitySink.getWays(),
 											 entitySink.getNodes());
 	}
-	
+
+
+
 //	private List<IHDRegulatoryElement> adaptRegulatoryElements(EntitySink entitySink) {
 //		
 //		return null;

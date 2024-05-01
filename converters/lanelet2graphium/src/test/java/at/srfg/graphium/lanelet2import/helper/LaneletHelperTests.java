@@ -77,9 +77,9 @@ public class LaneletHelperTests {
 		for (IHDWaySegment hdSegment : hdSegments) {
 			boolean[] lineDirections = LaneletHelper.checkLineDirections(hdSegment);
 			hdSegment.setGeometry(LaneletHelper.calculateCenterline(hdSegment, lineDirections));
-			System.out.println(hdSegment.getId() + ";left;" + lineDirections[0] + ";" + hdSegment.getLeftBorderGeometry().toText());
-			System.out.println(hdSegment.getId() + ";right;" + lineDirections[1] + ";" + hdSegment.getRightBorderGeometry().toText());
-			System.out.println(hdSegment.getId() + ";center;;" + hdSegment.getGeometry().toText());
+			log.info(hdSegment.getId() + ";left;" + lineDirections[0] + ";" + hdSegment.getLeftBorderGeometry().toText());
+			log.info(hdSegment.getId() + ";right;" + lineDirections[1] + ";" + hdSegment.getRightBorderGeometry().toText());
+			log.info(hdSegment.getId() + ";center;;" + hdSegment.getGeometry().toText());
 		}
 	}
 

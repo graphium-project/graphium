@@ -30,6 +30,10 @@ public class HDRegulatoryElementXInfoAdapter extends AbstractXInfoDTOAdapter<HDR
 	@Override
 	public HDRegulatoryElementDTO adaptReverse(HDRegulatoryElement objectToAdapt) {
 		HDRegulatoryElementDTO dto = new HDRegulatoryElementDTO();
+		// anw adapt all values
+		dto.setGeometry(objectToAdapt.getGeometry());
+		dto.setId(objectToAdapt.getId());
+		dto.setType(objectToAdapt.getType().name());
 		if (objectToAdapt.getTags() != null) {
 			Map<String, String> tags = new HashMap<>();
 			objectToAdapt.getTags().forEach(tags::put);
