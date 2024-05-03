@@ -78,7 +78,8 @@
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>42.1.1</version>
+			<!--<version>42.1.1</version>-->
+			<version>42.7.3</version>
 		</dependency>	
 
 		<!-- replacement for c3p0 -->
