@@ -1,13 +1,7 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:util="http://www.springframework.org/schema/util"
-	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="
-		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
-		http://www.springframework.org/schema/context 
-        http://www.springframework.org/schema/context/spring-context.xsd">
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <!-- override ResultSetExtractor -->
     <bean id="hdWaySegmentResultSetExtractor" class="at.srfg.graphium.postgis.persistence.resultsetextractors.HDWaySegmentResultSetExtractor"/>    
@@ -31,9 +25,14 @@
     	<property name="rowMapper" ref="wayGraphViewRowMapper"/>
     	<property name="waySegmentRowMapper" ref="waySegmentResultSetExtractor"/>
     </bean>
+
+    <bean id="postgisHDWayGraphAdditionalElementsWriteDao" class="at.srfg.graphium.postgis.persistence.impl.HDWayGraphAdditionalElementsWriteDaoImpl" parent="graphiumAbstractPostgisDao">
+        <property name="metadataDao" ref="postgisWayGraphVersionMetadataDao"/>
+    </bean>
     
     <alias name="postgisHDWayGraphReadDao" alias="hdWayGraphReadDao"/>
     <alias name="postgisHDWayGraphWriteDao" alias="hdWayGraphWriteDao"/>
+    <alias name="postgisHDWayGraphAdditionalElementsWriteDao" alias="hdWayGraphAdditionalElementsWriteDao"/>
  	<alias name="postgisQueuingHDGraphVersionImportService" alias="queuingHDGraphVersionImportService"/>
 
 </beans>

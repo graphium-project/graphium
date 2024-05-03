@@ -15,7 +15,7 @@
  */
 package at.srfg.graphium.io.dto.impl;
 
-import at.srfg.graphium.io.inputformat.impl.jackson.JacksonLineStringDeserializer;
+import at.srfg.graphium.io.inputformat.impl.jackson.JacksonGeometryDeserializer;
 import at.srfg.graphium.io.outputformat.impl.jackson.JacksonGeometrySerializer;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -44,7 +44,7 @@ public class HDAreaDTO extends BaseSegmentDTOImpl implements IHDAreaDTO {
 
 	@Override
 	@JsonSerialize(using = JacksonGeometrySerializer.class)
-	@JsonDeserialize(using = JacksonLineStringDeserializer.class)
+	@JsonDeserialize(using = JacksonGeometryDeserializer.class)
 	public Geometry getAreaGeometry() {
 		return areaGeometry;
 	}

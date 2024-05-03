@@ -27,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.xml.bind.ValidationException;
 
+import at.srfg.graphium.model.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,12 +54,6 @@ import at.srfg.graphium.io.dto.IBaseSegmentDTO;
 import at.srfg.graphium.io.inputformat.IQueuingGraphInputFormat;
 import at.srfg.graphium.io.producer.IBaseWaySegmentProducer;
 import at.srfg.graphium.io.producer.impl.BaseWaySegmentProducerImpl;
-import at.srfg.graphium.model.IBaseWaySegment;
-import at.srfg.graphium.model.ISource;
-import at.srfg.graphium.model.IWayGraph;
-import at.srfg.graphium.model.IWayGraphVersionMetadata;
-import at.srfg.graphium.model.IWaySegmentConnection;
-import at.srfg.graphium.model.State;
 import at.srfg.graphium.model.impl.WayGraph;
 import at.srfg.graphium.model.management.IServerStatus;
 
@@ -108,6 +103,7 @@ public class QueuingGraphVersionImportServiceImpl<T extends IBaseWaySegment> imp
                 throw new GraphImportException("Sorry, system is busy, a graph import is currently executed");
             }
 
+			ImportState importState = ImportState.METADATA;
             // deserialize
             segmentsQueue = new ArrayBlockingQueue<T>(queueSize);
             metadataQueue = new ArrayBlockingQueue<IWayGraphVersionMetadata>(1);
@@ -188,41 +184,69 @@ public class QueuingGraphVersionImportServiceImpl<T extends IBaseWaySegment> imp
             }
 
             // save segments via view
-            List<T> segmentsToSave = new ArrayList<T>(queueSize);
-            Map<Long, List<IWaySegmentConnection>> connectionIntegrityMap = new HashMap<Long, List<IWaySegmentConnection>>();
-            List<IWaySegmentConnection> connectionsToSave = new ArrayList<IWaySegmentConnection>();
-            List<Long> segmentIds = new ArrayList<Long>();
+            List<T> segmentsToSave = new ArrayList<>(queueSize);
+			List<IBaseSegment> additionalElementsToSave = new ArrayList<>(queueSize);
+            Map<Long, List<IWaySegmentConnection>> connectionIntegrityMap = new HashMap<>();
+            List<IWaySegmentConnection> connectionsToSave = new ArrayList<>();
+            List<Long> segmentIds = new ArrayList<>();
             String segmentType = null;
+			Class<T> primarySegmentClass = null;
+
             while (producerThread.isAlive() || !segmentsQueue.isEmpty()) {
+				IBaseSegment dequeued;
                 T segment;
                 try {
-                    segment = segmentsQueue.poll(500, TimeUnit.MILLISECONDS);
+					dequeued = segmentsQueue.poll(500, TimeUnit.MILLISECONDS);
 
-                    if (segment != null) {
-                        // check which segment type is contained as model
-                        if (segmentType == null) {
-                            segmentType = segmentAdpaterRegistry.getSegmentDtoType((Class<T>) segment.getClass());
-                        }
+                    if (dequeued != null) {
+						if(primarySegmentClass == null) {
+							importState = ImportState.PRIMARY_SEGMENTS;
+							primarySegmentClass = (Class<T>) dequeued.getClass();
+						}
+						if(importState == ImportState.PRIMARY_SEGMENTS && primarySegmentClass != null
+								&& !primarySegmentClass.equals(dequeued.getClass())) {
+							log.info("segment class changed, finishing import of primary segment type, " +
+									"flushing remaining segments and connections...");
+							saveBatchAndClearState(connectionIntegrityMap, segmentIds, segmentsToSave,
+									connectionsToSave, graphName, version, excludedXInfosList);
+							importState = ImportState.ADDITIONAL_ELEMENTS;
+							log.info("switched to additional elements if any present");
+						}
+						if(ImportState.PRIMARY_SEGMENTS == importState) {
+							segment = (T) dequeued;
+							// check which segment type is contained as model
+							if (segmentType == null) {
+								segmentType = segmentAdpaterRegistry.getSegmentDtoType((Class<T>) segment.getClass());
+							}
 
-                        segmentsCount++;
-                        if (segment.getCons() != null) {
-                            connectionsCount += segment.getCons().size();
-                        }
+							segmentsCount++;
+							if (segment.getCons() != null) {
+								connectionsCount += segment.getCons().size();
+							}
 
-                        if (metadata.getCoveredArea() == null) {
-                            coveredArea = expandEnvelope(coveredArea, segment);
-                        }
+							if (metadata.getCoveredArea() == null) {
+								coveredArea = expandEnvelope(coveredArea, segment);
+							}
 
-                        segmentsToSave.add(segment);
-                        segmentIds.add(segment.getId());
-                        addConnectionsToIntegrityList(segment, connectionIntegrityMap);
+							segmentsToSave.add(segment);
+							segmentIds.add(segment.getId());
+							addConnectionsToIntegrityList(segment, connectionIntegrityMap);
 
-                        if (segmentsToSave.size() == batchSize) {
-                            connectionsToSave = getValidConnections(connectionIntegrityMap, segmentIds);
-                            saveBatch(segmentsToSave, connectionsToSave, graphName, version, excludedXInfosList);
-                            segmentsToSave.clear();
-                            connectionsToSave.clear();
-                        }
+							if (segmentsToSave.size() == batchSize) {
+							/*    connectionsToSave = getValidConnections(connectionIntegrityMap, segmentIds);
+								saveBatch(segmentsToSave, connectionsToSave, graphName, version, excludedXInfosList);
+								segmentsToSave.clear();
+								connectionsToSave.clear();*/
+								saveBatchAndClearState(connectionIntegrityMap, segmentIds, segmentsToSave,
+										connectionsToSave, graphName, version, excludedXInfosList);
+							}
+						}
+						else if(importState == ImportState.ADDITIONAL_ELEMENTS) {
+							additionalElementsToSave.add(dequeued);
+							if (additionalElementsToSave.size() == batchSize) {
+								processAdditionalElements(additionalElementsToSave, graphName, version);
+							}
+						}
                     }
 
                 } catch (InterruptedException e) {
@@ -236,12 +260,20 @@ public class QueuingGraphVersionImportServiceImpl<T extends IBaseWaySegment> imp
                         producer.getException());
             }
 
+			// execute last patch probably still in lists cause batch size was not reached
             if (!segmentsToSave.isEmpty()) {
-                connectionsToSave = getValidConnections(connectionIntegrityMap, segmentIds);
+               /* connectionsToSave = getValidConnections(connectionIntegrityMap, segmentIds);
                 saveBatch(segmentsToSave, connectionsToSave, graphName, version, excludedXInfosList);
                 segmentsToSave.clear();
-                connectionsToSave.clear();
+                connectionsToSave.clear();*/
+				saveBatchAndClearState(connectionIntegrityMap, segmentIds, segmentsToSave,
+						connectionsToSave, graphName, version, excludedXInfosList);
             }
+
+			// same for additional elements
+			if (!additionalElementsToSave.isEmpty()) {
+				processAdditionalElements(additionalElementsToSave, graphName, version);
+			}
 
             if (!connectionIntegrityMap.isEmpty()) {
                 int waitingConnectionsSize = 0;
@@ -286,7 +318,13 @@ public class QueuingGraphVersionImportServiceImpl<T extends IBaseWaySegment> imp
         }
 
     }
-	
+
+	protected void processAdditionalElements(
+			List<IBaseSegment> additionalElementsToSave, String graphName, String version)
+			throws GraphStorageException {
+		log.info("{} additional Elements to process, implement processing in subclass...");
+	}
+
 	protected IWayGraphVersionMetadata saveInitialMetadata(String graphName, String version, IWayGraphVersionMetadata metadata, IWayGraphVersionMetadata savedMetadata) {
 		Date now = new Date();
 		boolean doInsert = true;
@@ -368,6 +406,18 @@ public class QueuingGraphVersionImportServiceImpl<T extends IBaseWaySegment> imp
 	protected void saveBatch(List<T> segmentsToSave, List<IWaySegmentConnection> connectionsToSave,
 			String graphName, String version) throws GraphImportException, GraphNotExistsException {
 		saveBatch(segmentsToSave, connectionsToSave, graphName, version, null);
+	}
+
+	protected void saveBatchAndClearState(
+			Map<Long, List<IWaySegmentConnection>> connectionIntegrityMap,
+			List<Long> segmentIds,
+			List<T> segmentsToSave, List<IWaySegmentConnection> connectionsToSave,
+		  	String graphName, String version, List<String> excludedXInfosList)
+				throws GraphImportException, GraphNotExistsException {
+		connectionsToSave = getValidConnections(connectionIntegrityMap, segmentIds);
+		saveBatch(segmentsToSave, connectionsToSave, graphName, version, excludedXInfosList);
+		segmentsToSave.clear();
+		connectionsToSave.clear();
 	}
 
 	protected void saveBatch(List<T> segmentsToSave, List<IWaySegmentConnection> connectionsToSave,
@@ -603,5 +653,8 @@ public class QueuingGraphVersionImportServiceImpl<T extends IBaseWaySegment> imp
 	public void setValidityPeriodValidator(GraphVersionValidityPeriodValidator validityPeriodValidator) {
 		this.validityPeriodValidator = validityPeriodValidator;
 	}
-	
+
+	private enum ImportState {
+		METADATA, PRIMARY_SEGMENTS, ADDITIONAL_ELEMENTS;
+	}
 }

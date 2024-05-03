@@ -15,28 +15,33 @@
  */
 package at.srfg.graphium.io.inputformat.impl.jackson;
 
-import java.io.IOException;
-
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 
-public class JacksonLineStringDeserializer extends JacksonGeometryDeserializer<LineString> {
+import java.io.IOException;
+
+public class JacksonGeometryDeserializer<T extends Geometry> extends JsonDeserializer<T> {
 	
 	@Override
-	public LineString deserialize(JsonParser jp, DeserializationContext ctxt)
+	public T deserialize(JsonParser jp, DeserializationContext ctxt)
 			throws IOException {
-		Geometry geom = parse(jp);
-		if(geom instanceof LineString) {
-			return (LineString)geom;		
+		return (T) parse(jp);
+	}
+
+	protected Geometry parse(JsonParser jp) throws IOException {
+		WKTReader reader = new WKTReader();
+		Geometry geom;
+		try {
+			geom = reader.read(jp.getText());
+		} catch (ParseException e) {
+			throw new JsonParseException(jp, "wkt not parsable", jp.getCurrentLocation(), e);
 		}
-		throw new JsonParseException(jp, "parsed geometry was not a LineString!", jp.getCurrentLocation());
+		return geom;
 	}
 
 }

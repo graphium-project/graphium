@@ -20,6 +20,11 @@ import java.sql.Timestamp;
 
 import javax.annotation.PostConstruct;
 
+import at.srfg.graphium.core.exception.GraphAlreadyExistException;
+import at.srfg.graphium.core.exception.GraphNotExistsException;
+import at.srfg.graphium.core.helper.GraphVersionHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 
 import at.srfg.graphium.model.hd.IHDWaySegment;
@@ -29,9 +34,15 @@ import at.srfg.graphium.model.hd.IHDWaySegment;
  *
  */
 public class HDWayGraphWriteDaoImpl<W extends IHDWaySegment> extends WayGraphWriteDaoImpl<W> {
-	
+
+	private static Logger log = LoggerFactory.getLogger(HDWayGraphWriteDaoImpl.class);
+
 	public final static String HDSEGMENT_TABLE_PREFIX = "hdwaysegments_";
 	public final static String PARENT_HDSEGMENT_TABLE_NAME = "hdwaysegments";
+	public final static String HDAREA_TABLE_PREFIX = "hdarea_";
+	public final static String PARENT_HDAREA_TABLE_NAME = "hdareas";
+	public final static String HDINFRA_AND_SIGN_TABLE_PREFIX = "hdinfra_and_signs_";
+	public final static String PARENT_HDINFRA_AND_SIGN_TABLE_NAME = "hdinfra_and_signs";
 
 	@PostConstruct
 	public void setup() {
@@ -77,4 +88,33 @@ public class HDWayGraphWriteDaoImpl<W extends IHDWaySegment> extends WayGraphWri
 	 		" WHERE id=:id";
 	}
 
+	@Override
+	public void createGraph(String graphName, String version, boolean overrideGraphIfExsists)
+			throws GraphAlreadyExistException, GraphNotExistsException {
+		super.createGraph(graphName, version, overrideGraphIfExsists);
+		String graphVersionName = GraphVersionHelper.createGraphVersionName(graphName, version);
+		createAreaTable(graphVersionName);
+		createInfrastructureAndSignTable(graphVersionName);
+	}
+
+	private void createAreaTable(String graphVersionName) {
+		log.info("creating hd element area table...");
+		getJdbcTemplate().execute("CREATE TABLE " + schema + HDAREA_TABLE_PREFIX + graphVersionName +
+				" (CONSTRAINT " + HDAREA_TABLE_PREFIX + graphVersionName + "_pk PRIMARY KEY (id)) INHERITS (" +
+				schema + PARENT_HDAREA_TABLE_NAME + ") WITH (OIDS=FALSE)");
+	}
+
+	private void createInfrastructureAndSignTable(String graphVersionName) {
+		log.info("creating hd infrastructure and sign table...");
+		getJdbcTemplate().execute("CREATE TABLE " + schema + HDINFRA_AND_SIGN_TABLE_PREFIX + graphVersionName +
+				" (CONSTRAINT " + HDINFRA_AND_SIGN_TABLE_PREFIX + graphVersionName + "_pk PRIMARY KEY (id)) INHERITS (" +
+				schema + PARENT_HDINFRA_AND_SIGN_TABLE_NAME + ") WITH (OIDS=FALSE)");
+	}
+
+	protected void deleteSegmentTables(String graphName, String version) {
+		super.deleteSegmentTables(graphName, version);
+		String graphVersionName = GraphVersionHelper.createGraphVersionName(graphName, version);
+		getJdbcTemplate().execute("DROP TABLE " + schema + HDAREA_TABLE_PREFIX + graphVersionName + " CASCADE");
+		getJdbcTemplate().execute("DROP TABLE " + schema + HDINFRA_AND_SIGN_TABLE_PREFIX + graphVersionName);
+	}
 }
