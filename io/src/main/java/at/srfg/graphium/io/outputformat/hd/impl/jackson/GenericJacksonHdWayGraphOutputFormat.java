@@ -23,9 +23,11 @@ import at.srfg.graphium.io.outputformat.hd.IHdWayGraphOutputFormat;
 import at.srfg.graphium.io.outputformat.impl.jackson.GenericJacksonWayGraphOutputFormat;
 import at.srfg.graphium.model.IWayGraphVersionMetadata;
 import at.srfg.graphium.model.hd.IHDArea;
+import at.srfg.graphium.model.hd.IHDRoadInfrastructure;
 import at.srfg.graphium.model.hd.IHDWaySegment;
 import com.fasterxml.jackson.core.JsonGenerator;
 
+import java.io.IOException;
 import java.io.OutputStream;
 
 /**
@@ -36,18 +38,70 @@ public class GenericJacksonHdWayGraphOutputFormat<T extends IHDWaySegment>
         extends GenericJacksonWayGraphOutputFormat<T> implements IHdWayGraphOutputFormat<T> {
 
     ISegmentOutputFormat<IHDArea> areaOutputFormat;
+    ISegmentOutputFormat<IHDRoadInfrastructure> roadInfraOutputFormat;
+
+    boolean segmentSectionFinished = false;
+    boolean areaSectionFinished = false;
+    boolean roadInfraSectionFinished = false;
 
     public GenericJacksonHdWayGraphOutputFormat(
             ISegmentOutputFormat<T> segmentOutputFormat, ISegmentOutputFormat<IHDArea> areaOutputFormat,
+            ISegmentOutputFormat<IHDRoadInfrastructure> roadInfraOutputFormat,
             IAdapter<IGraphVersionMetadataDTO, IWayGraphVersionMetadata> adapter, OutputStream stream,
             JsonGenerator generator) {
         super(segmentOutputFormat, adapter, stream, generator);
         this.areaOutputFormat = areaOutputFormat;
+        this.roadInfraOutputFormat = roadInfraOutputFormat;
+    }
+
+    @Override
+    public void finishSegments() throws WaySegmentSerializationException {
+        segmentOutputFormat.close();
+        segmentSectionFinished = true;
+    }
+
+    @Override
+    public void finishAreas() throws WaySegmentSerializationException {
+        areaOutputFormat.close();
+        areaSectionFinished = true;
+    }
+
+    @Override
+    public void finishRoadInfrastructure() throws WaySegmentSerializationException {
+        roadInfraOutputFormat.close();
+        roadInfraSectionFinished = true;
     }
 
     @Override
     public void serialize(IHDArea area) throws WaySegmentSerializationException {
         areaOutputFormat.serialize(area);
+    }
+
+    @Override
+    public void serialize(IHDRoadInfrastructure roadInfra) throws WaySegmentSerializationException {
+        roadInfraOutputFormat.serialize(roadInfra);
+    }
+
+    @Override
+    public void close() throws WaySegmentSerializationException {
+        try {
+            if(!segmentSectionFinished) {
+                segmentOutputFormat.close();
+            } else if (!areaSectionFinished) {
+                areaOutputFormat.close();
+            } else if (!roadInfraSectionFinished) {
+                roadInfraOutputFormat.close();
+            }
+
+            if(metadataToSerialize != null) {
+                doSerializeMetadata(metadataToSerialize);
+                metadataToSerialize = null;
+            }
+            generator.writeEndObject();
+            generator.flush();
+        } catch (IOException e) {
+            throw new WaySegmentSerializationException(e.getMessage(), e);
+        }
     }
 
 }

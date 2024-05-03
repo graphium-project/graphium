@@ -21,15 +21,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import at.srfg.graphium.io.adapter.IXInfoDTOAdapter;
-import at.srfg.graphium.io.adapter.impl.HDRegulatoryElementXInfoAdapter;
+import at.srfg.graphium.io.adapter.impl.*;
 import at.srfg.graphium.io.adapter.registry.impl.SegmentXInfoAdapterRegistry;
-import at.srfg.graphium.io.dto.IHDAreaDTO;
-import at.srfg.graphium.io.dto.ISegmentXInfoDTO;
+import at.srfg.graphium.io.dto.*;
 import at.srfg.graphium.io.outputformat.hd.IHdWayGraphOutputFormat;
 import at.srfg.graphium.io.outputformat.hd.IHdWayGraphOutputFormatFactory;
 import at.srfg.graphium.io.outputformat.hd.impl.jackson.GenericJacksonHdWayGraphOutputFormatFactoryImpl;
+import at.srfg.graphium.lanelet2import.adapter.RoadInfrastructureAdapter;
 import at.srfg.graphium.model.ISegmentXInfo;
 import at.srfg.graphium.model.hd.IHDArea;
+import at.srfg.graphium.model.hd.IHDRoadInfrastructure;
 import org.openstreetmap.osmosis.core.task.v0_6.RunnableSource;
 import org.openstreetmap.osmosis.core.task.v0_6.Sink;
 import org.openstreetmap.osmosis.core.task.v0_6.SinkSource;
@@ -41,18 +42,10 @@ import org.slf4j.LoggerFactory;
 
 import at.srfg.graphium.io.adapter.IAdapter;
 import at.srfg.graphium.io.adapter.ISegmentAdapter;
-import at.srfg.graphium.io.adapter.impl.GraphVersionMetadata2GraphVersionMetadataDTOAdapter;
-import at.srfg.graphium.io.adapter.impl.HDWaySegment2HDWaySegmentDTOAdapter;
-import at.srfg.graphium.io.adapter.impl.WaySegment2SegmentDTOAdapter;
 import at.srfg.graphium.io.adapter.registry.ISegmentAdapterRegistry;
 import at.srfg.graphium.io.adapter.registry.impl.SegmentAdapterRegistryImpl;
-import at.srfg.graphium.io.dto.IGraphVersionMetadataDTO;
-import at.srfg.graphium.io.dto.IHDWaySegmentDTO;
 import at.srfg.graphium.io.outputformat.ISegmentOutputFormatFactory;
-import at.srfg.graphium.io.outputformat.IWayGraphOutputFormat;
-import at.srfg.graphium.io.outputformat.IWayGraphOutputFormatFactory;
 import at.srfg.graphium.io.outputformat.impl.jackson.GenericJacksonSegmentOutputFormatFactoryImpl;
-import at.srfg.graphium.io.outputformat.impl.jackson.GenericJacksonWayGraphOutputFormatFactoryImpl;
 import at.srfg.graphium.lanelet2import.adapter.AreasAdapter;
 import at.srfg.graphium.lanelet2import.adapter.LaneletsAdapter;
 import at.srfg.graphium.lanelet2import.connections.ConnectionsBuilder;
@@ -60,7 +53,6 @@ import at.srfg.graphium.lanelet2import.model.IImportConfig;
 import at.srfg.graphium.lanelet2import.reader.EntitySink;
 import at.srfg.graphium.lanelet2import.reader.LaneletContainer;
 import at.srfg.graphium.model.IWayGraphVersionMetadata;
-import at.srfg.graphium.model.hd.IHDArea;
 import at.srfg.graphium.model.hd.IHDWaySegment;
 import at.srfg.graphium.model.impl.WayGraphVersionMetadata;
 import at.srfg.graphium.model.management.impl.Source;
@@ -78,14 +70,15 @@ public class LaneletImporterService {
 
     private LaneletsAdapter laneletsAdapter;
     private AreasAdapter areasAdapter;
+	private RoadInfrastructureAdapter roadInfrasAdapter;
     private ConnectionsBuilder connectionsBuilder;
     
     public LaneletImporterService() {
     	
     	IAdapter<IGraphVersionMetadataDTO, IWayGraphVersionMetadata> adapter = 
     			new GraphVersionMetadata2GraphVersionMetadataDTOAdapter();
-    	ISegmentAdapterRegistry<IHDWaySegmentDTO, IHDWaySegment> adapterRegistry = 
-    			new SegmentAdapterRegistryImpl<IHDWaySegmentDTO, IHDWaySegment>();
+    	ISegmentAdapterRegistry<IHDWaySegmentDTO, IHDWaySegment> adapterRegistry =
+                new SegmentAdapterRegistryImpl<>();
     	
     	WaySegment2SegmentDTOAdapter<IHDWaySegmentDTO, IHDWaySegment> waySegmentAdapter = 
     			new HDWaySegment2HDWaySegmentDTOAdapter<>();
@@ -108,20 +101,38 @@ public class LaneletImporterService {
 
 		ISegmentAdapterRegistry<IHDAreaDTO, IHDArea> areaAdapterRegistry =
 				new SegmentAdapterRegistryImpl<IHDAreaDTO, IHDArea>();
-		//areaAdapterRegistry.setAdapters();
+
+		HDArea2HDAreaDTOAdapter<IHDAreaDTO, IHDArea> areaAdapter = new HDArea2HDAreaDTOAdapter<>();
+		List<ISegmentAdapter<IHDAreaDTO, IHDArea>> areaAdapters = new ArrayList<>();
+		areaAdapters.add(areaAdapter);
+		areaAdapterRegistry.setAdapters(areaAdapters);
+
+		ISegmentAdapterRegistry<IHDRoadInfrastructureDTO, IHDRoadInfrastructure> roadInfraAdapterRegistry =
+				new SegmentAdapterRegistryImpl<>();
+
+		HDRoadInfrastructure2HDRoadInfrastructureDTOAdapter<IHDRoadInfrastructureDTO, IHDRoadInfrastructure> roadInfraAdapter =
+				new HDRoadInfrastructure2HDRoadInfrastructureDTOAdapter<>();
+		List<ISegmentAdapter<IHDRoadInfrastructureDTO, IHDRoadInfrastructure>> roadInfraAdapters = new ArrayList<>();
+		roadInfraAdapters.add(roadInfraAdapter);
+		roadInfraAdapterRegistry.setAdapters(roadInfraAdapters);
 
     	ISegmentOutputFormatFactory<IHDWaySegment> segmentOutputFormatFactory = 
-    			new GenericJacksonSegmentOutputFormatFactoryImpl<IHDWaySegment>(adapterRegistry);
+    			new GenericJacksonSegmentOutputFormatFactoryImpl<>(adapterRegistry);
 
 		ISegmentOutputFormatFactory<IHDArea> areaOutputFormatFactory =
-				new GenericJacksonSegmentOutputFormatFactoryImpl<IHDArea>(areaAdapterRegistry);
+				new GenericJacksonSegmentOutputFormatFactoryImpl<>(areaAdapterRegistry);
 
-    	this.outputFormatFactory = 
-    			new GenericJacksonHdWayGraphOutputFormatFactoryImpl<IHDWaySegment>(segmentOutputFormatFactory,
-						areaOutputFormatFactory, adapter);
+		ISegmentOutputFormatFactory<IHDRoadInfrastructure> roadInfraOutputFormatFactory =
+				new GenericJacksonSegmentOutputFormatFactoryImpl<>(roadInfraAdapterRegistry);
+
+
+		this.outputFormatFactory =
+    			new GenericJacksonHdWayGraphOutputFormatFactoryImpl<>(segmentOutputFormatFactory,
+						areaOutputFormatFactory, roadInfraOutputFormatFactory, adapter);
     	
     	laneletsAdapter = new LaneletsAdapter();
     	areasAdapter = new AreasAdapter();
+		roadInfrasAdapter = new RoadInfrastructureAdapter();
     	connectionsBuilder = new ConnectionsBuilder();
     }
 
@@ -144,6 +155,8 @@ public class LaneletImporterService {
 //        List<IHDRegulatoryElement> hdRegulatoryElements = adaptRegulatoryElements(entitySink);
         List<IHDWaySegment> lanelets = adaptLanelets(entitySink);
         List<IHDArea> areas = adaptAreas(entitySink);
+		List<IHDRoadInfrastructure> roadInfras = adaptRoadInfrastructure(entitySink);
+
 //        collectRegulatoryElements(hdWaySegment, hdRegulatoryElements);
 
         log.info(lanelets.size() + " segments adapted");
@@ -167,6 +180,15 @@ public class LaneletImporterService {
 	        for (IHDWaySegment hdSegment : lanelets) {
 	        	outputFormat.serialize(hdSegment);
 	        }
+			outputFormat.finishSegments();
+			for (IHDArea area : areas) {
+				outputFormat.serialize(area);
+			}
+
+			outputFormat.finishAreas();
+			for (IHDRoadInfrastructure roadInfra : roadInfras) {
+				outputFormat.serialize(roadInfra);
+			}
         } catch (Exception th) {
             throw th;
         } finally {
@@ -213,9 +235,15 @@ public class LaneletImporterService {
 	}
 
 	private List<IHDArea> adaptAreas(EntitySink entitySink) {
-		return areasAdapter.adaptLanelets(entitySink.getRelations(),
+		return areasAdapter.adapt(entitySink.getRelations(),
 											 entitySink.getWays(),
 											 entitySink.getNodes());
+	}
+
+	private List<IHDRoadInfrastructure> adaptRoadInfrastructure(EntitySink entitySink) {
+		return roadInfrasAdapter.adapt(entitySink.getRelations(),
+				entitySink.getWays(),
+				entitySink.getNodes());
 	}
 
 //	private List<IHDRegulatoryElement> adaptRegulatoryElements(EntitySink entitySink) {

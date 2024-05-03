@@ -20,10 +20,10 @@ import at.srfg.graphium.io.dto.impl.HDAreaDTO;
 import at.srfg.graphium.model.hd.IHDArea;
 import at.srfg.graphium.model.hd.impl.HDArea;
 
-public class HDArea2HDAreaDTOAdapter<O extends IHDAreaDTO, I extends IHDArea> extends WaySegment2SegmentDTOAdapter<O, I> {
+public class HDArea2HDAreaDTOAdapter<O extends IHDAreaDTO, I extends IHDArea> extends BaseSegment2SegmentDTOAdapter<O, I> {
 
 	public HDArea2HDAreaDTOAdapter() {
-		super(IHDArea.class, IHDAreaDTO.class);
+		super(HDArea.class, HDAreaDTO.class);
 	}
 	
 	@Override
@@ -44,12 +44,15 @@ public class HDArea2HDAreaDTOAdapter<O extends IHDAreaDTO, I extends IHDArea> ex
 	protected void setModelValues(I segment, O segmentDTO) {
 		super.setModelValues(segment, segmentDTO);
 		segment.setAreaGeometry(segmentDTO.getAreaGeometry());
-		
+		segment.setType(segmentDTO.getType());
+		segment.setTags(segmentDTO.getTags());
 	}
 
 	protected void setDtoValues(O segmentDTO, I segment) {
 		super.setDtoValues(segmentDTO, segment);
 		segmentDTO.setAreaGeometry(segment.getAreaGeometry());
+		segmentDTO.setType(segment.getType());
+		segmentDTO.setTags(segment.getTags());
 	}
 
 }

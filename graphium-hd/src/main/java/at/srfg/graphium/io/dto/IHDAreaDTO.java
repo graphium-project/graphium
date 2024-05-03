@@ -17,10 +17,19 @@ package at.srfg.graphium.io.dto;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-public interface IHDAreaDTO extends IWaySegmentDTO {
+import java.util.Map;
+
+public interface IHDAreaDTO extends IBaseSegmentDTO {
 
 	Geometry getAreaGeometry();
 	
 	void setAreaGeometry(Geometry area);
-	
+
+	Map<String, String> getTags();
+
+	void setTags(Map<String, String> tags);
+
+	String getType();
+
+	void setType(String type);
 }

@@ -80,5 +80,11 @@ public class Constants {
 	public final static String RIGHT = "right";
 
 	public final static String STOP_LINE = "stop_line";
-	
+	public final static String TRAFFIC_LIGHT = "traffic_light";
+	public final static String TRAFFIC_SIGN = "traffic_sign";
+	public final static String ARROW = "arrow";
+
+	public final static String AREA_SUBTYPE_VEGETATION = "vegetation";
+	public final static String AREA_SUBTYPE_KEEPOUT = "keepout";
+	public final static String AREA_SUBTYPE_BUILDING = "building";
 }

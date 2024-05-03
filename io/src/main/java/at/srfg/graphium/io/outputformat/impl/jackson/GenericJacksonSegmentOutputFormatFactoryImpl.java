@@ -22,6 +22,7 @@ import at.srfg.graphium.io.dto.IBaseSegmentDTO;
 import at.srfg.graphium.io.outputformat.ISegmentOutputFormat;
 import at.srfg.graphium.io.outputformat.ISegmentOutputFormatFactory;
 import at.srfg.graphium.model.IBaseSegment;
+import com.fasterxml.jackson.core.JsonGenerator;
 
 public class GenericJacksonSegmentOutputFormatFactoryImpl<T extends IBaseSegment>
 	implements ISegmentOutputFormatFactory<T> {
@@ -38,9 +39,21 @@ public class GenericJacksonSegmentOutputFormatFactoryImpl<T extends IBaseSegment
 	}
 
 	@Override
+	public ISegmentOutputFormat<T> getSegmentOutputFormat(OutputStream stream, JsonGenerator generator) {
+		return new GenericJacksonSegmentOutputFormat<T>(adapterRegistry, stream, generator);
+	}
+
+	@Override
 	public ISegmentOutputFormat<T> getSegmentOutputFormat(OutputStream stream,
 			int flushBatchCount) {
 		return new GenericJacksonSegmentOutputFormat<T>(adapterRegistry, stream, null, flushBatchCount);
+	}
+
+	@Override
+	public ISegmentOutputFormat<T> getSegmentOutputFormat(OutputStream stream,
+														  JsonGenerator generator,
+														  int flushBatchCount) {
+		return new GenericJacksonSegmentOutputFormat<T>(adapterRegistry, stream, generator, flushBatchCount);
 	}
 
 }

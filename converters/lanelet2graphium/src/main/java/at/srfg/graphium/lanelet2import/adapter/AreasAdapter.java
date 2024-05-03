@@ -16,7 +16,9 @@
 package at.srfg.graphium.lanelet2import.adapter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.openstreetmap.osmosis.core.domain.v0_6.Node;
 import org.openstreetmap.osmosis.core.domain.v0_6.Relation;
@@ -34,11 +36,11 @@ import gnu.trove.map.hash.TLongObjectHashMap;
 public class AreasAdapter {
 	private static Logger log = LoggerFactory.getLogger(AreasAdapter.class);
 	
-	public List<IHDArea> adaptLanelets(List<Relation> relations, TLongObjectHashMap<Way> ways,
+	public List<IHDArea> adapt(TLongObjectHashMap<Relation> relations, TLongObjectHashMap<Way> ways,
 			TLongObjectHashMap<Node> nodes) {
 		List<IHDArea> areas = new ArrayList<IHDArea>();
 		
-		for (Relation rel : relations) {
+		for (Relation rel : relations.valueCollection()) {
 			String type = LaneletHelper.getType(rel);
 			if (type != null && type.equals(Constants.TYPE_AREA)) {
 				IHDArea area = adapt(rel, ways, nodes);
@@ -54,9 +56,11 @@ public class AreasAdapter {
 	public IHDArea adapt(Relation relation, TLongObjectHashMap<Way> ways, TLongObjectHashMap<Node> nodes) {
 		IHDArea area = new HDArea();
 		area.setId(relation.getId());
-		
 		area.setAreaGeometry(AreaHelper.createPolygon(relation, ways, nodes, Constants.SRID));
-		
+
+		Map<String, String> tags = new HashMap<>();
+		relation.getTags().forEach(tag -> tags.put(tag.getKey(), tag.getValue()));
+		area.setType(tags.get("subtype"));
 		return area;
 	}
 }

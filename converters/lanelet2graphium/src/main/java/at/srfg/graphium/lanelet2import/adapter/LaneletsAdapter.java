@@ -212,133 +212,133 @@ public class LaneletsAdapter {
 		
 		Set<Access> accesses = new HashSet<>();
 		switch (roadType) {
-		case "road":
-			if (location.equals(Constants.URBAN)) {
-				segment.setFrc(FuncRoadClass.LOCAL_CONNECTING_ROAD);
+			case "road":
+				if (location.equals(Constants.URBAN)) {
+					segment.setFrc(FuncRoadClass.LOCAL_CONNECTING_ROAD);
+					segment.setUrban(true);
+					// TODO: set default city speed limit
+				} else {
+					segment.setFrc(FuncRoadClass.OTHER_MAJOR_ROAD);
+					segment.setUrban(false);
+					// TODO: set default non-urban speed limit
+				}
+				accesses = allVehiclesAccesses();
+				accesses.add(Access.BIKE);
+				segment.setFormOfWay(FormOfWay.PART_OF_MULTI_CARRIAGEWAY_WHICH_IS_NOT_A_MOTORWAY);
+				break;
+
+			case "highway":
+				segment.setFrc(FuncRoadClass.MOTORWAY_FREEWAY_OR_OTHER_MAJOR_MOTORWAY);
+				if (location.equals(Constants.URBAN)) {
+					segment.setUrban(true);
+					// TODO: set default urban highway speed limit
+				} else {
+					segment.setUrban(false);
+					// TODO: set default non-urban highway speed limit
+				}
+				accesses = allVehiclesAccesses();
+				segment.setFormOfWay(FormOfWay.PART_OF_MOTORWAY);
+				break;
+
+			case "play_street":
+				segment.setFrc(FuncRoadClass.SONSTIGE_STRASSEN);
 				segment.setUrban(true);
-				// TODO: set default city speed limit
-			} else {
-				segment.setFrc(FuncRoadClass.OTHER_MAJOR_ROAD);
-				segment.setUrban(false);
-				// TODO: set default non-urban speed limit
-			}
-			accesses = allVehiclesAccesses();
-			accesses.add(Access.BIKE);
-			segment.setFormOfWay(FormOfWay.PART_OF_MULTI_CARRIAGEWAY_WHICH_IS_NOT_A_MOTORWAY);
-			break;
+				// TODO: set default play street speed limit
+				accesses = allVehiclesAccesses();
+				accesses.add(Access.BIKE);
+				accesses.add(Access.PEDESTRIAN);
+				segment.setFormOfWay(FormOfWay.PART_OF_A_SERVICE_ROAD);
+				break;
 
-		case "highway":
-			segment.setFrc(FuncRoadClass.MOTORWAY_FREEWAY_OR_OTHER_MAJOR_MOTORWAY);
-			if (location.equals(Constants.URBAN)) {
-				segment.setUrban(true);
-				// TODO: set default urban highway speed limit
-			} else {
-				segment.setUrban(false);
-				// TODO: set default non-urban highway speed limit
-			}
-			accesses = allVehiclesAccesses();
-			segment.setFormOfWay(FormOfWay.PART_OF_MOTORWAY);
-			break;
+			case "emergency_lane":
+				segment.setFrc(FuncRoadClass.SONSTIGE_STRASSEN);
+	//			segment.setUrban(true);
+				// TODO: set default average emergency vehicle speed?
+				accesses.add(Access.EMERGENCY_VEHICLE);
+				segment.setFormOfWay(FormOfWay.ROAD_FOR_AUTHORITIES);
+				break;
 
-		case "play_street":
-			segment.setFrc(FuncRoadClass.SONSTIGE_STRASSEN);
-			segment.setUrban(true);
-			// TODO: set default play street speed limit
-			accesses = allVehiclesAccesses();
-			accesses.add(Access.BIKE);
-			accesses.add(Access.PEDESTRIAN);
-			segment.setFormOfWay(FormOfWay.PART_OF_A_SERVICE_ROAD);
-			break;
+			case "bus_lane":
+				segment.setFrc(FuncRoadClass.LOCAL_ROAD_OF_HIGH_IMPORTANCE);
+				if (location.equals(Constants.URBAN)) {
+					segment.setUrban(true);
+					// TODO: set default urban speed limit
+				} else {
+					segment.setUrban(false);
+					// TODO: set default non-urban speed limit
+				}
+				accesses = new HashSet<>();
+				accesses.add(Access.EMERGENCY_VEHICLE);
+				accesses.add(Access.PUBLIC_BUS);
+				accesses.add(Access.TAXI);
+				segment.setFormOfWay(FormOfWay.ROAD_FOR_AUTHORITIES);
+				break;
 
-		case "emergency_lane":
-			segment.setFrc(FuncRoadClass.SONSTIGE_STRASSEN);
-//			segment.setUrban(true);
-			// TODO: set default average emergency vehicle speed?
-			accesses.add(Access.EMERGENCY_VEHICLE);
-			segment.setFormOfWay(FormOfWay.ROAD_FOR_AUTHORITIES);
-			break;
+			case "bicycle_lane":
+				segment.setFrc(FuncRoadClass.RAD_FUSSWEG);
+	//			segment.setUrban(true);
+				// TODO: set default average bike vehicle speed?
+				accesses.add(Access.BIKE);
+				segment.setFormOfWay(FormOfWay.PART_OF_A_WALKWAY_OR_BICYCLE_WAY);
+				break;
 
-		case "bus_lane":
-			segment.setFrc(FuncRoadClass.LOCAL_ROAD_OF_HIGH_IMPORTANCE);
-			if (location.equals(Constants.URBAN)) {
+			case "exit":
+				segment.setFrc(FuncRoadClass.SONSTIGE_STRASSEN);
 				segment.setUrban(true);
 				// TODO: set default urban speed limit
-			} else {
-				segment.setUrban(false);
-				// TODO: set default non-urban speed limit
-			}
-			accesses = new HashSet<>();
-			accesses.add(Access.EMERGENCY_VEHICLE);
-			accesses.add(Access.PUBLIC_BUS);
-			accesses.add(Access.TAXI);
-			segment.setFormOfWay(FormOfWay.ROAD_FOR_AUTHORITIES);
-			break;
+				accesses = allVehiclesAccesses();
+				accesses.add(Access.BIKE);
+				accesses.add(Access.PEDESTRIAN);
+				segment.setFormOfWay(FormOfWay.NOT_APPLICABLE);
+				break;
 
-		case "bicycle_lane":
-			segment.setFrc(FuncRoadClass.RAD_FUSSWEG);
-//			segment.setUrban(true);
-			// TODO: set default average bike vehicle speed?
-			accesses.add(Access.BIKE);
-			segment.setFormOfWay(FormOfWay.PART_OF_A_WALKWAY_OR_BICYCLE_WAY);
-			break;
+			case "parking":
+				segment.setFrc(FuncRoadClass.SONSTIGE_STRASSEN);
+	//			segment.setUrban(true);
+				// TODO: set default average pedestrian walking speed
+				accesses = allVehiclesAccesses();
+				accesses.add(Access.BIKE);
+				accesses.add(Access.PEDESTRIAN);
+				segment.setFormOfWay(FormOfWay.PART_OF_AN_ETA_PARKING_PLACE);
+				break;
 
-		case "exit":
-			segment.setFrc(FuncRoadClass.SONSTIGE_STRASSEN);
-			segment.setUrban(true);
-			// TODO: set default urban speed limit
-			accesses = allVehiclesAccesses();
-			accesses.add(Access.BIKE);
-			accesses.add(Access.PEDESTRIAN);
-			segment.setFormOfWay(FormOfWay.NOT_APPLICABLE);
-			break;
+			case "walkway":
+				segment.setFrc(FuncRoadClass.RAD_FUSSWEG);
+	//			segment.setUrban(true);
+				// TODO: set default average pedestrian walking speed
+				accesses.add(Access.PEDESTRIAN);
+				segment.setFormOfWay(FormOfWay.PART_OF_A_WALKWAY_OR_BICYCLE_WAY);
+				break;
 
-		case "parking":
-			segment.setFrc(FuncRoadClass.SONSTIGE_STRASSEN);
-//			segment.setUrban(true);
-			// TODO: set default average pedestrian walking speed
-			accesses = allVehiclesAccesses();
-			accesses.add(Access.BIKE);
-			accesses.add(Access.PEDESTRIAN);
-			segment.setFormOfWay(FormOfWay.PART_OF_AN_ETA_PARKING_PLACE);
-			break;
+			case "shared_walkway":
+				segment.setFrc(FuncRoadClass.RAD_FUSSWEG);
+	//			segment.setUrban(true);
+				// TODO: set default average pedestrian walking speed
+				accesses.add(Access.BIKE);
+				accesses.add(Access.PEDESTRIAN);
+				segment.setFormOfWay(FormOfWay.PART_OF_A_WALKWAY_OR_BICYCLE_WAY);
+				break;
 
-		case "walkway":
-			segment.setFrc(FuncRoadClass.RAD_FUSSWEG);
-//			segment.setUrban(true);
-			// TODO: set default average pedestrian walking speed
-			accesses.add(Access.PEDESTRIAN);
-			segment.setFormOfWay(FormOfWay.PART_OF_A_WALKWAY_OR_BICYCLE_WAY);
-			break;
+			case "crosswalk":
+				segment.setFrc(FuncRoadClass.RAD_FUSSWEG);
+	//			segment.setUrban(true);
+				// TODO: set default average pedestrian walking speed
+				accesses.add(Access.PEDESTRIAN);
+				segment.setFormOfWay(FormOfWay.PART_OF_A_WALKWAY_OR_BICYCLE_WAY);
+				break;
 
-		case "shared_walkway":
-			segment.setFrc(FuncRoadClass.RAD_FUSSWEG);
-//			segment.setUrban(true);
-			// TODO: set default average pedestrian walking speed
-			accesses.add(Access.BIKE);
-			accesses.add(Access.PEDESTRIAN);
-			segment.setFormOfWay(FormOfWay.PART_OF_A_WALKWAY_OR_BICYCLE_WAY);
-			break;
+			case "stairs":
+				segment.setFrc(FuncRoadClass.RAD_FUSSWEG);
+	//			segment.setUrban(true);
+				// TODO: set default average pedestrian walking speed
+				accesses.add(Access.PEDESTRIAN);
+				segment.setFormOfWay(FormOfWay.PART_OF_A_PEDESTRIAN_ZONE);
+				break;
 
-		case "crosswalk":
-			segment.setFrc(FuncRoadClass.RAD_FUSSWEG);
-//			segment.setUrban(true);
-			// TODO: set default average pedestrian walking speed
-			accesses.add(Access.PEDESTRIAN);
-			segment.setFormOfWay(FormOfWay.PART_OF_A_WALKWAY_OR_BICYCLE_WAY);
-			break;
-
-		case "stairs":
-			segment.setFrc(FuncRoadClass.RAD_FUSSWEG);
-//			segment.setUrban(true);
-			// TODO: set default average pedestrian walking speed
-			accesses.add(Access.PEDESTRIAN);
-			segment.setFormOfWay(FormOfWay.PART_OF_A_PEDESTRIAN_ZONE);
-			break;
-
-		default:
-			segment.setFrc(FuncRoadClass.NOT_APPLICABLE);
-			segment.setFormOfWay(FormOfWay.NOT_APPLICABLE);
-			break;
+			default:
+				segment.setFrc(FuncRoadClass.NOT_APPLICABLE);
+				segment.setFormOfWay(FormOfWay.NOT_APPLICABLE);
+				break;
 		}
 		
 		segment.setAccessTow(accesses);

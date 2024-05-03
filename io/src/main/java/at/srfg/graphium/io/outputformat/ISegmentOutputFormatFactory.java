@@ -18,11 +18,16 @@ package at.srfg.graphium.io.outputformat;
 import java.io.OutputStream;
 
 import at.srfg.graphium.model.IBaseSegment;
+import com.fasterxml.jackson.core.JsonGenerator;
 
 public interface ISegmentOutputFormatFactory<T extends IBaseSegment> {
 
 	public ISegmentOutputFormat<T> getSegmentOutputFormat(OutputStream stream);
-	
+
+	public ISegmentOutputFormat<T> getSegmentOutputFormat(OutputStream stream, JsonGenerator generator);
+
 	public ISegmentOutputFormat<T> getSegmentOutputFormat(OutputStream stream, int flushBatchCount);
+
+	public ISegmentOutputFormat<T> getSegmentOutputFormat(OutputStream stream, JsonGenerator generator, int flushBatchCount);
 	
 }

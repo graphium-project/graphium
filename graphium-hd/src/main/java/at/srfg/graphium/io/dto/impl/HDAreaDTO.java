@@ -15,18 +15,26 @@
  */
 package at.srfg.graphium.io.dto.impl;
 
+import at.srfg.graphium.io.inputformat.impl.jackson.JacksonLineStringDeserializer;
+import at.srfg.graphium.io.outputformat.impl.jackson.JacksonGeometrySerializer;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.vividsolutions.jts.geom.Geometry;
 
 import at.srfg.graphium.io.dto.IHDAreaDTO;
 
+import java.util.Map;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class HDAreaDTO extends WaySegmentDTOImpl implements IHDAreaDTO {
+public class HDAreaDTO extends BaseSegmentDTOImpl implements IHDAreaDTO {
 
 	private Geometry areaGeometry;
-	
+	private String type;
+	protected Map<String, String> tags;
+
 	public HDAreaDTO() {}
 	
 	public HDAreaDTO(Geometry areaGeometry) {
@@ -35,6 +43,8 @@ public class HDAreaDTO extends WaySegmentDTOImpl implements IHDAreaDTO {
 	}
 
 	@Override
+	@JsonSerialize(using = JacksonGeometrySerializer.class)
+	@JsonDeserialize(using = JacksonLineStringDeserializer.class)
 	public Geometry getAreaGeometry() {
 		return areaGeometry;
 	}
@@ -43,5 +53,24 @@ public class HDAreaDTO extends WaySegmentDTOImpl implements IHDAreaDTO {
 	public void setAreaGeometry(Geometry area) {
 		areaGeometry = area;
 	}
-	
+
+	@Override
+	public Map<String, String> getTags() {
+		return tags;
+	}
+
+	@Override
+	public void setTags(Map<String, String> tags) {
+		this.tags = tags;
+	}
+
+	@Override
+	public String getType() {
+		return type;
+	}
+
+	@Override
+	public void setType(String type) {
+		this.type = type;
+	}
 }
