@@ -26,26 +26,29 @@ public class HDArea extends BaseSegment implements IHDArea {
 
     private static final long serialVersionUID = 1704083353423296842L;
 
-    private Geometry areaGeometry;
+    private Geometry geometry;
     private String type;
     protected Map<String, String> tags;
 
     public HDArea() {
     }
 
-    public HDArea(Geometry areaGeometry) {
+    public HDArea(long id, Geometry geometry, String type, Map<String, String> tags) {
         super();
-        this.areaGeometry = areaGeometry;
+        this.id = id;
+        this.type = type;
+        this.tags = tags;
+        this.geometry = geometry;
     }
 
     @Override
-    public Geometry getAreaGeometry() {
-        return areaGeometry;
+    public Geometry getGeometry() {
+        return geometry;
     }
 
     @Override
-    public void setAreaGeometry(Geometry area) {
-        areaGeometry = area;
+    public void setGeometry(Geometry area) {
+        geometry = area;
     }
 
     @Override
@@ -70,7 +73,7 @@ public class HDArea extends BaseSegment implements IHDArea {
 
     @Override
     public String toString() {
-        return "LaneletArea [areaGeometry=" + areaGeometry + ", id=" + id + ", xInfo=" + xInfo + ", cons=" + cons + "]";
+        return "LaneletArea [geometry=" + geometry + ", id=" + id + ", xInfo=" + xInfo + ", cons=" + cons + "]";
 		/*return "LaneletArea [areaGeometry=" + areaGeometry + ", maxSpeedTow=" + maxSpeedTow + ", maxSpeedBkw="
 				+ maxSpeedBkw + ", speedCalcTow=" + speedCalcTow + ", speedCalcBkw=" + speedCalcBkw + ", lanesTow="
 				+ lanesTow + ", lanesBkw=" + lanesBkw + ", frc=" + frc + ", formOfWay=" + formOfWay + ", accessTow="

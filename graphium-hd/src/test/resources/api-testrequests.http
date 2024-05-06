@@ -1,0 +1,19 @@
+### upload hd graph
+
+POST http://localhost:6767/graphium_tutorial_central_server_war/api/hdwaysegments/graphs/salzburg_hd_from_lanelet2/versions/210628?overrideIfExists=true HTTP/1.1
+Content-Type: multipart/form-data; boundary=boundary
+
+
+--boundary
+Content-Disposition: form-data; name="file"; filename="graph_file.txt"
+
+// The 'input.txt' file will be uploaded
+< /Users/development/project_data/hdmap/sterneckstraße/sterneckstrasse_hd_2806_210628_2.json
+
+
+### delete hd graph
+DELETE http://localhost:6767/graphium_tutorial_central_server_war/api/hdwaysegments/graphs/salzburg_hd_from_lanelet2/versions/210628 HTTP/1.1
+
+
+### fetch graph
+GET http://localhost:6767/graphium_tutorial_central_server_war/api/hdwaysegments/graphs/salzburg_hd_from_lanelet2/versions/210628 HTTP/1.1

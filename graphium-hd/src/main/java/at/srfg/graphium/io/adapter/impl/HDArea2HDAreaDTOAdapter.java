@@ -43,14 +43,14 @@ public class HDArea2HDAreaDTOAdapter<O extends IHDAreaDTO, I extends IHDArea> ex
 	@Override
 	protected void setModelValues(I segment, O segmentDTO) {
 		super.setModelValues(segment, segmentDTO);
-		segment.setAreaGeometry(segmentDTO.getAreaGeometry());
+		segment.setGeometry(segmentDTO.getGeometry());
 		segment.setType(segmentDTO.getType());
 		segment.setTags(segmentDTO.getTags());
 	}
 
 	protected void setDtoValues(O segmentDTO, I segment) {
 		super.setDtoValues(segmentDTO, segment);
-		segmentDTO.setAreaGeometry(segment.getAreaGeometry());
+		segmentDTO.setGeometry(segment.getGeometry());
 		segmentDTO.setType(segment.getType());
 		segmentDTO.setTags(segment.getTags());
 	}

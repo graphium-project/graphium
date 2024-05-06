@@ -11,6 +11,9 @@
     	<property name="xInfoRowMapperFactory" ref="segmentXInfoRowMapperFactory"/>
     </bean>
 
+    <bean id="hdAreaRowMapper" class="at.srfg.graphium.postgis.persistence.rowmapper.HDAreaRowMapper" />
+    <bean id="hdInfraAndSignsRowMapper" class="at.srfg.graphium.postgis.persistence.rowmapper.HDInfraAndSignsRowMapper" />
+
     <bean id="postgisHDWayGraphWriteDao" class="at.srfg.graphium.postgis.persistence.impl.HDWayGraphWriteDaoImpl" parent="graphiumAbstractPostgisDao">
     	<property name="xInfoDaoRegistry" ref="xInfoDaoRegistry"/>
     	<property name="metadataDao" ref="postgisWayGraphVersionMetadataDao"/>
@@ -23,15 +26,26 @@
     
     <bean id="postgisHDWayGraphViewDao" class="at.srfg.graphium.postgis.persistence.impl.HDWayGraphViewDaoImpl" parent="graphiumAbstractPostgisDao">
     	<property name="rowMapper" ref="wayGraphViewRowMapper"/>
+        <property name="areaRowMapper" ref="hdAreaRowMapper" />
+        <property name="infraAndSignsRowMapper" ref="hdInfraAndSignsRowMapper" />
     	<property name="waySegmentRowMapper" ref="waySegmentResultSetExtractor"/>
     </bean>
 
-    <bean id="postgisHDWayGraphAdditionalElementsWriteDao" class="at.srfg.graphium.postgis.persistence.impl.HDWayGraphAdditionalElementsWriteDaoImpl" parent="graphiumAbstractPostgisDao">
+    <bean id="postgisHDWayGraphAdditionalElementsWriteDao"
+          class="at.srfg.graphium.postgis.persistence.impl.HDWayGraphAdditionalElementsWriteDaoImpl" parent="graphiumAbstractPostgisDao">
         <property name="metadataDao" ref="postgisWayGraphVersionMetadataDao"/>
+    </bean>
+
+    <bean id="postgisHDWayGraphAdditionalElementsReadDao" class="at.srfg.graphium.postgis.persistence.impl.HDWayGraphAdditionalElementsReadDaoImpl"
+          parent="graphiumAbstractPostgisDao">
+        <property name="viewDao" ref="wayGraphViewDao"/>
+        <property name="areaRowMapper" ref="hdAreaRowMapper"/>
+        <property name="infraAndSignsRowMapper" ref="hdInfraAndSignsRowMapper"/>
     </bean>
     
     <alias name="postgisHDWayGraphReadDao" alias="hdWayGraphReadDao"/>
     <alias name="postgisHDWayGraphWriteDao" alias="hdWayGraphWriteDao"/>
+    <alias name="postgisHDWayGraphAdditionalElementsReadDao" alias="hdWayGraphAdditionalElementsReadDao"/>
     <alias name="postgisHDWayGraphAdditionalElementsWriteDao" alias="hdWayGraphAdditionalElementsWriteDao"/>
  	<alias name="postgisQueuingHDGraphVersionImportService" alias="queuingHDGraphVersionImportService"/>
 

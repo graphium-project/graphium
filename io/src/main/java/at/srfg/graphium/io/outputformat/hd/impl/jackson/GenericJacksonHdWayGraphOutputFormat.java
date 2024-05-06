@@ -23,7 +23,7 @@ import at.srfg.graphium.io.outputformat.hd.IHdWayGraphOutputFormat;
 import at.srfg.graphium.io.outputformat.impl.jackson.GenericJacksonWayGraphOutputFormat;
 import at.srfg.graphium.model.IWayGraphVersionMetadata;
 import at.srfg.graphium.model.hd.IHDArea;
-import at.srfg.graphium.model.hd.IHDRoadInfrastructure;
+import at.srfg.graphium.model.hd.IHDInfraAndSigns;
 import at.srfg.graphium.model.hd.IHDWaySegment;
 import com.fasterxml.jackson.core.JsonGenerator;
 
@@ -38,7 +38,7 @@ public class GenericJacksonHdWayGraphOutputFormat<T extends IHDWaySegment>
         extends GenericJacksonWayGraphOutputFormat<T> implements IHdWayGraphOutputFormat<T> {
 
     ISegmentOutputFormat<IHDArea> areaOutputFormat;
-    ISegmentOutputFormat<IHDRoadInfrastructure> roadInfraOutputFormat;
+    ISegmentOutputFormat<IHDInfraAndSigns> roadInfraOutputFormat;
 
     boolean segmentSectionFinished = false;
     boolean areaSectionFinished = false;
@@ -46,7 +46,7 @@ public class GenericJacksonHdWayGraphOutputFormat<T extends IHDWaySegment>
 
     public GenericJacksonHdWayGraphOutputFormat(
             ISegmentOutputFormat<T> segmentOutputFormat, ISegmentOutputFormat<IHDArea> areaOutputFormat,
-            ISegmentOutputFormat<IHDRoadInfrastructure> roadInfraOutputFormat,
+            ISegmentOutputFormat<IHDInfraAndSigns> roadInfraOutputFormat,
             IAdapter<IGraphVersionMetadataDTO, IWayGraphVersionMetadata> adapter, OutputStream stream,
             JsonGenerator generator) {
         super(segmentOutputFormat, adapter, stream, generator);
@@ -78,7 +78,7 @@ public class GenericJacksonHdWayGraphOutputFormat<T extends IHDWaySegment>
     }
 
     @Override
-    public void serialize(IHDRoadInfrastructure roadInfra) throws WaySegmentSerializationException {
+    public void serialize(IHDInfraAndSigns roadInfra) throws WaySegmentSerializationException {
         roadInfraOutputFormat.serialize(roadInfra);
     }
 

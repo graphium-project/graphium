@@ -86,13 +86,18 @@ public class ViewParseUtil {
 		
 		return addFiltersAndOrder(query, view, graphVersion,schema, order, additionalFilter);
 	}
-	
-	protected static String addFiltersAndOrder(String query, IWayGraphView view, String graphVersion, String schema,			
-			GraphReadOrder order, Map<String, ? extends Object> additionalFilter) {
+
+	public static String addFiltersAndOrder(String query, IWayGraphView view, String graphVersion, String schema,
+											GraphReadOrder order, Map<String, ? extends Object> additionalFilter) {
+		return addFiltersAndOrder(query, view, graphVersion, schema, order, additionalFilter, "wayseg_");
+	}
+
+	public static String addFiltersAndOrder(String query, IWayGraphView view, String graphVersion, String schema,
+			GraphReadOrder order, Map<String, ? extends Object> additionalFilter, String prefix) {
 		StringBuilder filters = new StringBuilder();
 		
 		if (view.isWaySegmentsIncluded() && graphVersion != null) {
-			filters.append("wayseg_graphversion_id = f_current_graphversion_immutable('" + view.getGraph().getName() + "', '" + graphVersion + "')");
+			filters.append(prefix + "graphversion_id = f_current_graphversion_immutable('" + view.getGraph().getName() + "', '" + graphVersion + "')");
 		}
 		
 		if (additionalFilter != null && !additionalFilter.isEmpty()) {

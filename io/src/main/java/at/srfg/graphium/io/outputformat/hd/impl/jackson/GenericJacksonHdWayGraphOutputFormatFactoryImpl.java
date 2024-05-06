@@ -24,7 +24,7 @@ import at.srfg.graphium.io.outputformat.hd.IHdWayGraphOutputFormatFactory;
 import at.srfg.graphium.io.outputformat.impl.jackson.GenericJacksonSegmentOutputFormat;
 import at.srfg.graphium.model.IWayGraphVersionMetadata;
 import at.srfg.graphium.model.hd.IHDArea;
-import at.srfg.graphium.model.hd.IHDRoadInfrastructure;
+import at.srfg.graphium.model.hd.IHDInfraAndSigns;
 import at.srfg.graphium.model.hd.IHDWaySegment;
 import com.fasterxml.jackson.core.JsonGenerator;
 
@@ -41,13 +41,13 @@ public class GenericJacksonHdWayGraphOutputFormatFactoryImpl<T extends IHDWaySeg
 	private ISegmentOutputFormatFactory<T> segmentOutputFormatFactory;
 	// TODO generic for area
 	private ISegmentOutputFormatFactory<IHDArea> areaOutputFormatFactory;
-	private ISegmentOutputFormatFactory<IHDRoadInfrastructure> roadInfraOutputFormatFactory;
+	private ISegmentOutputFormatFactory<IHDInfraAndSigns> roadInfraOutputFormatFactory;
 	private IAdapter<IGraphVersionMetadataDTO, IWayGraphVersionMetadata> adapter;
 
 	public GenericJacksonHdWayGraphOutputFormatFactoryImpl(
 			ISegmentOutputFormatFactory<T> segmentOutputFormatFactory,
 			ISegmentOutputFormatFactory<IHDArea> areaOutputFormatFactory,
-			ISegmentOutputFormatFactory<IHDRoadInfrastructure> roadInfraOutputFormatFactory,
+			ISegmentOutputFormatFactory<IHDInfraAndSigns> roadInfraOutputFormatFactory,
 			IAdapter<IGraphVersionMetadataDTO, IWayGraphVersionMetadata> adapter) {
 		this.segmentOutputFormatFactory = segmentOutputFormatFactory;
 		this.areaOutputFormatFactory = areaOutputFormatFactory;
@@ -64,8 +64,8 @@ public class GenericJacksonHdWayGraphOutputFormatFactoryImpl<T extends IHDWaySeg
 		ISegmentOutputFormat<IHDArea> areaOutputFormat = areaOutputFormatFactory.getSegmentOutputFormat(stream, generator);
 		((GenericJacksonSegmentOutputFormat<IHDArea>)areaOutputFormat).setWrapInObject(false);
 
-		ISegmentOutputFormat<IHDRoadInfrastructure> roadInfraOutputFormat = roadInfraOutputFormatFactory.getSegmentOutputFormat(stream, generator);
-		((GenericJacksonSegmentOutputFormat<IHDRoadInfrastructure>)roadInfraOutputFormat).setWrapInObject(false);
+		ISegmentOutputFormat<IHDInfraAndSigns> roadInfraOutputFormat = roadInfraOutputFormatFactory.getSegmentOutputFormat(stream, generator);
+		((GenericJacksonSegmentOutputFormat<IHDInfraAndSigns>)roadInfraOutputFormat).setWrapInObject(false);
 
 		return new GenericJacksonHdWayGraphOutputFormat<T>(segmentOutputFormat, areaOutputFormat, roadInfraOutputFormat, adapter, stream, generator);
 	}

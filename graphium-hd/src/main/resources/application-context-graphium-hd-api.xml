@@ -9,7 +9,8 @@
 		<property name="metadataService" ref="graphVersionMetadataService"/>
 		<property name="graphWriteService" ref="hdGraphWriteService"/>
 		<property name="importService" ref="queuingHDGraphVersionImportService"/>
-		<property name="graphOutputFormatFactory" ref="jacksonWayGraphOutputFormatFactory"/>
+		<!--<property name="graphOutputFormatFactory" ref="jacksonWayGraphOutputFormatFactory"/>-->
+		<property name="graphOutputFormatFactory" ref="jacksonHdWayGraphOutputFormatFactory" />
 		<property name="graphFileUploadDirectory" value="${graphium.import.uploadDir}"/>
 		<property name="xInfoDaoRegistry" ref="xInfoDaoRegistry"/>
 		<property name="cacheGraphFiles" value="${graphium.import.cacheGraphFiles}"/>

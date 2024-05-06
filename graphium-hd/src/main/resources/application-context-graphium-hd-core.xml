@@ -9,8 +9,9 @@
     
 	<!-- services -->
 	<bean id="hdGraphReadService" 
-		class="at.srfg.graphium.core.service.impl.GraphReadServiceImpl">
+		class="at.srfg.graphium.service.impl.HDGraphReadServiceImpl">
 		<property name="readDao" ref="hdWayGraphReadDao"/>
+		<property name="additionalElementsReadDao" ref="hdWayGraphAdditionalElementsReadDao"/>
 	</bean>
 	
 	<bean id="hdGraphWriteService" 

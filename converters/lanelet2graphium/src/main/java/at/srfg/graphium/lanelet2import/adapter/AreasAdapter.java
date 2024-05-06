@@ -56,7 +56,7 @@ public class AreasAdapter {
 	public IHDArea adapt(Relation relation, TLongObjectHashMap<Way> ways, TLongObjectHashMap<Node> nodes) {
 		IHDArea area = new HDArea();
 		area.setId(relation.getId());
-		area.setAreaGeometry(AreaHelper.createPolygon(relation, ways, nodes, Constants.SRID));
+		area.setGeometry(AreaHelper.createPolygon(relation, ways, nodes, Constants.SRID));
 
 		Map<String, String> tags = new HashMap<>();
 		relation.getTags().forEach(tag -> tags.put(tag.getKey(), tag.getValue()));

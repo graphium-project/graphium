@@ -21,9 +21,9 @@ import java.util.Map;
 
 public interface IHDAreaDTO extends IBaseSegmentDTO {
 
-	Geometry getAreaGeometry();
+	Geometry getGeometry();
 	
-	void setAreaGeometry(Geometry area);
+	void setGeometry(Geometry area);
 
 	Map<String, String> getTags();
 

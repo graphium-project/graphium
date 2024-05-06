@@ -5,8 +5,8 @@ import at.srfg.graphium.core.helper.GraphVersionHelper;
 import at.srfg.graphium.core.persistence.IWayGraphVersionMetadataDao;
 import at.srfg.graphium.model.IWayGraphVersionMetadata;
 import at.srfg.graphium.model.hd.IHDArea;
-import at.srfg.graphium.model.hd.IHDRoadInfrastructure;
-import at.srfg.graphium.postgis.persistence.IHDWayGraphAdditionalElementsWriteDaoImpl;
+import at.srfg.graphium.model.hd.IHDInfraAndSigns;
+import at.srfg.graphium.postgis.persistence.IHDWayGraphAdditionalElementsWriteDao;
 import com.vividsolutions.jts.io.WKTWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +20,7 @@ import java.util.Calendar;
 import java.util.List;
 
 public class HDWayGraphAdditionalElementsWriteDaoImpl extends AbstractWayGraphDaoImpl
-    implements IHDWayGraphAdditionalElementsWriteDaoImpl {
+    implements IHDWayGraphAdditionalElementsWriteDao {
 
     private static Logger log = LoggerFactory.getLogger(HDWayGraphAdditionalElementsWriteDaoImpl.class);
 
@@ -57,7 +57,7 @@ public class HDWayGraphAdditionalElementsWriteDaoImpl extends AbstractWayGraphDa
     }
 
     @Override
-    public void saveHdInfrastructureAndSigns(List<IHDRoadInfrastructure> infrastructureAndSigns,
+    public void saveHdInfrastructureAndSigns(List<IHDInfraAndSigns> infrastructureAndSigns,
                                              String graphName, String version) throws GraphStorageException {
         log.info("storing {} infrastructure and signs", infrastructureAndSigns.size());
 
@@ -90,7 +90,7 @@ public class HDWayGraphAdditionalElementsWriteDaoImpl extends AbstractWayGraphDa
     protected MapSqlParameterSource getAreaParamSource(IHDArea area, Timestamp now) throws SQLException {
         MapSqlParameterSource args = new MapSqlParameterSource();
         args.addValue("id", area.getId());
-        args.addValue("geometry","SRID=4326;"+wktWriter.write(area.getAreaGeometry()));
+        args.addValue("geometry","SRID=4326;"+wktWriter.write(area.getGeometry()));
         args.addValue("type", area.getType());
         args.addValue("timestamp", now);
         args.addValue("tags", area.getTags());
@@ -103,11 +103,11 @@ public class HDWayGraphAdditionalElementsWriteDaoImpl extends AbstractWayGraphDa
     }
 
     public SqlParameterSource[] getInfraAndSignParamSource(
-            List<IHDRoadInfrastructure> infraAndSigns, Integer graphVersionId) throws SQLException {
+            List<IHDInfraAndSigns> infraAndSigns, Integer graphVersionId) throws SQLException {
         final Timestamp now = new Timestamp(Calendar.getInstance().getTimeInMillis());
         SqlParameterSource[] argArray = new SqlParameterSource[infraAndSigns.size()];
         int i = 0;
-        for (IHDRoadInfrastructure infraAndSign : infraAndSigns) {
+        for (IHDInfraAndSigns infraAndSign : infraAndSigns) {
             MapSqlParameterSource args = getInfraAndSignParamSource(infraAndSign, now);
             if (graphVersionId != null) {
                 args.addValue("graphVersionId", graphVersionId);
@@ -118,7 +118,7 @@ public class HDWayGraphAdditionalElementsWriteDaoImpl extends AbstractWayGraphDa
         return argArray;
     }
 
-    protected MapSqlParameterSource getInfraAndSignParamSource(IHDRoadInfrastructure area, Timestamp now) throws SQLException {
+    protected MapSqlParameterSource getInfraAndSignParamSource(IHDInfraAndSigns area, Timestamp now) throws SQLException {
         MapSqlParameterSource args = new MapSqlParameterSource();
         args.addValue("id", area.getId());
         args.addValue("geometry","SRID=4326;"+wktWriter.write(area.getGeometry()));

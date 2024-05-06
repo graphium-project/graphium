@@ -16,13 +16,23 @@
 package at.srfg.graphium.postgis.persistence.impl;
 
 import at.srfg.graphium.model.ISegmentXInfo;
+import at.srfg.graphium.model.IWayGraph;
+import at.srfg.graphium.model.hd.IHDArea;
+import at.srfg.graphium.model.hd.IHDInfraAndSigns;
 import at.srfg.graphium.model.hd.IHDWaySegment;
+import at.srfg.graphium.postgis.persistence.IHDAreaRowMapper;
+import at.srfg.graphium.postgis.persistence.IHDInfraAndSignsRowMapper;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author mwimmer
  *
  */
 public class HDWayGraphViewDaoImpl<W extends IHDWaySegment, X extends ISegmentXInfo> extends WayGraphViewDaoImpl<W, X> {
+
+	protected static final String AREA_QUERY_PREFIX = "area";
+	protected static final String INFRA_AND_SIGNS_QUERY_PREFIX = "infra_and_signs";
 
 	protected String[] hdSegmentsAttributes = new String[] {
 			"id AS id",
@@ -59,8 +69,60 @@ public class HDWayGraphViewDaoImpl<W extends IHDWaySegment, X extends ISegmentXI
 			"right_border_endnode_id AS " + QUERY_PREFIX + "_right_border_endnode_id"
 		};
 
+	protected String[] hdAreaAttributes = new String[] {
+			"id AS id",
+			"graphversion_id AS " + AREA_QUERY_PREFIX + "_graphversion_id",
+			"geometry AS " + AREA_QUERY_PREFIX + "_geometry",
+			"timestamp AS " + AREA_QUERY_PREFIX + "_timestamp",
+			"type AS " + AREA_QUERY_PREFIX + "_type",
+			"tags AS " + AREA_QUERY_PREFIX + "_tags"
+	};
+
+	protected String[] hdInfraAndSignsAttributes = new String[] {
+			"id AS id",
+			"graphversion_id AS " + INFRA_AND_SIGNS_QUERY_PREFIX + "_graphversion_id",
+			"geometry AS " + INFRA_AND_SIGNS_QUERY_PREFIX + "_geometry",
+			"timestamp AS " + INFRA_AND_SIGNS_QUERY_PREFIX + "_timestamp",
+			"type AS " + INFRA_AND_SIGNS_QUERY_PREFIX + "_type",
+			"tags AS " + INFRA_AND_SIGNS_QUERY_PREFIX + "_tags"
+	};
+
+	protected IHDAreaRowMapper<IHDArea> areaRowMapper;
+	protected IHDInfraAndSignsRowMapper<IHDInfraAndSigns> infraAndSignsRowMapper;
+
 	protected String[] getSegmentsAttributes() {
 		return hdSegmentsAttributes;
+	}
+
+	@Override
+	@Transactional(readOnly=false, propagation= Propagation.REQUIRED)
+	public void saveDefaultView(IWayGraph wayGraph) {
+		// save area / infra and signs views
+		saveDefaultAreasAndInfraSignsView(wayGraph);
+		super.saveDefaultView(wayGraph);
+	}
+
+	private void saveDefaultAreasAndInfraSignsView(IWayGraph wayGraph) {
+		boolean defaultViewExits = viewExists(wayGraph.getName()); // currently should be graphname
+		if (!defaultViewExits) {
+			String areasDbView = createDefaultAreaViewStatement(wayGraph.getName(), String.join(",", hdAreaAttributes));
+			getJdbcTemplate().execute(areasDbView);
+			String infraAndSignsDbView = createDefaultInfraAndSignsViewStatement(wayGraph.getName(),
+					String.join(",", hdInfraAndSignsAttributes));
+			getJdbcTemplate().execute(infraAndSignsDbView);
+		}
+	}
+
+	protected String createDefaultInfraAndSignsViewStatement(String wayGraph, String attributes) {
+		return "CREATE OR REPLACE VIEW " + schema + DEFAULT_VIEW_PREFIX + "_" + wayGraph + "_infra_and_signs" + " AS " +
+				"SELECT " + attributes +
+				" FROM " + schema + HDWayGraphWriteDaoImpl.PARENT_HDINFRA_AND_SIGN_TABLE_NAME + " AS " + infraAndSignsRowMapper.getPrefix();
+	}
+
+	protected String createDefaultAreaViewStatement(String wayGraph, String attributes) {
+		return "CREATE OR REPLACE VIEW " + schema + DEFAULT_VIEW_PREFIX + "_" + wayGraph + "_areas" + " AS " +
+				"SELECT " + attributes +
+				" FROM " + schema + HDWayGraphWriteDaoImpl.PARENT_HDAREA_TABLE_NAME + " AS " + areaRowMapper.getPrefix();
 	}
 
 	@Override
@@ -90,6 +152,22 @@ public class HDWayGraphViewDaoImpl<W extends IHDWaySegment, X extends ISegmentXI
 				" GROUP BY con_end.from_segment_id, con_end.graphversion_id" +
 				" ) AS endnodesegments" +
 				" ON endnodesegments.graphversion_id = wayseg.graphversion_id";
+	}
+
+	public IHDAreaRowMapper<IHDArea> getAreaRowMapper() {
+		return areaRowMapper;
+	}
+
+	public void setAreaRowMapper(IHDAreaRowMapper<IHDArea> areaRowMapper) {
+		this.areaRowMapper = areaRowMapper;
+	}
+
+	public IHDInfraAndSignsRowMapper<IHDInfraAndSigns> getInfraAndSignsRowMapper() {
+		return infraAndSignsRowMapper;
+	}
+
+	public void setInfraAndSignsRowMapper(IHDInfraAndSignsRowMapper<IHDInfraAndSigns> infraAndSignsRowMapper) {
+		this.infraAndSignsRowMapper = infraAndSignsRowMapper;
 	}
 
 }

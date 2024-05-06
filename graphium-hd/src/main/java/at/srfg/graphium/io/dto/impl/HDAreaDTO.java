@@ -31,27 +31,27 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class HDAreaDTO extends BaseSegmentDTOImpl implements IHDAreaDTO {
 
-	private Geometry areaGeometry;
+	private Geometry geometry;
 	private String type;
 	protected Map<String, String> tags;
 
 	public HDAreaDTO() {}
 	
-	public HDAreaDTO(Geometry areaGeometry) {
+	public HDAreaDTO(Geometry geometry) {
 		super();
-		this.areaGeometry = areaGeometry;
+		this.geometry = geometry;
 	}
 
 	@Override
 	@JsonSerialize(using = JacksonGeometrySerializer.class)
 	@JsonDeserialize(using = JacksonGeometryDeserializer.class)
-	public Geometry getAreaGeometry() {
-		return areaGeometry;
+	public Geometry getGeometry() {
+		return geometry;
 	}
 
 	@Override
-	public void setAreaGeometry(Geometry area) {
-		areaGeometry = area;
+	public void setGeometry(Geometry area) {
+		geometry = area;
 	}
 
 	@Override

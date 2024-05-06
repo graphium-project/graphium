@@ -8,13 +8,22 @@
           parent="abstractSegmentDTOAdapter"/>
 
     <bean id="hdArea2HDAreaDTOAdapter" class="at.srfg.graphium.io.adapter.impl.HDArea2HDAreaDTOAdapter"/>
-    <bean id="hdRoadInfrastructure2HDRoadInfrastructureDTOAdapter"
-          class="at.srfg.graphium.io.adapter.impl.HDRoadInfrastructure2HDRoadInfrastructureDTOAdapter"/>
+    <bean id="hdInfraAndSigns2HDInfraAndSignsDTOAdapter"
+          class="at.srfg.graphium.io.adapter.impl.HDInfraAndSigns2HDInfraAndSignsDTOAdapter"/>
 
     <bean id="jacksonQueuingHdGraphInputFormat"
           class="at.srfg.graphium.io.inputformat.hd.impl.jackson.GenericQueuingJacksonHdWayGraphInputFormat">
         <constructor-arg name="adapterRegistry" ref="autodetectingSegmentAdapterRegistry"/>
         <property name="metadataAdapter" ref="graphVersionMetadataDTO2GraphVersionMetadataAdapter"/>
+    </bean>
+
+    <bean id="jacksonHdWayGraphOutputFormatFactory"
+          class="at.srfg.graphium.io.outputformat.hd.impl.jackson.GenericJacksonHdWayGraphOutputFormatFactoryImpl" >
+      <!-- set by parent bean "jacksonWayGraphOutputFormatFactory" -->
+        <constructor-arg name="segmentOutputFormatFactory" ref="jacksonSegmentOutputFormatFactory" />
+        <constructor-arg name="adapter" ref="graphVersionMetadata2GraphVersionMetadataDTOAdapter" />
+        <constructor-arg name="areaOutputFormatFactory" ref="jacksonSegmentOutputFormatFactory" />
+        <constructor-arg name="roadInfraOutputFormatFactory" ref="jacksonSegmentOutputFormatFactory" />
     </bean>
 
     <bean id="hdRegulatoryElementXInfoAdapter"
