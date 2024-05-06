@@ -5,7 +5,7 @@ import com.vividsolutions.jts.geom.Geometry;
 
 import java.util.Map;
 
-public interface IHDRoadInfrastructure extends IBaseSegment {
+public interface IHDInfraAndSigns extends IBaseSegment {
 
     Geometry getGeometry();
 

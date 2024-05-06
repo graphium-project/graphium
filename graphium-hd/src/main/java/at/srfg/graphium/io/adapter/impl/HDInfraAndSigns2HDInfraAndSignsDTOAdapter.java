@@ -15,32 +15,28 @@
  */
 package at.srfg.graphium.io.adapter.impl;
 
-import at.srfg.graphium.io.dto.IHDAreaDTO;
-import at.srfg.graphium.io.dto.IHDRoadInfrastructureDTO;
-import at.srfg.graphium.io.dto.impl.HDAreaDTO;
-import at.srfg.graphium.io.dto.impl.HDRoadInfrastructureDTO;
-import at.srfg.graphium.model.hd.IHDArea;
-import at.srfg.graphium.model.hd.IHDRoadInfrastructure;
-import at.srfg.graphium.model.hd.impl.HDArea;
-import at.srfg.graphium.model.hd.impl.HDRoadInfrastructure;
+import at.srfg.graphium.io.dto.IHDInfraAndSignsDTO;
+import at.srfg.graphium.io.dto.impl.HDInfraAndSignsDTO;
+import at.srfg.graphium.model.hd.IHDInfraAndSigns;
+import at.srfg.graphium.model.hd.impl.HDInfraAndSigns;
 
-public class HDRoadInfrastructure2HDRoadInfrastructureDTOAdapter
-		<O extends IHDRoadInfrastructureDTO, I extends IHDRoadInfrastructure> extends BaseSegment2SegmentDTOAdapter<O, I> {
+public class HDInfraAndSigns2HDInfraAndSignsDTOAdapter
+		<O extends IHDInfraAndSignsDTO, I extends IHDInfraAndSigns> extends BaseSegment2SegmentDTOAdapter<O, I> {
 
-	public HDRoadInfrastructure2HDRoadInfrastructureDTOAdapter() {
-		super(HDRoadInfrastructure.class, HDRoadInfrastructureDTO.class);
+	public HDInfraAndSigns2HDInfraAndSignsDTOAdapter() {
+		super(HDInfraAndSigns.class, HDInfraAndSignsDTO.class);
 	}
 	
 	@Override
 	public O adapt(I segment) {
-		O segmentDTO = (O) new HDRoadInfrastructureDTO();
+		O segmentDTO = (O) new HDInfraAndSignsDTO();
 		setDtoValues(segmentDTO, segment);
 		return segmentDTO;
 	}
 
 	@Override
 	public I adaptReverse(O dto) {
-		I segment = (I) new HDRoadInfrastructure();
+		I segment = (I) new HDInfraAndSigns();
 		setModelValues(segment,dto);
 		return segment;
 	}

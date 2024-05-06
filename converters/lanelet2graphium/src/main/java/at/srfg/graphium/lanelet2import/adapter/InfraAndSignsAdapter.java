@@ -17,8 +17,8 @@ package at.srfg.graphium.lanelet2import.adapter;
 
 import at.srfg.graphium.lanelet2import.helper.Constants;
 import at.srfg.graphium.lanelet2import.helper.LaneletHelper;
-import at.srfg.graphium.model.hd.IHDRoadInfrastructure;
-import at.srfg.graphium.model.hd.impl.HDRoadInfrastructure;
+import at.srfg.graphium.model.hd.IHDInfraAndSigns;
+import at.srfg.graphium.model.hd.impl.HDInfraAndSigns;
 import gnu.trove.map.hash.TLongObjectHashMap;
 import org.openstreetmap.osmosis.core.domain.v0_6.Node;
 import org.openstreetmap.osmosis.core.domain.v0_6.Relation;
@@ -31,18 +31,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class RoadInfrastructureAdapter {
-	private static Logger log = LoggerFactory.getLogger(RoadInfrastructureAdapter.class);
+public class InfraAndSignsAdapter {
+	private static Logger log = LoggerFactory.getLogger(InfraAndSignsAdapter.class);
 	
-	public List<IHDRoadInfrastructure> adapt(TLongObjectHashMap<Relation> relations, TLongObjectHashMap<Way> ways,
-											 TLongObjectHashMap<Node> nodes) {
-		List<IHDRoadInfrastructure> roadInfras = new ArrayList<>();
+	public List<IHDInfraAndSigns> adapt(TLongObjectHashMap<Relation> relations, TLongObjectHashMap<Way> ways,
+										TLongObjectHashMap<Node> nodes) {
+		List<IHDInfraAndSigns> roadInfras = new ArrayList<>();
 		
 		for (Way way : ways.valueCollection()) {
 			String type = LaneletHelper.getType(way);
 			if (type != null && (type.equals(Constants.STOP_LINE) || type.equals(Constants.ARROW) ||
 					type.equals(Constants.TRAFFIC_LIGHT) || type.equals(Constants.TRAFFIC_SIGN))) {
-				IHDRoadInfrastructure roadInfra = adapt(way, ways, nodes);
+				IHDInfraAndSigns roadInfra = adapt(way, ways, nodes);
 				if (roadInfra != null) {
 					roadInfras.add(roadInfra);
 				}
@@ -52,8 +52,8 @@ public class RoadInfrastructureAdapter {
 		return roadInfras;
 	}
 	
-	public IHDRoadInfrastructure adapt(Way way, TLongObjectHashMap<Way> ways, TLongObjectHashMap<Node> nodes) {
-		IHDRoadInfrastructure roadInfra = new HDRoadInfrastructure();
+	public IHDInfraAndSigns adapt(Way way, TLongObjectHashMap<Way> ways, TLongObjectHashMap<Node> nodes) {
+		IHDInfraAndSigns roadInfra = new HDInfraAndSigns();
 		roadInfra.setId(way.getId());
 		roadInfra.setGeometry(LaneletHelper.createLinestring(way, nodes, Constants.SRID));
 		roadInfra.setType(LaneletHelper.getType(way));

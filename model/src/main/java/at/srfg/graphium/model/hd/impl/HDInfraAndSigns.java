@@ -1,16 +1,25 @@
 package at.srfg.graphium.model.hd.impl;
 
-import at.srfg.graphium.model.hd.IHDRoadInfrastructure;
+import at.srfg.graphium.model.hd.IHDInfraAndSigns;
 import at.srfg.graphium.model.impl.BaseSegment;
 import com.vividsolutions.jts.geom.Geometry;
 
 import java.util.Map;
 
-public class HDRoadInfrastructure extends BaseSegment implements IHDRoadInfrastructure {
+public class HDInfraAndSigns extends BaseSegment implements IHDInfraAndSigns {
 
     private Geometry geometry;
     private String type;
     protected Map<String, String> tags;
+
+    public HDInfraAndSigns() {}
+
+    public HDInfraAndSigns(long id, Geometry geometry, String type, Map<String, String> tags) {
+        this.id = id;
+        this.geometry = geometry;
+        this.type = type;
+        this.tags = tags;
+    }
 
     @Override
     public Geometry getGeometry() {
@@ -44,7 +53,7 @@ public class HDRoadInfrastructure extends BaseSegment implements IHDRoadInfrastr
 
     @Override
     public String toString() {
-        return "HDRoadInfrastructure [geometry=" + geometry + ", id=" + id + ", xInfo=" + xInfo + ", cons=" + cons + "]";
+        return "HdInfraAndSigns [geometry=" + geometry + ", id=" + id + ", xInfo=" + xInfo + ", cons=" + cons + "]";
     }
 
 }

@@ -27,10 +27,10 @@ import at.srfg.graphium.io.dto.*;
 import at.srfg.graphium.io.outputformat.hd.IHdWayGraphOutputFormat;
 import at.srfg.graphium.io.outputformat.hd.IHdWayGraphOutputFormatFactory;
 import at.srfg.graphium.io.outputformat.hd.impl.jackson.GenericJacksonHdWayGraphOutputFormatFactoryImpl;
-import at.srfg.graphium.lanelet2import.adapter.RoadInfrastructureAdapter;
+import at.srfg.graphium.lanelet2import.adapter.InfraAndSignsAdapter;
 import at.srfg.graphium.model.ISegmentXInfo;
 import at.srfg.graphium.model.hd.IHDArea;
-import at.srfg.graphium.model.hd.IHDRoadInfrastructure;
+import at.srfg.graphium.model.hd.IHDInfraAndSigns;
 import org.openstreetmap.osmosis.core.task.v0_6.RunnableSource;
 import org.openstreetmap.osmosis.core.task.v0_6.Sink;
 import org.openstreetmap.osmosis.core.task.v0_6.SinkSource;
@@ -70,7 +70,7 @@ public class LaneletImporterService {
 
     private LaneletsAdapter laneletsAdapter;
     private AreasAdapter areasAdapter;
-	private RoadInfrastructureAdapter roadInfrasAdapter;
+	private InfraAndSignsAdapter infraAndSignsAdapter;
     private ConnectionsBuilder connectionsBuilder;
     
     public LaneletImporterService() {
@@ -107,12 +107,12 @@ public class LaneletImporterService {
 		areaAdapters.add(areaAdapter);
 		areaAdapterRegistry.setAdapters(areaAdapters);
 
-		ISegmentAdapterRegistry<IHDRoadInfrastructureDTO, IHDRoadInfrastructure> roadInfraAdapterRegistry =
+		ISegmentAdapterRegistry<IHDInfraAndSignsDTO, IHDInfraAndSigns> roadInfraAdapterRegistry =
 				new SegmentAdapterRegistryImpl<>();
 
-		HDRoadInfrastructure2HDRoadInfrastructureDTOAdapter<IHDRoadInfrastructureDTO, IHDRoadInfrastructure> roadInfraAdapter =
-				new HDRoadInfrastructure2HDRoadInfrastructureDTOAdapter<>();
-		List<ISegmentAdapter<IHDRoadInfrastructureDTO, IHDRoadInfrastructure>> roadInfraAdapters = new ArrayList<>();
+		HDInfraAndSigns2HDInfraAndSignsDTOAdapter<IHDInfraAndSignsDTO, IHDInfraAndSigns> roadInfraAdapter =
+				new HDInfraAndSigns2HDInfraAndSignsDTOAdapter<>();
+		List<ISegmentAdapter<IHDInfraAndSignsDTO, IHDInfraAndSigns>> roadInfraAdapters = new ArrayList<>();
 		roadInfraAdapters.add(roadInfraAdapter);
 		roadInfraAdapterRegistry.setAdapters(roadInfraAdapters);
 
@@ -122,7 +122,7 @@ public class LaneletImporterService {
 		ISegmentOutputFormatFactory<IHDArea> areaOutputFormatFactory =
 				new GenericJacksonSegmentOutputFormatFactoryImpl<>(areaAdapterRegistry);
 
-		ISegmentOutputFormatFactory<IHDRoadInfrastructure> roadInfraOutputFormatFactory =
+		ISegmentOutputFormatFactory<IHDInfraAndSigns> roadInfraOutputFormatFactory =
 				new GenericJacksonSegmentOutputFormatFactoryImpl<>(roadInfraAdapterRegistry);
 
 
@@ -132,7 +132,7 @@ public class LaneletImporterService {
     	
     	laneletsAdapter = new LaneletsAdapter();
     	areasAdapter = new AreasAdapter();
-		roadInfrasAdapter = new RoadInfrastructureAdapter();
+		infraAndSignsAdapter = new InfraAndSignsAdapter();
     	connectionsBuilder = new ConnectionsBuilder();
     }
 
@@ -155,7 +155,7 @@ public class LaneletImporterService {
 //        List<IHDRegulatoryElement> hdRegulatoryElements = adaptRegulatoryElements(entitySink);
         List<IHDWaySegment> lanelets = adaptLanelets(entitySink);
         List<IHDArea> areas = adaptAreas(entitySink);
-		List<IHDRoadInfrastructure> roadInfras = adaptRoadInfrastructure(entitySink);
+		List<IHDInfraAndSigns> roadInfras = adaptRoadInfrastructure(entitySink);
 
 //        collectRegulatoryElements(hdWaySegment, hdRegulatoryElements);
 
@@ -186,7 +186,7 @@ public class LaneletImporterService {
 			}
 
 			outputFormat.finishAreas();
-			for (IHDRoadInfrastructure roadInfra : roadInfras) {
+			for (IHDInfraAndSigns roadInfra : roadInfras) {
 				outputFormat.serialize(roadInfra);
 			}
         } catch (Exception th) {
@@ -240,8 +240,8 @@ public class LaneletImporterService {
 											 entitySink.getNodes());
 	}
 
-	private List<IHDRoadInfrastructure> adaptRoadInfrastructure(EntitySink entitySink) {
-		return roadInfrasAdapter.adapt(entitySink.getRelations(),
+	private List<IHDInfraAndSigns> adaptRoadInfrastructure(EntitySink entitySink) {
+		return infraAndSignsAdapter.adapt(entitySink.getRelations(),
 				entitySink.getWays(),
 				entitySink.getNodes());
 	}

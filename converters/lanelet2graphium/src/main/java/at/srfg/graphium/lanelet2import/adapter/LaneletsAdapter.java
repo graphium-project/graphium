@@ -406,7 +406,8 @@ public class LaneletsAdapter {
 		String laneChangePossible = "false";
 		if (typeEntry != null) {
 			if (typeEntry.getValue() != null) {
-				segment.getTags().put("left", typeEntry.getKey() + ":" + typeEntry.getValue());
+				segment.getTags().put("left:" + typeEntry.getKey(), typeEntry.getValue());
+				//segment.getTags().put("left", typeEntry.getKey() + ":" + typeEntry.getValue());
 			} else {
 				segment.getTags().put("left", typeEntry.getKey());
 			}
@@ -424,7 +425,8 @@ public class LaneletsAdapter {
 		laneChangePossible = "false";
 		if (typeEntry != null) {
 			if (typeEntry.getValue() != null) {
-				segment.getTags().put("right", typeEntry.getKey() + ":" + typeEntry.getValue());
+				segment.getTags().put("right:" + typeEntry.getKey(), typeEntry.getValue());
+				//segment.getTags().put("right", typeEntry.getKey() + ":" + typeEntry.getValue());
 			} else {
 				segment.getTags().put("right", typeEntry.getKey());
 			}

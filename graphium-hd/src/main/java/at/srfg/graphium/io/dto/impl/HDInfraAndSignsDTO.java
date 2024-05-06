@@ -1,6 +1,6 @@
 package at.srfg.graphium.io.dto.impl;
 
-import at.srfg.graphium.io.dto.IHDRoadInfrastructureDTO;
+import at.srfg.graphium.io.dto.IHDInfraAndSignsDTO;
 import at.srfg.graphium.io.inputformat.impl.jackson.JacksonLineStringDeserializer;
 import at.srfg.graphium.io.outputformat.impl.jackson.JacksonGeometrySerializer;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -13,15 +13,15 @@ import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class HDRoadInfrastructureDTO extends BaseSegmentDTOImpl implements IHDRoadInfrastructureDTO {
+public class HDInfraAndSignsDTO extends BaseSegmentDTOImpl implements IHDInfraAndSignsDTO {
 
     private Geometry geometry;
     private String type;
     protected Map<String, String> tags;
 
-    public HDRoadInfrastructureDTO() {}
+    public HDInfraAndSignsDTO() {}
 
-    public HDRoadInfrastructureDTO(Geometry geometry) {
+    public HDInfraAndSignsDTO(Geometry geometry) {
         super();
         this.geometry = geometry;
     }
