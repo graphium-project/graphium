@@ -100,8 +100,6 @@ public class LaneletsAdapter {
 						log.error("Relation " + relation.getId() + ": Way " + member.getMemberId() + " is null");
 						return null;
 					}
-				} else if (role.equals("ref_line")) {
-					log.info("stop line");
 				}
 			} else if(member.getMemberType().equals(EntityType.Relation)) {
 				String role = member.getMemberRole();
@@ -125,6 +123,7 @@ public class LaneletsAdapter {
 		}
 
 		if(!regulatoryElements.isEmpty()) {
+			regulatoryElements.stream().forEach(re -> re.setSegmentId(segment.getId()));
 			segment.setXInfo(regulatoryElements);
 		}
 

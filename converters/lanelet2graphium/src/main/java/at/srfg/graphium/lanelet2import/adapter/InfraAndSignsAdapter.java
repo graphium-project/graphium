@@ -61,12 +61,15 @@ public class InfraAndSignsAdapter {
 		Map<String, String> tags = new HashMap<>();
 		way.getTags().forEach(tag -> tags.put(tag.getKey(), tag.getValue()));
 
+		Map<String, String> filteredTags = new HashMap<>();
 		// TODO: handle more tags
 		if(tags.containsKey("subtype")) {
-			roadInfra.setTags(new HashMap<>());
-			roadInfra.getTags().put("subtype", tags.get("subtype"));
+			filteredTags.put("subtype", tags.get("subtype"));
 		}
-
+		if(tags.containsKey("sg_id")) {
+			filteredTags.put("sg_id", tags.get("sg_id"));
+		}
+		roadInfra.setTags(filteredTags);
 		return roadInfra;
 	}
 }

@@ -16,8 +16,7 @@
 package at.srfg.graphium.model.hd.impl;
 
 import java.util.Map;
-
-import com.vividsolutions.jts.geom.Geometry;
+import java.util.Set;
 
 import at.srfg.graphium.model.hd.HDRegulatoryElementType;
 import at.srfg.graphium.model.hd.IHDRegulatoryElement;
@@ -25,26 +24,29 @@ import at.srfg.graphium.model.impl.AbstractSegmentXInfo;
 
 public class HDRegulatoryElement extends AbstractSegmentXInfo implements IHDRegulatoryElement {
 
-	private static final String xInfoType = "laneletRegulatoryElement";
+	private static final String xInfoType = "hdregulatoryElement";
 	
 	private long id;
     private Long graphVersionId;
 	// TODO: kann hier der groupKey verwendet werden???
     private HDRegulatoryElementType type;
-	private Geometry geometry;
+	private boolean dynamic = false;
+	private boolean fallback = false;
 	private Map<String, String> tags;
-	
+	private Set<Long> refersIds;
+	private Set<Long> refLineIds;
+
 	public HDRegulatoryElement() {
 		super(xInfoType);
 	}
 
 	public HDRegulatoryElement(long id, Long graphVersionId, HDRegulatoryElementType type,
-			Geometry geometry, Map<String, String> tags) {
+			Map<String, String> tags) {
 		super(xInfoType);
 		this.id = id;
 		this.graphVersionId = graphVersionId;
 		this.type = type;
-		this.geometry = geometry;
+		//this.geometry = geometry;
 		this.tags = tags;
 	}
 
@@ -74,18 +76,48 @@ public class HDRegulatoryElement extends AbstractSegmentXInfo implements IHDRegu
 	}
 
 	@Override
+	public boolean isDynamic() {
+		return dynamic;
+	}
+
+	@Override
+	public void setDynamic(boolean dynamic) {
+		this.dynamic = dynamic;
+	}
+
+	@Override
+	public boolean isFallback() {
+		return fallback;
+	}
+
+	@Override
+	public void setFallback(boolean fallback) {
+		this.fallback = fallback;
+	}
+
+	@Override
 	public void setType(HDRegulatoryElementType type) {
 		this.type = type;
 	}
 
 	@Override
-	public Geometry getGeometry() {
-		return geometry;
+	public Set<Long> getRefersIds() {
+		return refersIds;
 	}
 
 	@Override
-	public void setGeometry(Geometry geometry) {
-		this.geometry = geometry;
+	public void setRefersIds(Set<Long> refersIds) {
+		this.refersIds = refersIds;
+	}
+
+	@Override
+	public Set<Long> getRefLineIds() {
+		return refLineIds;
+	}
+
+	@Override
+	public void setRefLineIds(Set<Long> refLineIds) {
+		this.refLineIds = refLineIds;
 	}
 
 	@Override
@@ -131,8 +163,8 @@ public class HDRegulatoryElement extends AbstractSegmentXInfo implements IHDRegu
 
 	@Override
 	public String toString() {
-		return "LaneletRegulatoryElement [id=" + id + ", graphVersionId=" + graphVersionId + ", type=" + type
-				+ ", geometry=" + geometry + ", tags=" + tags + ", segmentId=" + segmentId + "]";
+		return "HDRegulatoryElement [id=" + id + ", graphVersionId=" + graphVersionId + ", type=" + type
+				+ ", tags=" + tags + ", segmentId=" + segmentId + "]";
 	}
 	
 }

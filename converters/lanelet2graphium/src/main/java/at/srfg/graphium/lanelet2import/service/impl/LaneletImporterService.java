@@ -65,7 +65,6 @@ public class LaneletImporterService {
 	
 	private static Logger log = LoggerFactory.getLogger(LaneletImporterService.class);
 
-   // private IWayGraphOutputFormatFactory<IHDWaySegment> outputFormatFactory;
 	private IHdWayGraphOutputFormatFactory<IHDWaySegment> outputFormatFactory;
 
     private LaneletsAdapter laneletsAdapter;
@@ -169,7 +168,6 @@ public class LaneletImporterService {
         createConnections(lanelets, laneletContainer);
         
         FileOutputStream stream = null;
-        //IWayGraphOutputFormat<IHDWaySegment> outputFormat = null;
 		IHdWayGraphOutputFormat<IHDWaySegment> outputFormat = null;
         
         try {

@@ -47,23 +47,40 @@ public class RegulatoryElementsAdapter {
 		String type = tags.get("subtype");
 		IHDRegulatoryElement adapted = new HDRegulatoryElement();
 		adapted.setId(regulatoryElement.getId());
-		adapted.setType(HDRegulatoryElementType.TRAFFIC_LIGHT);
 
-        for (RelationMember member : regulatoryElement.getMembers()) {
-			if (member.getMemberType().equals(EntityType.Way)) {
-				String role = member.getMemberRole();
-				if(role.equals("ref_line")) {
-					Geometry refLineGeom = LaneletHelper.createLinestring(ways.get(member.getMemberId()), nodes, Constants.SRID);
-					adapted.setGeometry(refLineGeom);
-					log.info("creating ref_line geom");
-				}
-				else {
-					log.info("role {} not handled", role);
+		HDRegulatoryElementType regulatoryElementType = HDRegulatoryElementType.fromValue(type);
+		if(regulatoryElementType != null) {
+			adapted.setType(HDRegulatoryElementType.TRAFFIC_LIGHT);
+			Set<Long> refLines = new HashSet<>();
+			Set<Long> refers = new HashSet<>();
+			for (RelationMember member : regulatoryElement.getMembers()) {
+				if (member.getMemberType().equals(EntityType.Way)) {
+					String role = member.getMemberRole();
+					if(role.equals("ref_line")) {
+						//Geometry refLineGeom = LaneletHelper.createLinestring(ways.get(member.getMemberId()), nodes, Constants.SRID);
+						//adapted.setGeometry(refLineGeom);
+						//log.info("creating ref_line geom");
+						refLines.add(member.getMemberId());
+					}
+					else if(role.equals("refers")) {
+						refers.add(member.getMemberId());
+					}
+					else {
+						log.info("role {} not handled", role);
+					}
 				}
 			}
-        }
-
-		regulatoryElements.add(adapted);
-        return regulatoryElements;
+			if(!refLines.isEmpty()) {
+				adapted.setRefLineIds(refLines);
+			}
+			if(!refers.isEmpty()) {
+				adapted.setRefersIds(refers);
+			}
+			regulatoryElements.add(adapted);
+		}
+		else {
+			log.warn("unknown regulatory element type: {}, skipping", type);
+		}
+		return regulatoryElements;
     }
 }

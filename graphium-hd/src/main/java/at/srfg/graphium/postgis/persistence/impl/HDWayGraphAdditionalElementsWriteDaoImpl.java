@@ -118,13 +118,13 @@ public class HDWayGraphAdditionalElementsWriteDaoImpl extends AbstractWayGraphDa
         return argArray;
     }
 
-    protected MapSqlParameterSource getInfraAndSignParamSource(IHDInfraAndSigns area, Timestamp now) throws SQLException {
+    protected MapSqlParameterSource getInfraAndSignParamSource(IHDInfraAndSigns infraAndSigns, Timestamp now) throws SQLException {
         MapSqlParameterSource args = new MapSqlParameterSource();
-        args.addValue("id", area.getId());
-        args.addValue("geometry","SRID=4326;"+wktWriter.write(area.getGeometry()));
-        args.addValue("type", area.getType());
+        args.addValue("id", infraAndSigns.getId());
+        args.addValue("geometry","SRID=4326;"+wktWriter.write(infraAndSigns.getGeometry()));
+        args.addValue("type", infraAndSigns.getType());
         args.addValue("timestamp", now);
-        args.addValue("tags", area.getTags());
+        args.addValue("tags", infraAndSigns.getTags());
         return args;
     }
 

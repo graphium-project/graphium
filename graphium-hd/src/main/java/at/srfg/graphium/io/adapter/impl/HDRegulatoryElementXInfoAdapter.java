@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import at.srfg.graphium.io.dto.impl.HDRegulatoryElementDTO;
+import at.srfg.graphium.model.hd.HDRegulatoryElementType;
 import at.srfg.graphium.model.hd.impl.HDRegulatoryElement;
 
 public class HDRegulatoryElementXInfoAdapter extends AbstractXInfoDTOAdapter<HDRegulatoryElement, HDRegulatoryElementDTO> {
@@ -30,10 +31,15 @@ public class HDRegulatoryElementXInfoAdapter extends AbstractXInfoDTOAdapter<HDR
 	@Override
 	public HDRegulatoryElementDTO adaptReverse(HDRegulatoryElement objectToAdapt) {
 		HDRegulatoryElementDTO dto = new HDRegulatoryElementDTO();
-		// anw adapt all values
-		dto.setGeometry(objectToAdapt.getGeometry());
+
 		dto.setId(objectToAdapt.getId());
 		dto.setType(objectToAdapt.getType().name());
+		dto.setDynamic(objectToAdapt.isDynamic());
+		dto.setFallback(objectToAdapt.isFallback());
+		dto.setRefersIds(objectToAdapt.getRefersIds());
+		dto.setRefLineIds(objectToAdapt.getRefLineIds());
+		dto.setDirectionTow(objectToAdapt.isDirectionTow());
+
 		if (objectToAdapt.getTags() != null) {
 			Map<String, String> tags = new HashMap<>();
 			objectToAdapt.getTags().forEach(tags::put);
@@ -45,6 +51,13 @@ public class HDRegulatoryElementXInfoAdapter extends AbstractXInfoDTOAdapter<HDR
 	@Override
 	public HDRegulatoryElement adapt(HDRegulatoryElementDTO objectToAdapt) {
 		HDRegulatoryElement xInfo = new HDRegulatoryElement();
+		xInfo.setId(objectToAdapt.getId());
+		xInfo.setType(HDRegulatoryElementType.fromValue(objectToAdapt.getType()));
+		xInfo.setDynamic(objectToAdapt.isDynamic());
+		xInfo.setFallback(objectToAdapt.isFallback());
+		xInfo.setRefersIds(objectToAdapt.getRefersIds());
+		xInfo.setRefLineIds(objectToAdapt.getRefLineIds());
+		xInfo.setDirectionTow(objectToAdapt.getDirectionTow());
 		if (objectToAdapt.getTags() != null) {
 			Map<String, String> tags = new HashMap<>();
 			objectToAdapt.getTags().forEach(tags::put);

@@ -42,6 +42,13 @@
         <property name="areaRowMapper" ref="hdAreaRowMapper"/>
         <property name="infraAndSignsRowMapper" ref="hdInfraAndSignsRowMapper"/>
     </bean>
+
+    <bean id="hdRegulatoryElementXinfoDao" parent="graphiumAbstractPostgisDao"
+          class="at.srfg.graphium.postgis.persistence.impl.HDRegulatoryElementXinfoDao" >
+        <property name="viewDao" ref="wayGraphViewDao"/>
+        <property name="metadataDao" ref="postgisWayGraphVersionMetadataDao"/>
+    </bean>
+
     
     <alias name="postgisHDWayGraphReadDao" alias="hdWayGraphReadDao"/>
     <alias name="postgisHDWayGraphWriteDao" alias="hdWayGraphWriteDao"/>

@@ -16,8 +16,7 @@
 package at.srfg.graphium.model.hd;
 
 import java.util.Map;
-
-import com.vividsolutions.jts.geom.Geometry;
+import java.util.Set;
 
 import at.srfg.graphium.model.ISegmentXInfo;
 
@@ -26,11 +25,15 @@ public interface IHDRegulatoryElement extends ISegmentXInfo {
 	HDRegulatoryElementType getType();
 	
 	void setType(HDRegulatoryElementType type);
-	
-	Geometry getGeometry();
-	
-	void setGeometry(Geometry geometry);
-	
+
+	Set<Long> getRefersIds();
+
+	void setRefersIds(Set<Long> refersIds);
+
+	Set<Long> getRefLineIds();
+
+	void setRefLineIds(Set<Long> refLineIds);
+
 	Map<String, String> getTags();
 	
 	void setTags(Map<String, String> tags);
@@ -42,5 +45,12 @@ public interface IHDRegulatoryElement extends ISegmentXInfo {
 	Long getGraphVersionId();
 
 	void setGraphVersionId(Long graphVersionId);
-	
+
+	boolean isDynamic();
+
+	void setDynamic(boolean dynamic);
+
+	boolean isFallback();
+
+	void setFallback(boolean fallback);
 }

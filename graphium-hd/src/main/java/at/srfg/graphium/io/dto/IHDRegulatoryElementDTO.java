@@ -15,7 +15,9 @@
  */
 package at.srfg.graphium.io.dto;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -25,10 +27,18 @@ public interface IHDRegulatoryElementDTO {
 	
 	void setType(String type);
 	
-	Geometry getGeometry();
+	//Geometry getGeometry();
 	
-	void setGeometry(Geometry geometry);
-	
+	//void setGeometry(Geometry geometry);
+
+	Set<Long> getRefersIds();
+
+	void setRefersIds(Set<Long> refersIds);
+
+	Set<Long> getRefLineIds();
+
+	void setRefLineIds(Set<Long> refLineIds);
+
 	Map<String, String> getTags();
 	
 	void setTags(Map<String, String> tags);
@@ -40,5 +50,13 @@ public interface IHDRegulatoryElementDTO {
 	Long getGraphVersionId();
 
 	void setGraphVersionId(Long graphVersionId);
+
+	boolean isDynamic();
+
+	void setDynamic(boolean dynamic);
+
+	boolean isFallback();
+
+	void setFallback(boolean fallback);
 
 }

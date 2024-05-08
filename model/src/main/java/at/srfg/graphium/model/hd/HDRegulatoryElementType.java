@@ -16,12 +16,29 @@
 package at.srfg.graphium.model.hd;
 
 public enum HDRegulatoryElementType {
-	
-	TRAFFIC_LIGHT,
-	TRAFFIC_SIGN,
-	SPEED_LIMIT,
-	RIGHT_OF_WAY,
-	DYNAMIC,
-	FALLBACK;
-	
+
+	TRAFFIC_LIGHT("traffic_light"),
+	TRAFFIC_SIGN("traffic_sign"),
+	SPEED_LIMIT("speed_limit"),
+	RIGHT_OF_WAY("right_of_way"),
+	ALL_WAY_STOP("all_way_stop");
+
+	private String value;
+
+	HDRegulatoryElementType(String value) {
+		this.value = value;
+	}
+
+	public String getValue() {
+		return this.value;
+	}
+
+	public static HDRegulatoryElementType fromValue(String value) {
+		for (HDRegulatoryElementType type : HDRegulatoryElementType.values()) {
+			if (type.value.equals(value.toLowerCase())) {
+				return type;
+			}
+		}
+		return null;
+	}
 }
