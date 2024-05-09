@@ -28,6 +28,6 @@ CREATE TABLE graphs.hdinfra_and_signs
     WITH (
         OIDS=FALSE
         );
-ALTER TABLE graphs.hdinfra_and_sign OWNER TO graphium;
+ALTER TABLE graphs.hdinfra_and_signs OWNER TO graphium;
 
 select graphs.db_schema_changed(10, '010_from_v9_to_10_add_hd_area_infrandsign_tables.sql');
