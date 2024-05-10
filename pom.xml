@@ -121,7 +121,7 @@
 	</build>
 
 	<properties>
-		<graphium.version>1.2.2-SNAPSHOT</graphium.version>
+		<graphium.version>1.3.0-SNAPSHOT</graphium.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<slf4j-log4j12.version>1.7.21</slf4j-log4j12.version>
 		<junit.version>4.12</junit.version>
