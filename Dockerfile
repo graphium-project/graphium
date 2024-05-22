@@ -1,4 +1,4 @@
-FROM maven:3.5.3-jdk-8 as builder
+FROM maven:3.9.6-amazoncorretto-8-debian-bookworm as builder
 # install openjfx
 RUN apt-get update \
     #&& apt-get install --no-install-recommends -y openjfx \
