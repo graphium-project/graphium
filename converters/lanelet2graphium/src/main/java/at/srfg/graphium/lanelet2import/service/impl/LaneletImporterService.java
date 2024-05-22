@@ -27,7 +27,7 @@ import at.srfg.graphium.io.dto.*;
 import at.srfg.graphium.io.outputformat.hd.IHdWayGraphOutputFormat;
 import at.srfg.graphium.io.outputformat.hd.IHdWayGraphOutputFormatFactory;
 import at.srfg.graphium.io.outputformat.hd.impl.jackson.GenericJacksonHdWayGraphOutputFormatFactoryImpl;
-import at.srfg.graphium.lanelet2import.adapter.InfraAndSignsAdapter;
+import at.srfg.graphium.lanelet2import.adapter.*;
 import at.srfg.graphium.model.ISegmentXInfo;
 import at.srfg.graphium.model.hd.IHDArea;
 import at.srfg.graphium.model.hd.IHDInfraAndSigns;
@@ -46,8 +46,6 @@ import at.srfg.graphium.io.adapter.registry.ISegmentAdapterRegistry;
 import at.srfg.graphium.io.adapter.registry.impl.SegmentAdapterRegistryImpl;
 import at.srfg.graphium.io.outputformat.ISegmentOutputFormatFactory;
 import at.srfg.graphium.io.outputformat.impl.jackson.GenericJacksonSegmentOutputFormatFactoryImpl;
-import at.srfg.graphium.lanelet2import.adapter.AreasAdapter;
-import at.srfg.graphium.lanelet2import.adapter.LaneletsAdapter;
 import at.srfg.graphium.lanelet2import.connections.ConnectionsBuilder;
 import at.srfg.graphium.lanelet2import.model.IImportConfig;
 import at.srfg.graphium.lanelet2import.reader.EntitySink;
@@ -174,14 +172,26 @@ public class LaneletImporterService {
 			stream = new FileOutputStream(config.getOutputDir() + "/" + config.getGraphName() + "_" + config.getVersion() + ".json");
 	        outputFormat = outputFormatFactory.getWayGraphOutputFormat(stream);
 	        outputFormat.serialize(this.getVersionMetadata(config, lanelets.size()));
-	        
+
+			IDetailedCoverageAreaCalculator coverageAreaCalculator = new DetailedCoverageAreaCalculatorMerge();
+
 	        for (IHDWaySegment hdSegment : lanelets) {
 	        	outputFormat.serialize(hdSegment);
+				coverageAreaCalculator.expandCoverage(hdSegment);
 	        }
 			outputFormat.finishSegments();
+
+			long maxPresentId = -1;
 			for (IHDArea area : areas) {
 				outputFormat.serialize(area);
+				coverageAreaCalculator.expandCoverage(area);
+				if(maxPresentId < area.getId()) {
+					maxPresentId = area.getId();
+				}
 			}
+
+			IHDArea coverageArea = coverageAreaCalculator.createCoverageHdArea(maxPresentId + 1);
+			outputFormat.serialize(coverageArea);
 
 			outputFormat.finishAreas();
 			for (IHDInfraAndSigns roadInfra : roadInfras) {
