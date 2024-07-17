@@ -64,6 +64,8 @@ graphiumCentral:
   dbUrl: "jdbc:postgresql://database:5432/graphium"
   dbUsername: "graphium"
   dbPassword: "graphium"
+  serverName: "graphium-central"
+  serverUri: "http://localhost/graphium-central-server/api"
 
 database:
   enabled: true

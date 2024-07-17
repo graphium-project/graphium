@@ -51,6 +51,10 @@ spec:
             - name: "db.password"
               value: "{{ .Values.graphiumCentral.dbPassword }}"
           {{- end }}
+            - name: "graphium.server.name"
+              value: "{{ .Values.graphiumCentral.serverName }}"
+            - name: "graphium.server.uri"
+              value: "{{ .Values.graphiumCentral.serverUri }}"
           livenessProbe:
             httpGet:
               path: /graphium/api/status
