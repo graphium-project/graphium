@@ -72,7 +72,10 @@ public class GipLinkUsesParser extends AbstractSectionParser<TLongObjectMap<Map<
 				
 				// build map of attribute and position in line (order of attributes is not defined!)
 				if (line.startsWith("atr")) {
+					//V1
 					// atr;USE_ID;LINK_ID;COUNT;OFFSET;WIDTH;MINWIDTH;FROM_PERCENT;TO_PERCENT;BASETYPE;USE_ACCESS_TOW;USE_ACCESS_BKW;STATUS;USE_OBJECTID;LINK_OBJECTID
+					//V2
+					//atr;OBJECT_ID;SHORT_ID;LINK_ID;LINK_SHORT_ID;LINEAR_USE_ID;OFFSET_AVERAGE;WIDTH_AVERAGE;WIDTH_MINIMAL;LINK_PERCENTAGE_FROM;LINK_PERCENTAGE_TO;BASE_TYPE;ACCESS_TOW;ACCESS_BKW;SURFACE;ELECTRIC;ONEWAY_CAR;ONEWAY_BIKE;ONEWAY_BUS;ONEWAY_PEDESTRIAN
 					atrPos = ParserHelper.splitAtrLine(line);
 				}
 				
@@ -81,9 +84,18 @@ public class GipLinkUsesParser extends AbstractSectionParser<TLongObjectMap<Map<
 
 					String[] values = line.split(";");
 
-					if (values[atrPos.get("BASETYPE")].equals("34")) {
-						boolean tow = ParserHelper.validateAccess(Integer.parseInt(values[atrPos.get("USE_ACCESS_TOW")]), accessTypes);
-						boolean bkw = ParserHelper.validateAccess(Integer.parseInt(values[atrPos.get("USE_ACCESS_BKW")]), accessTypes);
+					//V1
+					//if (values[atrPos.get("BASETYPE")].equals("34")) {
+					//V2
+					if (values[atrPos.get("BASE_TYPE")].equals("34")) {
+						//V1
+						//boolean tow = ParserHelper.validateAccess(Integer.parseInt(values[atrPos.get("USE_ACCESS_TOW")]), accessTypes);
+						//V2
+						boolean tow = ParserHelper.validateAccess(Integer.parseInt(values[atrPos.get("ACCESS_TOW")]), accessTypes);
+						//V1
+						//boolean bkw = ParserHelper.validateAccess(Integer.parseInt(values[atrPos.get("USE_ACCESS_BKW")]), accessTypes);
+						//V2
+						boolean bkw = ParserHelper.validateAccess(Integer.parseInt(values[atrPos.get("ACCESS_BKW")]), accessTypes);
 						String direction = "";
 						if (!tow && bkw) {
 							direction = "bkw";
@@ -94,8 +106,11 @@ public class GipLinkUsesParser extends AbstractSectionParser<TLongObjectMap<Map<
 						}
 						Map<String, Object> buslaneMap = new HashMap<>();
 						buslaneMap.put("buslane", direction);
-						
-						map.put(Long.parseLong(values[atrPos.get("LINK_ID")]), buslaneMap);
+
+						//V1
+						//map.put(Long.parseLong(values[atrPos.get("LINK_ID")]), buslaneMap);
+						//V2
+						map.put(Long.parseLong(values[atrPos.get("LINK_SHORT_ID")]), buslaneMap);
 					}
 					
 				}

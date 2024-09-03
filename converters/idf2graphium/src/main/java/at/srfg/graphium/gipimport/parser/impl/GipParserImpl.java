@@ -24,18 +24,13 @@ import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.zip.ZipInputStream;
 
+import at.srfg.graphium.gipimport.model.*;
+import gnu.trove.map.hash.THashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,12 +40,6 @@ import com.vividsolutions.jts.geom.LineString;
 import at.srfg.graphium.gipimport.helper.GeoHelper;
 import at.srfg.graphium.gipimport.helper.GipLinkFilter;
 import at.srfg.graphium.gipimport.helper.ParserHelper;
-import at.srfg.graphium.gipimport.model.IDFMetadata;
-import at.srfg.graphium.gipimport.model.IGipLink;
-import at.srfg.graphium.gipimport.model.IGipModelFactory;
-import at.srfg.graphium.gipimport.model.IGipNode;
-import at.srfg.graphium.gipimport.model.IGipTurnEdge;
-import at.srfg.graphium.gipimport.model.IImportConfigIdf;
 import at.srfg.graphium.gipimport.model.impl.GipModelFactory;
 import at.srfg.graphium.gipimport.model.impl.IDFMetadataImpl;
 import at.srfg.graphium.gipimport.parser.IGipParser;
@@ -116,16 +105,25 @@ public class GipParserImpl<T extends IBaseSegment> implements IGipParser<T> {
 		this.active = true;
 		statistics.resetInstance();
 
+		//additional V2 section-parsres
+		IGipSectionParser<TLongObjectMap<IGipReferenceObject>> referenceObjectParser = new GipReferenceObjectParser(this, config);
+		IGipSectionParser<TLongObjectMap<IGipLinkToReferenceObject>> linkToReferenceObjectParser = new GipLinkToReferenceObjectParser(this, config);
+		IGipSectionParser<THashMap<String, IGipWayNames>> wayNamesParser = new GipWayNamesParser(this, config);
+		//IGipSectionParser<TLongObjectMap<IGipLinkToWayNames>> linkToWayNamesParser = new GipLinkToWayNamesParser(this, config);
+		IGipSectionParser<THashMap<String, IGipLinkToWayNames>> linkToWayNamesParser = new GipLinkToWayNamesParser(this, config);
+		IGipSectionParser<TLongObjectMap<IGipLinkToTruck>> linkToTruckParser = new GipLinkToTruckParser(this, config);
+
+
 		IGipSectionParser<TLongObjectMap<IGipNode>> nodesParser = new GipNodeSectionParserImpl(this);
 		IGipSectionParser<TLongObjectMap<IGipLink>> linkParser = new GipLinkSectionParser(this,
-				nodesParser,config,statistics);
+				nodesParser, config,statistics);
 		IGipSectionParser<TLongSet> linkCoordinatesParser = new GipLinkCoordinatesParser(this,
 				linkParser);
 		IGipSectionParser<TLongObjectMap<List<IGipTurnEdge>>> turnEdgeParser = new GipLinkTurnEdgesParser(
 				this,config,nodesParser,linkParser,linkCoordinatesParser
 		);
 		IGipSectionParser<TLongObjectMap<Map<String, Object>>> linkUseParser = new GipLinkUsesParser(this);
-		
+
 		this.beginParseDate = new Date();
 
 		if (metadata.getFileName() == null) {
@@ -171,22 +169,40 @@ public class GipParserImpl<T extends IBaseSegment> implements IGipParser<T> {
 					case IGipSectionParser.PHASE_TURNEDGE:
 						line = turnEdgeParser.parseSection(file);
 
-						if (!config.isExtractBusLaneInfo()) {
-							finished = true;
-						}
+						//if (!config.isExtractBusLaneInfo()) {
+						//	finished = true;
+						//}
 						break;
 					case IGipSectionParser.PHASE_LINKUSE:
 						line = linkUseParser.parseSection(file);
 
-						if (config.isExtractBusLaneInfo()) {
-							finished = true;
-						}
+						//if (config.isExtractBusLaneInfo()) {
+						//	finished = true;
+						//}
 						break;
+
+					//V2-Phasen
+					case IGipSectionParser.WAY_NAMES:
+						line = wayNamesParser.parseSection(file);
+						break;
+					case IGipSectionParser.LINK_TO_WAY_NAMES:
+						line = linkToWayNamesParser.parseSection(file);
+						break;
+					case IGipSectionParser.REFERENCE_OBJECT:
+						line = referenceObjectParser.parseSection(file);
+						break;
+					case IGipSectionParser.LINK_TO_REFERENCE_OBJECT:
+						line = linkToReferenceObjectParser.parseSection(file);
+						break;
+					case IGipSectionParser.LINK_TO_TRUCK:
+						line = linkToTruckParser.parseSection(file);
+						finished = true;
+						break;
+
 					default:
 						line = file.readLine();
 						break;
 				}
-				
 			}
 
 			TLongSet linksToEnqueue = linkCoordinatesParser.getResult();
@@ -198,6 +214,14 @@ public class GipParserImpl<T extends IBaseSegment> implements IGipParser<T> {
 			TLongObjectMap<Map<String, Object>> buslaneMap = linkUseParser.getResult();
 			TLongObjectMap<Map<String, Object>> defaultTags = new TSynchronizedLongObjectMap<>(new TLongObjectHashMap<>());
 			defaultTags.putAll(buslaneMap);
+
+			//GIP 2.0 Data
+			TLongObjectMap<IGipReferenceObject> referenceObjects = referenceObjectParser.getResult();
+			TLongObjectMap<IGipLinkToReferenceObject> gipLinkToReferenceObjects = linkToReferenceObjectParser.getResult();
+			THashMap<String, IGipWayNames> wayNames = wayNamesParser.getResult();
+			//TLongObjectMap<IGipLinkToWayNames> gipLinkToWayNames = linkToWayNamesParser.getResult();
+			THashMap<String, IGipLinkToWayNames> gipLinkToWayNames = linkToWayNamesParser.getResult();
+			TLongObjectMap<IGipLinkToTruck> gipLinkToTrucks = linkToTruckParser.getResult();
 
 			if (config.isCalculatePixelCut()) {
 //				renderingResultPerSegment = this.calculatePixelCutOffset(config,linksToEnqueue,links);
@@ -223,7 +247,7 @@ public class GipParserImpl<T extends IBaseSegment> implements IGipParser<T> {
 			}
 
 			if (finished) {
-				enqueueSegments(linksToEnqueue, links, turnEdges, optionalXInfos, defaultTags, queue, config);
+				enqueueSegments(linksToEnqueue, links, turnEdges, referenceObjects, gipLinkToReferenceObjects, wayNames, gipLinkToWayNames, gipLinkToTrucks, optionalXInfos, defaultTags, queue, config);
 			}
 			
 			log.info("segmentation tasks enqueued: " + statistics.getNrOfSegmentTasks());
@@ -328,6 +352,11 @@ public class GipParserImpl<T extends IBaseSegment> implements IGipParser<T> {
 								   final TLongObjectMap<IGipLink> links,
 								   final TLongObjectMap<List<IGipTurnEdge>> turnEdges,
 								   //final TLongObjectMap<IPixelCut> rendering,
+								   TLongObjectMap<IGipReferenceObject> referenceObjects,
+								   TLongObjectMap<IGipLinkToReferenceObject> gipLinkToReferenceObjects,
+								   THashMap<String, IGipWayNames> wayNames,
+								   THashMap<String, IGipLinkToWayNames> gipLinkToWayNames,
+								   TLongObjectMap<IGipLinkToTruck> gipLinkToTrucks,
 								   TLongObjectMap<List<ISegmentXInfo>> optionalXInfos,
 								   final TLongObjectMap<Map<String, Object>> defaultTags,
 								   final BlockingQueue<T> queue,
@@ -357,12 +386,15 @@ public class GipParserImpl<T extends IBaseSegment> implements IGipParser<T> {
 			
 			for (long linkId : linksToEnqueue.toArray()) {
 				IGipLink link = links.get(linkId);
+
+				String linkObjectId = link.getObjectId().replaceAll("\"", "");
 				Coordinate[] coordinates = new Coordinate[link.getCoordinatesX().length];
 				for (int i = 0; i < link.getCoordinatesX().length; i++) {
 					coordinates[i] = new Coordinate(((double)link.getCoordinatesX()[i] / (double)GeoHelper.COORDINATE_MULTIPLIER),
 							((double)link.getCoordinatesY()[i] / (double)GeoHelper.COORDINATE_MULTIPLIER));
 				}
 				LineString lineString = GeoHelper.createLineString(coordinates, SRID);
+
 				// intersects link the given BBox?
 				if (config.getBounds() != null && !lineString.intersects(config.getBounds())) {
 					statistics.increaseNrOfNotIntersectingLinks();
@@ -373,13 +405,65 @@ public class GipParserImpl<T extends IBaseSegment> implements IGipParser<T> {
 				validateLink(link);
 				
 				statistics.increaseNrOfSegmentTasks();
-	
+
+				//V1
+				/*
 				String segmentName = link.getName1();
 				if (!link.getName1().equals("") && !link.getName2().equals("")) {
 					segmentName += ", ";
 				}
 				segmentName += link.getName2();
-				
+				*/
+				//V2
+				String segmentName = "";
+
+				if (gipLinkToWayNames.containsKey(linkObjectId)) {
+					IGipLinkToWayNames gipLinkToWayName = gipLinkToWayNames.get(linkObjectId);
+					String wayObjectId = gipLinkToWayName.getWayObjectId();
+					if (wayNames.containsKey(wayObjectId)) {
+						IGipWayNames gipWayName = wayNames.get(wayObjectId);
+						segmentName = gipWayName.getNameText();
+					}
+				}
+				if (segmentName == null || segmentName.trim().isEmpty()) {
+					//if no value than use V1 values
+					segmentName = link.getName1();
+					if (!link.getName1().equals("") && !link.getName2().equals("")) {
+						segmentName += ", ";
+					}
+					segmentName += link.getName2();
+				}
+
+				//V2
+				link.setBridge(false);
+				link.setTunnel(false);
+				if (gipLinkToReferenceObjects.containsKey(linkId)) {
+					IGipLinkToReferenceObject gipLinkToReferenceObject = gipLinkToReferenceObjects.get(linkId);
+					long referenceObjectShortId = gipLinkToReferenceObject.getReferenceObjectShortId();
+					if (referenceObjects.containsKey(referenceObjectShortId)) {
+						IGipReferenceObject referenceObject = referenceObjects.get(referenceObjectShortId);
+						//bridge = 5002; tunnel = 5023
+						switch (referenceObject.getReferenceType()) {
+							case 5002:
+								link.setBridge(true);
+								break;
+							case 5023:
+								link.setTunnel(true);
+								break;
+						}
+					}
+				}
+
+				/*
+                //TODO: implement me correct: set maxWith from maxWithResult (not needed in idf2Graphium)
+                //TODO: there is no width-field in IWaySegment!
+                if (gipLinkToTrucks.containsKey(linkId)) {
+                    //TODO: short-id != link-short-id --> use nodeFromShortId and nodeToShortId
+                    IGipLinkToTruck gipLinkToTruck = gipLinkToTrucks.get(linkId);
+                }
+				*/
+
+
 				T segment = segmentFactory.newSegment();
 				segment.setId(link.getId());
 				IWaySegment waySeg = (IWaySegment) segment;
@@ -403,6 +487,7 @@ public class GipParserImpl<T extends IBaseSegment> implements IGipParser<T> {
 				waySeg.setAccessBkw(ParserHelper.adaptAccess(link.getAccessBkw()));
 				waySeg.setTunnel(link.isTunnel());
 				waySeg.setBridge(link.isBridge());
+
 				waySeg.setUrban(link.isUrban());
 				waySeg.setTimestamp(beginParseDate);
 				
@@ -557,17 +642,38 @@ public class GipParserImpl<T extends IBaseSegment> implements IGipParser<T> {
 
 	protected String selectPhase(String line) {
 		String[] lineParts = line.split(";");
-		switch (lineParts[1]) {
-			case "Node":
+		switch (lineParts[1].toLowerCase()) {
+			//In V2: upper-case-letters
+			case "node":
 				return IGipSectionParser.PHASE_NODE;
-			case "Link":
+			case "link":
 				return IGipSectionParser.PHASE_LINK;
-			case "LinkCoordinate":
+			//V1
+			//case "LinkCoordinate":
+			//V2
+			case "link_coordinate":
 				return IGipSectionParser.PHASE_LINKCOORDINATES;
-			case "TurnEdge":
+			//V1
+			// case "TurnEdge":
+			//V2
+			case "turn_edge":
 				return IGipSectionParser.PHASE_TURNEDGE;
-			case "LinkUse":
+			//V1
+			//case "linkuse":
+			//V2
+			case "linear_use_part":
 				return IGipSectionParser.PHASE_LINKUSE;
+			//additional tabels in V2
+			case "way_names":
+				return IGipSectionParser.WAY_NAMES;
+			case "link_2_way_names":
+				return IGipSectionParser.LINK_TO_WAY_NAMES;
+			case "reference_object":
+				return IGipSectionParser.REFERENCE_OBJECT;
+			case "link_2_reference_object":
+				return IGipSectionParser.LINK_TO_REFERENCE_OBJECT;
+			case "link_2_truck":
+				return IGipSectionParser.LINK_TO_TRUCK;
 		}
 		return PHASE_UNDEFINED;
 	}

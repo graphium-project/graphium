@@ -20,13 +20,11 @@ import java.io.StringReader;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import at.srfg.graphium.gipimport.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.srfg.graphium.gipimport.helper.ParserHelper;
-import at.srfg.graphium.gipimport.model.IGipLink;
-import at.srfg.graphium.gipimport.model.IGipModelFactory;
-import at.srfg.graphium.gipimport.model.IGipNode;
 import at.srfg.graphium.model.Access;
 import au.com.bytecode.opencsv.CSVReader;
 import gnu.trove.map.TLongObjectMap;
@@ -82,18 +80,53 @@ public class AsyncGipLinkParser implements Supplier<IGipLink> {
             reader.close();
 
             try {
+                //V2
+                //atr;OBJECT_ID;SHORT_ID;NODE_FROM_ID;NODE_TO_ID;NODE_FROM_SHORT_ID;NODE_TO_SHORT_ID;EDGE_ID;NAME_TEXT_HR;
+                //SHORT_NAME_HR;NAME_TEXT_ADDITIONAL;SPEED_TOW_CAR;SPEED_BKW_CAR;MAXSPEED_TOW_CAR;MAXSPEED_BKW_CAR;
+                //ACCESS_TOW;ACCESS_BKW;LENGTH;FUNCTIONAL_CLASS;LANES_TOW_MAX;LANES_BKW_MAX;LANES_TOW_MIN;LANES_BKW_MIN;
+                //FORM_OF_WAY;ABUTTER_CAR;URBAN;LEVEL_INTERMEDIATE;CONSTRUCTION_STATE;TOLL;SUBNET;ONEWAY_CAR;ONEWAY_PEDESTRIAN;
+                //ONEWAY_BIKE;ONEWAY_BUS;EDGE_CATEGORY;SUSTAINER;REGIONAL_CODE;CONNECTOR
+
                 IGipLink link = modelFactory.newLink();
-                link.setId(Long.parseLong(values[atrPos.get("LINK_ID")]));
-                link.setName1(values[atrPos.get("NAME1")]);
-                link.setName2(values[atrPos.get("NAME2")]);
-                IGipNode fromNode = this.nodes.get(Long.parseLong(values[atrPos.get("FROM_NODE")]));
+                //V1
+                //link.setId(Long.parseLong(values[atrPos.get("LINK_ID")]));
+                //V2
+                link.setId(Long.parseLong(values[atrPos.get("SHORT_ID")]));
+                link.setObjectId(values[atrPos.get("OBJECT_ID")]);
+
+                //TODO GIP2.0: It is recommended to use the names from the Link2WayNames
+                //V1
+                //link.setName1(values[atrPos.get("NAME1")]);
+                if (values.length < 38) {
+                    return null;
+                }
+
+                //V2: use info from link-table
+                link.setName1(values[atrPos.get("NAME_TEXT_HR")]); //TODO: implement me correct: set from WayNamesResult
+                //V1
+                //link.setName2(values[atrPos.get("NAME2")]);
+                //V2: use info from link-table
+                link.setName2(values[atrPos.get("SHORT_NAME_HR")]); //TODO: implement me correct: set from WayNamesResult
+                //in V2 gaebe es auch noch: NAME_TEXT_ADDITIONAL
+
+                link.setName3(values[atrPos.get("NAME_TEXT_ADDITIONAL")]);
+
+                //V1
+                //IGipNode fromNode = this.nodes.get(Long.parseLong(values[atrPos.get("FROM_NODE")]));
+                //V2
+
+                IGipNode fromNode = this.nodes.get(Long.parseLong(values[atrPos.get("NODE_FROM_SHORT_ID")]));
                 if (fromNode != null) {
                     link.setFromNodeId(fromNode.getId());
                 }
-                IGipNode toNode = this.nodes.get(Long.parseLong(values[atrPos.get("TO_NODE")]));
+                //V1
+                //IGipNode toNode = this.nodes.get(Long.parseLong(values[atrPos.get("TO_NODE")]));
+                //V2
+                IGipNode toNode = this.nodes.get(Long.parseLong(values[atrPos.get("NODE_TO_SHORT_ID")]));
                 if (toNode != null) {
                     link.setToNodeId(toNode.getId());
                 }
+
                 short speedTow = Short.parseShort(values[atrPos.get("MAXSPEED_TOW_CAR")]);
                 if (speedTow <= 0) {
                 	speedTow = Short.parseShort(values[atrPos.get("SPEED_TOW_CAR")]);
@@ -104,24 +137,43 @@ public class AsyncGipLinkParser implements Supplier<IGipLink> {
                 }
                 link.setSpeedTow(speedTow);
                 link.setSpeedBkw(speedBkw);
+                //GIP 2.0: In GIP 2.0 there are separate fields for car, bus, bike. The old logic still works.
                 link.setAccessTow(Integer.parseInt(values[atrPos.get("ACCESS_TOW")]));
                 link.setAccessBkw(Integer.parseInt(values[atrPos.get("ACCESS_BKW")]));
                 link.setLength(Float.parseFloat(values[atrPos.get("LENGTH")]));
-                link.setFuncRoadClassValue(Short.parseShort(values[atrPos.get("FUNCROADCLASS")]));
-                link.setFormOfWay(Short.parseShort(values[atrPos.get("FORMOFWAY")]));
+                //V1
+                //link.setFuncRoadClassValue(Short.parseShort(values[atrPos.get("FUNCROADCLASS")]));
+                //V2
+                link.setFuncRoadClassValue(Short.parseShort(values[atrPos.get("FUNCTIONAL_CLASS")]));
+                //V1
+                //link.setFormOfWay(Short.parseShort(values[atrPos.get("FORMOFWAY")]));
+                //V2
+                link.setFormOfWay(Short.parseShort(values[atrPos.get("FORM_OF_WAY")]));
                 link.setUrban(Short.parseShort(values[atrPos.get("URBAN")]) == 1);
 
-                float lanesTow = Short.parseShort(values[atrPos.get("LANES_TOW")]);	// input is decimal(2,1)!
-                float lanesBkw = Short.parseShort(values[atrPos.get("LANES_BKW")]);	// input is decimal(2,1)!
+                //Es gibt nun 2 Werte statt einen Wert --> Für einen entscheiden (MAX)
+                //V1
+                //float lanesTow = Short.parseShort(values[atrPos.get("LANES_TOW")]);	// input is decimal(2,1)!
+                //float lanesBkw = Short.parseShort(values[atrPos.get("LANES_BKW")]);	// input is decimal(2,1)!
+                //V2
+                short lanesTow = Short.parseShort(values[atrPos.get("LANES_TOW_MAX")]);	// input is decimal(1)!
+                short lanesBkw = Short.parseShort(values[atrPos.get("LANES_BKW_MAX")]);	// input is decimal(1)!
                 link.setLanesTow((short) lanesTow);
                 link.setLanesBkw((short) lanesBkw);
-                link.setEdgeId(Long.parseLong(values[atrPos.get("EDGE_ID")]));
+                //TODO: GIP 2.0: The edge ID changes from decimal(20) to a UUID. There is no longer a numerical alternative. We currently parse the edge ID. In Gip2OSM, the field is present in the model. However, we do not parse this field here! In Idf2Graphium, the Edge ID is saved in the segment in the Way-ID field!
+                //V1
+                //link.setEdgeId(Long.parseLong(values[atrPos.get("EDGE_ID")]));
+                //V2
+                link.setEdgeId(Long.parseLong(values[atrPos.get("SHORT_ID")]));
 
                 // TODO: Brauchen wir das?
-                link.setUTurn(Byte.parseByte(values[atrPos.get("U_TURN")]));
-
-
-                link.setOneway(Byte.parseByte(values[atrPos.get("ONEWAY")]));
+                //V1
+                //link.setUTurn(Byte.parseByte(values[atrPos.get("U_TURN")]));
+                //V2: no uTurn information
+                //V1
+                //link.setOneway(Byte.parseByte(values[atrPos.get("ONEWAY")]));
+                //V2: V2 also has ONEWAY_BIKE and ONEWAY_PEDESTRIAN --> not relevant here
+                link.setOneway(Byte.parseByte(values[atrPos.get("ONEWAY_CAR")]));
                 if (link.getOneway() == (byte)-1) {
                     link.setOneway((byte)2);
                 }
@@ -147,7 +199,13 @@ public class AsyncGipLinkParser implements Supplier<IGipLink> {
 
                 link.setCoordinatesX(new int[]{fromNode.getCoordinateX(),toNode.getCoordinateX()});
                 link.setCoordinatesY(new int[]{fromNode.getCoordinateY(),toNode.getCoordinateY()});
-                link.setLevel(Float.parseFloat(values[atrPos.get("LEVEL")]));
+                //V1
+                //link.setLevel(Float.parseFloat(values[atrPos.get("LEVEL")]));
+                //V2
+                link.setLevel(Integer.parseInt(values[atrPos.get("LEVEL_INTERMEDIATE")]));
+
+                //V1
+                /*
                 try {
                     link.setBridge(Integer.parseInt(values[atrPos.get("BRUNNEL")]) == 1);
                     link.setTunnel(Integer.parseInt(values[atrPos.get("BRUNNEL")]) == 2);
@@ -155,9 +213,14 @@ public class AsyncGipLinkParser implements Supplier<IGipLink> {
                     link.setBridge(Float.parseFloat(values[atrPos.get("BRUNNEL")]) == 1.0);
                     link.setTunnel(Float.parseFloat(values[atrPos.get("BRUNNEL")]) == 2.0);
                 }
+                */
+                //V2: Information Tabellen: ReferenceObject, Link2ReferenceObject --> later in enqueue
 
-                int baustatus = Integer.parseInt(values[atrPos.get("BAUSTATUS")]);
-                
+                //V1
+                //int baustatus = Integer.parseInt(values[atrPos.get("BAUSTATUS")]);
+                //V2
+                int baustatus = Integer.parseInt(values[atrPos.get("CONSTRUCTION_STATE")]);
+
                 //this.links.put(link.getId(), link);
 
                 boolean valid = true;
@@ -189,6 +252,8 @@ public class AsyncGipLinkParser implements Supplier<IGipLink> {
             } catch(NumberFormatException e) {
                 log.warn("expected number but was not in " + values[atrPos.get("LINK_ID")],e);
                 log.warn("row data line: " + ParserHelper.rebuildHeaderLine(values));
+            } catch (Exception e) {
+                log.error("Error while reading GIP-Links!", e);
             }
 
         }

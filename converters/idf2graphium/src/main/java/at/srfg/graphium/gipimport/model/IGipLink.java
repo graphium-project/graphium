@@ -39,12 +39,12 @@ public interface IGipLink {
 	short getSpeedBkw();
 	void setSpeedBkw(short speed);
 
-	int getAccessTow();
-	void setAccessTow(int access);
+	long getAccessTow();
+	void setAccessTow(long access);
 	boolean isAccessTow(Access access);
 	
-	int getAccessBkw();
-	void setAccessBkw(int access);
+	long getAccessBkw();
+	void setAccessBkw(long access);
 	boolean isAccessBkw(Access access);
 
 	float getLength();
@@ -70,8 +70,8 @@ public interface IGipLink {
 	byte getOneway();
 	void setOneway(byte oneway);
 	
-	float getLevel();
-	void setLevel(float level);
+	int getLevel();
+	void setLevel(int level);
 	
 	boolean isBridge();
 	void setBridge(boolean bridge);
@@ -102,6 +102,18 @@ public interface IGipLink {
 	int[] getCoordinatesY();
 
 	void setCoordinatesY(int[] coordinatesY);
+
+	float getMaxWidth();
+
+	void setMaxWidth(float maxWidth);
+
+    String getObjectId();
+
+	void setObjectId(String objectId);
+
+	String getName3();
+
+	void setName3(String name3);
 
 	IGipLink clone() throws CloneNotSupportedException;
 }

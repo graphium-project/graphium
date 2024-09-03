@@ -80,8 +80,11 @@ public class GipLinkTurnEdgesParser extends AbstractSectionParser<TLongObjectMap
 
                 // build map of attribute and position in line (order of attributes is not defined!)
                 if (line.startsWith("atr")) {
+                    //V1
                     // atr;TURN_ID;FROM_LINK;TO_LINK;VIA_NODE;VEHICLE_TYPE;TIME;CAPACITY;LANESFROM;LANESTO;STATUS
-                    atrPos = ParserHelper.splitAtrLine(line);
+                    //V2
+                    //atr;OBJECT_ID;SHORT_ID;LINK_FROM_ID;LINK_FROM_SHORT_ID;LINK_TO_ID;LINK_TO_SHORT_ID;NODE_VIA_ID;NODE_VIA_SHORT_ID;ACCESS_TOW;LANES_TOW;TURN_USE_ID;ONEWAY_CAR;ONEWAY_BUS
+                            atrPos = ParserHelper.splitAtrLine(line);
                 }
 
                 if (line.startsWith("rec")) {
@@ -90,9 +93,15 @@ public class GipLinkTurnEdgesParser extends AbstractSectionParser<TLongObjectMap
                     String[] values = line.split(";");
 
                     IGipTurnEdge turnEdge = getParserReference().getModelFactory().newTurnEdge();
-                    turnEdge.setId(Long.parseLong(values[atrPos.get("TURN_ID")]));
+                    //V1
+                    //turnEdge.setId(Long.parseLong(values[atrPos.get("TURN_ID")]));
+                    //V2
+                    turnEdge.setId(Long.parseLong(values[atrPos.get("SHORT_ID")]));
 
-                    turnEdge.setVehicleType(new Integer(values[atrPos.get("VEHICLE_TYPE")]));
+                    //V1
+                    //turnEdge.setVehicleType(new Integer(values[atrPos.get("VEHICLE_TYPE")]));
+                    //V2
+                    turnEdge.setVehicleType(new Long(values[atrPos.get("ACCESS_TOW")]));
                     if (ok && config.getAccessTypes() != null && !config.getAccessTypes().isEmpty()){
                         ok = ParserHelper.validateAccess(turnEdge.getVehicleType(), config.getAccessTypes());
                         countLinksFilteredOnAccessType++;
@@ -104,22 +113,28 @@ public class GipLinkTurnEdgesParser extends AbstractSectionParser<TLongObjectMap
                     }
 
                     if (ok) {
-                    	if (this.linkParser.getResult().containsKey(Long.parseLong(values[atrPos.get("FROM_LINK")]))) {
-                    		turnEdge.setFromLinkId(Long.parseLong(values[atrPos.get("FROM_LINK")]));
+                        //V1
+                    	//if (this.linkParser.getResult().containsKey(Long.parseLong(values[atrPos.get("FROM_LINK")]))) {
+                    	//V2
+                        if (this.linkParser.getResult().containsKey(Long.parseLong(values[atrPos.get("LINK_FROM_SHORT_ID")]))) {
+                    		turnEdge.setFromLinkId(Long.parseLong(values[atrPos.get("LINK_FROM_SHORT_ID")]));
 	                    } else {
 	                        log.debug("TurnEdge with id = " + turnEdge.getId() + " references missing fromLink with id = " +
-	                                values[atrPos.get("FROM_LINK")]);
+	                                values[atrPos.get("LINK_FROM_SHORT_ID")]);
 	                        ok = false;
 	                        countMissingFromLinks++;
 	                    }
                     }
 
                     if (ok) {
-                    	if (this.linkParser.getResult().containsKey(Long.parseLong(values[atrPos.get("TO_LINK")]))) {
-	                        turnEdge.setToLinkId(Long.parseLong(values[atrPos.get("TO_LINK")]));
+                    	//V1
+                        //if (this.linkParser.getResult().containsKey(Long.parseLong(values[atrPos.get("TO_LINK")]))) {
+                        //V2
+                        if (this.linkParser.getResult().containsKey(Long.parseLong(values[atrPos.get("LINK_TO_SHORT_ID")]))) {
+	                        turnEdge.setToLinkId(Long.parseLong(values[atrPos.get("LINK_TO_SHORT_ID")]));
 	                    } else {
 	                        log.debug("TurnEdge with id = " + turnEdge.getId() + " references missing toLink with id = " +
-	                                values[atrPos.get("TO_LINK")]);
+	                                values[atrPos.get("LINK_TO_SHORT_ID")]);
 	                        ok = false;
 	                        countMissingToLinks++;
 	                    }
@@ -133,11 +148,14 @@ public class GipLinkTurnEdgesParser extends AbstractSectionParser<TLongObjectMap
                     }
 
                     if (ok) {
-                    	if (this.nodeParser.getResult().containsKey(Long.parseLong(values[atrPos.get("VIA_NODE")]))) {
-	                        turnEdge.setViaNodeId(Long.parseLong(values[atrPos.get("VIA_NODE")]));
+                        //V1
+                    	//if (this.nodeParser.getResult().containsKey(Long.parseLong(values[atrPos.get("VIA_NODE")]))) {
+                    	//V2
+                        if (this.nodeParser.getResult().containsKey(Long.parseLong(values[atrPos.get("NODE_VIA_SHORT_ID")]))) {
+	                        turnEdge.setViaNodeId(Long.parseLong(values[atrPos.get("NODE_VIA_SHORT_ID")]));
 	                    } else {
 	                    	log.debug("TurnEdge with id = " + turnEdge.getId() + " references missing viaNode with id = " +
-	                                values[atrPos.get("VIA_NODE")]);
+	                                values[atrPos.get("NODE_VIA_SHORT_ID")]);
 	                    	ok = false;
 	                        countMissingViaNodes++;
 	                    }
@@ -191,7 +209,10 @@ public class GipLinkTurnEdgesParser extends AbstractSectionParser<TLongObjectMap
                     	}
                     }
 
-                    turnEdge.setVehicleType(Integer.parseInt(values[atrPos.get("VEHICLE_TYPE")]));
+                    //V1
+                    //turnEdge.setVehicleType(Integer.parseInt(values[atrPos.get("VEHICLE_TYPE")]));
+                    //V2
+                    turnEdge.setVehicleType(Long.parseLong(values[atrPos.get("ACCESS_TOW")]));
 
                     if (ok) {
                         if (!turnEdges.containsKey(turnEdge.getFromLinkId())) {

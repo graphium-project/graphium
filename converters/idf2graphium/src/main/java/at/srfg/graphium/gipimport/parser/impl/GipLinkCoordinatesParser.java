@@ -85,14 +85,21 @@ public class GipLinkCoordinatesParser extends AbstractSectionParser<TLongSet> {
 
                 // build map of attribute and position in line (order of attributes is not defined!)
                 if (line.startsWith("atr")) {
+                    //V1
                     // atr;LINK_ID;COUNT;X;Y;STATUS
+
+                    //V2
+                    //atr;OBJECT_ID;LINK_ID;LINK_SHORT_ID;X;Y;Z;SEQUENCE
                     atrPos = ParserHelper.splitAtrLine(line);
                 }
 
                 if (line.startsWith("rec")) {
                     String[] values = line.split(";");
                     // atr;LINK_ID;COUNT;X;Y;STATUS
-                    long linkId = Long.parseLong(values[atrPos.get("LINK_ID")]);
+                    //V1
+                    //long linkId = Long.parseLong(values[atrPos.get("LINK_ID")]);
+                    //V2
+                    long linkId = Long.parseLong(values[atrPos.get("LINK_SHORT_ID")]);
                     if (currentLinkId != linkId && currentLinkId > -1) {
                         buildLinkAsync(currentLinkId, linkCoords, this.linkParser.getResult(), linksToEnqueue);
                         linkCoords.clear();
@@ -101,7 +108,10 @@ public class GipLinkCoordinatesParser extends AbstractSectionParser<TLongSet> {
                     currentLinkId = linkId;
                     compCoord = new GipComparableLinkCoordinate();
                     compCoord.setLinkId(linkId);
-                    compCoord.setCount(Integer.parseInt(values[atrPos.get("COUNT")]));
+                    //V1
+                    //compCoord.setCount(Integer.parseInt(values[atrPos.get("COUNT")]));
+                    //V2
+                    compCoord.setCount(Integer.parseInt(values[atrPos.get("SEQUENCE")]));
                     compCoord.setX((int) Math.round(Double.parseDouble(values[atrPos.get("X")]) * GeoHelper.COORDINATE_MULTIPLIER));
                     compCoord.setY((int) Math.round(Double.parseDouble(values[atrPos.get("Y")]) * GeoHelper.COORDINATE_MULTIPLIER));
                     linkCoords.add(compCoord);

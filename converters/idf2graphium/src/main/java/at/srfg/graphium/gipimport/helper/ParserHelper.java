@@ -100,7 +100,7 @@ public class ParserHelper {
      * @param access validate the access
      * @return acessFound
      */
-    public static boolean validateAccess(int access, Set<Access> accessTypes) {
+    public static boolean validateAccess(long access, Set<Access> accessTypes) {
         boolean accessFound = false;
         for (Access acc : adaptAccess(access)) {
             if (!accessFound && accessTypes.contains(acc)) {
@@ -110,7 +110,7 @@ public class ParserHelper {
         return accessFound;
     }
 
-    public static Set<Access> adaptAccess(int gipAccesses) {
+    public static Set<Access> adaptAccess(long gipAccesses) {
         Set<Access> accesses = new HashSet<>();
         // Caution: Names must be equal
         for (GipAccess gipAccess : GipAccess.getAccessTypes(gipAccesses)) {

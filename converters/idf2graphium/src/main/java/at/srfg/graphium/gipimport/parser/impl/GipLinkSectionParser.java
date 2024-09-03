@@ -25,9 +25,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import at.srfg.graphium.gipimport.helper.ParserHelper;
-import at.srfg.graphium.gipimport.model.IGipLink;
-import at.srfg.graphium.gipimport.model.IGipNode;
-import at.srfg.graphium.gipimport.model.IImportConfigIdf;
+import at.srfg.graphium.gipimport.model.*;
 import at.srfg.graphium.gipimport.parser.IGipParser;
 import at.srfg.graphium.gipimport.parser.IGipSectionParser;
 import at.srfg.graphium.model.Access;
@@ -85,11 +83,20 @@ public class GipLinkSectionParser extends AbstractSectionParser<TLongObjectMap<I
 
                 // build map of attribute and position in line (order of attributes is not defined!)
                 if (line.startsWith("atr;")) {
+                    //V1
                     // atr;LINK_ID;NAME1;NAME2;FROM_NODE;TO_NODE;SPEED_TOW_CAR;SPEED_BKW_CAR;SPEED_TOW_TRUCK;SPEED_BKW_TRUCK;
                     // ACCESS_TOW;ACCESS_BKW;LENGTH;FUNCROADCLASS;CAP_TOW;CAP_BKW;LANES_TOW;LANES_BKW;FORMOFWAY;BRUNNEL;
                     // MAXHEIGHT;MAXWIDTH;MAXPRESSURE;ABUTTER_CAR;ABUTTER_LORRY;U_TURN;SLOPE;URBAN;WIDTH;LEVEL;BAUSTATUS;
                     // PTV_TYPENO;SUBNET_ID;ONEWAY;BLT;BLB;EDGE_ID;AGG_TYP;STATUS
-                    atrPos = ParserHelper.splitAtrLine(line);
+
+                    //V2
+                    //atr;OBJECT_ID;SHORT_ID;NODE_FROM_ID;NODE_TO_ID;NODE_FROM_SHORT_ID;NODE_TO_SHORT_ID;EDGE_ID;NAME_TEXT_HR;
+                    //SHORT_NAME_HR;NAME_TEXT_ADDITIONAL;SPEED_TOW_CAR;SPEED_BKW_CAR;MAXSPEED_TOW_CAR;MAXSPEED_BKW_CAR;
+                    //ACCESS_TOW;ACCESS_BKW;LENGTH;FUNCTIONAL_CLASS;LANES_TOW_MAX;LANES_BKW_MAX;LANES_TOW_MIN;LANES_BKW_MIN;
+                    //FORM_OF_WAY;ABUTTER_CAR;URBAN;LEVEL_INTERMEDIATE;CONSTRUCTION_STATE;TOLL;SUBNET;ONEWAY_CAR;ONEWAY_PEDESTRIAN;
+                    //ONEWAY_BIKE;ONEWAY_BUS;EDGE_CATEGORY;SUSTAINER;REGIONAL_CODE;CONNECTOR
+
+                            atrPos = ParserHelper.splitAtrLine(line);
                 }
 
                 AsyncGipLinkParser linkParser = new AsyncGipLinkParser(line,

@@ -25,16 +25,19 @@ import at.srfg.graphium.model.FuncRoadClass;
 public class GipLinkImpl implements IGipLink, Cloneable, Serializable {
 
 	private static final long serialVersionUID = 1239758995434878308L;
-	
+
+	private String objectId;
 	private long id;
 	private String name1;
 	private String name2;
+	//TODO: delete
+	private String name3;
 	private long fromNodeId;
 	private long toNodeId;
 	private short speedTow;
 	private short speedBkw;
-	private int accessTow;
-	private int accessBkw;
+	private long accessTow;
+	private long accessBkw;
 	private float length;
 	private short formOfWay;
 	private short funcRoadClass;
@@ -45,18 +48,19 @@ public class GipLinkImpl implements IGipLink, Cloneable, Serializable {
 	private byte oneway;
 	private int[] coordinatesX;
 	private int[] coordinatesY;
-	private float level;
+	private int level;
 	private boolean bridge;
 	private boolean tunnel;
 	private boolean valid;
 	private long edgeId;
+	private float maxWidth;
 	
 	@Override
-	public int getAccessBkw() {
+	public long getAccessBkw() {
 		return accessBkw;
 	}
 	@Override
-	public int getAccessTow() {
+	public long getAccessTow() {
 		return accessTow;
 	}
 
@@ -123,11 +127,11 @@ public class GipLinkImpl implements IGipLink, Cloneable, Serializable {
 	}
 
 	@Override
-	public void setAccessBkw(int access) {
+	public void setAccessBkw(long access) {
 		this.accessBkw = access;
 	}
 	@Override
-	public void setAccessTow(int access) {
+	public void setAccessTow(long access) {
 		this.accessTow = access;
 	}
 
@@ -178,11 +182,11 @@ public class GipLinkImpl implements IGipLink, Cloneable, Serializable {
 		this.lanesTow = lanes;
 	}
 	@Override
-	public float getLevel() {
+	public int getLevel() {
 		return level;
 	}
 	@Override
-	public void setLevel(float level) {
+	public void setLevel(int level) {
 		this.level = level;
 	}
 	@Override
@@ -279,6 +283,36 @@ public class GipLinkImpl implements IGipLink, Cloneable, Serializable {
 	}
 
 	@Override
+	public float getMaxWidth() {
+		return maxWidth;
+	}
+
+	@Override
+	public void setMaxWidth(float maxWidth) {
+		this.maxWidth = maxWidth;
+	}
+
+	@Override
+	public String getObjectId() {
+		return objectId;
+	}
+
+	@Override
+	public void setObjectId(String objectId) {
+		this.objectId = objectId;
+	}
+
+	@Override
+	public String getName3() {
+		return name3;
+	}
+
+	@Override
+	public void setName3(String name3) {
+		this.name3 = name3;
+	}
+
+	@Override
 	public IGipLink clone() throws CloneNotSupportedException {
 		return (IGipLink) super.clone();
 	}
@@ -301,6 +335,7 @@ public class GipLinkImpl implements IGipLink, Cloneable, Serializable {
 		if (funcRoadClass != gipLink.funcRoadClass) return false;
 		if (lanesTow != gipLink.lanesTow) return false;
 		if (lanesBkw != gipLink.lanesBkw) return false;
+		if (maxWidth != gipLink.maxWidth) return false;
 		if (uTurn != gipLink.uTurn) return false;
 		if (urban != gipLink.urban) return false;
 		if (oneway != gipLink.oneway) return false;
@@ -310,6 +345,8 @@ public class GipLinkImpl implements IGipLink, Cloneable, Serializable {
 		if (valid != gipLink.valid) return false;
 		if (name1 != null ? !name1.equals(gipLink.name1) : gipLink.name1 != null) return false;
 		if (name2 != null ? !name2.equals(gipLink.name2) : gipLink.name2 != null) return false;
+		if (name3 != null ? !name3.equals(gipLink.name3) : gipLink.name3 != null) return false;
+		if (objectId != null ? !objectId.equals(gipLink.objectId) : gipLink.objectId != null) return false;
 		if (!Arrays.equals(coordinatesX, gipLink.coordinatesX)) return false;
 		return Arrays.equals(coordinatesY, gipLink.coordinatesY);
 
@@ -317,19 +354,22 @@ public class GipLinkImpl implements IGipLink, Cloneable, Serializable {
 
 	@Override
 	public int hashCode() {
-		int result = (int) (id ^ (id >>> 32));
+		int result = Long.hashCode(id);
 		result = 31 * result + (name1 != null ? name1.hashCode() : 0);
 		result = 31 * result + (name2 != null ? name2.hashCode() : 0);
-		result = 31 * result + (int) (fromNodeId ^ (fromNodeId >>> 32));
-		result = 31 * result + (int) (toNodeId ^ (toNodeId >>> 32));
+		result = 31 * result + (name3 != null ? name3.hashCode() : 0);
+		result = 31 * result + (objectId != null ? objectId.hashCode() : 0);
+		result = 31 * result + Long.hashCode(fromNodeId);
+		result = 31 * result + Long.hashCode(toNodeId);
 		result = 31 * result + (int) speedTow;
 		result = 31 * result + (int) speedBkw;
-		result = 31 * result + accessTow;
-		result = 31 * result + accessBkw;
+		result = 31 * result + Long.hashCode(accessTow);
+		result = 31 * result + Long.hashCode(accessBkw);
 		result = 31 * result + (length != +0.0f ? Float.floatToIntBits(length) : 0);
 		result = 31 * result + funcRoadClass;
 		result = 31 * result + (int) lanesTow;
 		result = 31 * result + (int) lanesBkw;
+		result = 31 * result + (maxWidth != +0.0f ? Float.floatToIntBits(maxWidth) : 0);
 		result = 31 * result + (int) uTurn;
 		result = 31 * result + (urban ? 1 : 0);
 		result = 31 * result + (int) oneway;
@@ -355,6 +395,7 @@ public class GipLinkImpl implements IGipLink, Cloneable, Serializable {
 				", accessTow=" + accessTow +
 				", accessBkw=" + accessBkw +
 				", length=" + length +
+				", maxWidth=" + maxWidth +
 				", funcRoadClass=" + funcRoadClass +
 				", lanesTow=" + lanesTow +
 				", lanesBkw=" + lanesBkw +

@@ -28,6 +28,14 @@ public interface IGipSectionParser<T> {
     String PHASE_TURNEDGE = "turnedge";
     String PHASE_LINKUSE = "linkuse";
 
+    //additional V2-sections
+    String REFERENCE_OBJECT = "referenceObject";
+    String LINK_TO_REFERENCE_OBJECT = "linkToReferenceObject";
+    String WAY_NAMES = "wayNames";
+    String LINK_TO_WAY_NAMES = "linkToWayNames";
+    String LINK_TO_TRUCK = "linkToTruck";
+
+
     String getPhase();
 
     String parseSection(BufferedReader file);

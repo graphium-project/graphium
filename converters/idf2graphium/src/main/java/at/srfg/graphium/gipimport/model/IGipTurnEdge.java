@@ -28,7 +28,7 @@ public interface IGipTurnEdge {
 	long getViaNodeId();
 	void setViaNodeId(long id);
 	
-	int getVehicleType();
-	void setVehicleType(int vehicleType);
+	long getVehicleType();
+	void setVehicleType(long vehicleType);
 	
 }

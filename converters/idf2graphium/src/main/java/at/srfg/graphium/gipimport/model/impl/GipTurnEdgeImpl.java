@@ -23,7 +23,7 @@ public class GipTurnEdgeImpl implements IGipTurnEdge {
 	private long fromLinkId;
 	private long toLinkId;
 	private long viaNodeId;
-	private int vehicleType;
+	private long vehicleType;
 
 
 	@Override
@@ -32,7 +32,7 @@ public class GipTurnEdgeImpl implements IGipTurnEdge {
 	}
 
 	@Override
-	public int getVehicleType() {
+	public long getVehicleType() {
 		return vehicleType;
 	}
 
@@ -42,7 +42,7 @@ public class GipTurnEdgeImpl implements IGipTurnEdge {
 	}
 
 	@Override
-	public void setVehicleType(int vehicleType) {
+	public void setVehicleType(long vehicleType) {
 		this.vehicleType = vehicleType;
 	}
 
@@ -93,11 +93,11 @@ public class GipTurnEdgeImpl implements IGipTurnEdge {
 
 	@Override
 	public int hashCode() {
-		int result = (int) (id ^ (id >>> 32));
-		result = 31 * result + (int) (fromLinkId ^ (fromLinkId >>> 32));
-		result = 31 * result + (int) (toLinkId ^ (toLinkId >>> 32));
-		result = 31 * result + (int) (viaNodeId ^ (viaNodeId >>> 32));
-		result = 31 * result + vehicleType;
+		int result = Long.hashCode(id);
+		result = 31 * result + Long.hashCode(fromLinkId);
+		result = 31 * result + Long.hashCode(toLinkId);
+		result = 31 * result + Long.hashCode(viaNodeId);
+		result = 31 * result + Long.hashCode(vehicleType);
 		return result;
 	}
 

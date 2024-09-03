@@ -63,14 +63,14 @@ public enum GipAccess {
 	public int getValue() {
 		return value;
 	}
-	
-	public static List<GipAccess> getAccessTypes(int access) {
+
+	public static List<GipAccess> getAccessTypes(long access) {
 		List<GipAccess> accessTypes = new ArrayList<GipAccess>();
 		
 		// convert integer to bit[]
 		int count = GipAccess.values().length;
 		boolean[] bits = new boolean[count];
-		int decimalNumber = access;
+		long decimalNumber = access;
 		int index = 0; //count - 1;
 		
 		while (decimalNumber != 0) { 

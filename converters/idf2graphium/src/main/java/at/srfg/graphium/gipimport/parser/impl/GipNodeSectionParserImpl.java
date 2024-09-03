@@ -64,7 +64,8 @@ public class GipNodeSectionParserImpl extends AbstractSectionParser<TLongObjectM
                 }
 
                 // build map of attribute and position in line (order of attributes is not defined!)
-                // atr;NODE_ID;LEVEL;VIRTUAL_TYPE;X;Y;VIRT_LINKID;VIRT_PERCENT;BIKE_DELAY;STATUS
+                // V1: atr;NODE_ID;LEVEL;VIRTUAL_TYPE;X;Y;VIRT_LINKID;VIRT_PERCENT;BIKE_DELAY;STATUS
+                // V2: atr;OBJECT_ID;SHORT_ID;LOGICAL_HEIGHT;X;Y;Z;FEATURE_NAME;REMARK;PLATEAU_ID;EDGE_DEGREE;FORM_OF_NODE;OWNER
                 if (line.startsWith("atr")) {
                     atrPos = ParserHelper.splitAtrLine(line);
                 }
@@ -72,13 +73,20 @@ public class GipNodeSectionParserImpl extends AbstractSectionParser<TLongObjectM
                 if (line.startsWith("rec")) {
                     String[] values = line.split(";");
                     IGipNode node = super.getParserReference().getModelFactory().newNode();
-                    node.setId(Long.parseLong(values[atrPos.get("NODE_ID")]));
-                    node.setVirtual(values[atrPos.get("VIRTUAL_TYPE")].equals("1"));
+                    //V1
+                    //node.setId(Long.parseLong(values[atrPos.get("NODE_ID")]));
+                    //V2
+                    node.setId(Long.parseLong(values[atrPos.get("SHORT_ID")]));
+                    //V1
+                    //node.setVirtual(values[atrPos.get("VIRTUAL_TYPE")].equals("1"));
+                    //V2: enthaelt keine virtuellen Knoten mehr
+                    node.setVirtual(false);
                     double xValue = Double.parseDouble(values[atrPos.get("X")]);
                     node.setCoordinateX((int) Math.round(xValue * GeoHelper.COORDINATE_MULTIPLIER));
                     double yValue = Double.parseDouble(values[atrPos.get("Y")]);
                     node.setCoordinateY((int) Math.round(yValue * GeoHelper.COORDINATE_MULTIPLIER));
-                    node.setVirtualLinkId(Long.parseLong(values[atrPos.get("VIRT_LINKID")]));
+                    //Only relevant for V1
+                    //node.setVirtualLinkId(Long.parseLong(values[atrPos.get("VIRT_LINKID")]));
 
                     nodes.put(node.getId(), node);
 
